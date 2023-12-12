@@ -1,0 +1,4 @@
+NYSE|New York Stock Exchange|153|930|1600|Simulates the New York Stock Exchange|4300000001
+NASDAQ|NASDAQ (National Association of Security Dealers and Quotations)|173|930|1600|Simulates the NASDAQ|4300000002
+AMEX|American Stock Exchange|189|930|1600|Simulates the American Stock Exchange|4300000003
+PCX|Pacific Exchange|170|930|1600|Simulates the Pacific Exchange|4300000004

@@ -1,0 +1,4 @@
+blue==0.9.1
+ruff==0.0.287
+setuptools==65.5.0
+mypy==1.5.1
