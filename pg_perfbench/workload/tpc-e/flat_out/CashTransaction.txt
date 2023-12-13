@@ -1,0 +1,100 @@
+200000000000005|2005-01-03 09:00:01.511|-4502.64|Market-Buy 200 shares of PREF_C of ZymoGenetics, Inc.
+200000000000002|2005-01-03 09:00:01.541|8109.45|Market-Sell 400 shares of COMMON of Zones, Inc.
+200000000000007|2005-01-03 09:00:02.028|-16454.54|Market-Buy 800 shares of COMMON of AmerAlia, Inc.
+200000000000004|2005-01-03 09:00:02.082|10071.15|Market-Sell 400 shares of PREF_A of United Therapeutics Corporation
+200000000000010|2005-01-03 09:00:02.094|8246.34|Market-Sell 400 shares of PREF_A of Varco International, Inc.
+200000000000012|2005-01-03 09:00:02.567|16764.42|Market-Sell 800 shares of PREF_B of Transcom WorldWide S.A.
+200000000000017|2005-01-03 09:00:02.622|4674.59|Market-Sell 200 shares of COMMON of Anchor BanCorp Wisconsin, Inc.
+200000000000008|2005-01-03 09:00:02.836|2481.52|Market-Sell 100 shares of PREF_B of Women First HealthCare, Inc.
+200000000000001|2005-01-03 09:00:02.978|-2305.58|Market-Buy 100 shares of COMMON of Banta Corporation
+200000000000020|2005-01-03 09:00:03.051|2420.26|Market-Sell 100 shares of COMMON of ATMI, Inc.
+200000000000016|2005-01-03 09:00:03.118|9348.97|Limit-Sell 400 shares of COMMON of 3-Dimensional Pharmaceuticals, Inc.
+200000000000025|2005-01-03 09:00:03.405|2290.14|Market-Sell 100 shares of COMMON of Airlease Limited
+200000000000023|2005-01-03 09:00:03.422|-11031.67|Market-Buy 400 shares of PREF_A of Ascential Software Corporation
+200000000000026|2005-01-03 09:00:04.079|-9318.41|Market-Buy 400 shares of COMMON of ABAXIS, Inc.
+200000000000014|2005-01-03 09:00:04.238|-2796.52|Market-Buy 100 shares of PREF_A of Totta & Acores Financing Limited
+200000000000027|2005-01-03 09:00:04.275|-8343.60|Limit-Buy 400 shares of PREF_A of USEC, Inc.
+200000000000034|2005-01-03 09:00:04.648|-16286.91|Market-Buy 800 shares of PREF_A of Berry Petroleum Company
+200000000000041|2005-01-03 09:00:05.084|16373.51|Market-Sell 800 shares of COMMON of Zale Corporation
+200000000000032|2005-01-03 09:00:05.211|-10269.24|Market-Buy 400 shares of COMMON of Wickes, Inc.
+200000000000028|2005-01-03 09:00:05.227|22303.84|Market-Sell 800 shares of COMMON of Artisan Components, Inc.
+200000000000042|2005-01-03 09:00:05.367|-20549.87|Market-Buy 800 shares of PREF_B of Turnstone Systems
+200000000000021|2005-01-03 09:00:05.395|2176.62|Market-Sell 100 shares of COMMON of America Online Latin America, Inc.
+200000000000037|2005-01-03 09:00:05.440|-10937.03|Market-Buy 400 shares of COMMON of ARM Holdings plc
+200000000000019|2005-01-03 09:00:05.609|-4616.02|Limit-Buy 200 shares of PREF_D of Ambassadors Group, Inc.
+200000000000033|2005-01-03 09:00:05.771|-11472.14|Limit-Buy 400 shares of PREF_C of 3DO Company (The)
+200000000000035|2005-01-03 09:00:05.935|-2462.27|Market-Buy 100 shares of COMMON of Blyth Industries, Inc.
+200000000000043|2005-01-03 09:00:06.079|-17582.08|Limit-Buy 800 shares of COMMON of America Online Latin America, Inc.
+200000000000039|2005-01-03 09:00:06.152|8727.47|Market-Sell 400 shares of PREF_A of Tweeter Home Entertainment Group, Inc
+200000000000036|2005-01-03 09:00:06.211|8777.76|Stop-Loss 400 shares of PREF_A of Wickes, Inc.
+200000000000053|2005-01-03 09:00:06.334|5744.09|Market-Sell 200 shares of PREF_C of Winston Hotels, Inc.
+200000000000050|2005-01-03 09:00:06.402|-5636.70|Market-Buy 200 shares of COMMON of Adams Golf, Inc.
+200000000000045|2005-01-03 09:00:06.481|-2272.44|Market-Buy 100 shares of COMMON of Amgen, Inc.
+200000000000024|2005-01-03 09:00:06.500|10544.63|Limit-Sell 400 shares of COMMON of ArQule, Inc.
+200000000000054|2005-01-03 09:00:07.016|5170.89|Market-Sell 200 shares of COMMON of Traffix, Inc.
+200000000000064|2005-01-03 09:00:07.369|11147.70|Market-Sell 400 shares of PREF_A of U.S. Physical Therapy, Inc.
+200000000000060|2005-01-03 09:00:07.403|16644.75|Market-Sell 800 shares of PREF_A of United Parcel Service, Inc.
+200000000000062|2005-01-03 09:00:07.421|21758.39|Market-Sell 800 shares of COMMON of Alfa Corporation
+200000000000069|2005-01-03 09:00:07.801|5071.16|Market-Sell 200 shares of PREF_A of Transkaryotic Therapies, Inc.
+200000000000055|2005-01-03 09:00:07.821|-2675.76|Market-Buy 100 shares of COMMON of ASE Test, Ltd,
+200000000000058|2005-01-03 09:00:07.847|-18439.98|Market-Buy 800 shares of COMMON of Barclays Bank plc
+200000000000056|2005-01-03 09:00:07.884|20721.30|Market-Sell 800 shares of PREF_B of AmerUs Life Holding, Inc.
+200000000000059|2005-01-03 09:00:07.920|-12016.36|Market-Buy 400 shares of COMMON of ABN AMRO Holding N.V.
+200000000000061|2005-01-03 09:00:08.198|-2523.03|Market-Buy 100 shares of COMMON of Autonomy Corporation plc
+200000000000067|2005-01-03 09:00:08.257|21407.38|Market-Sell 800 shares of PREF_A of Travis Boats & Motors, Inc.
+200000000000047|2005-01-03 09:00:08.295|-19988.30|Market-Buy 800 shares of COMMON of Advance Financial Bancorp
+200000000000066|2005-01-03 09:00:08.529|-20301.67|Limit-Buy 800 shares of PREF_B of Andrew Corporation
+200000000000073|2005-01-03 09:00:08.571|5587.30|Market-Sell 200 shares of PREF_B of Versicor, Inc.
+200000000000081|2005-01-03 09:00:09.052|-4378.19|Market-Buy 200 shares of COMMON of Aware, Inc.
+200000000000063|2005-01-03 09:00:09.087|2327.13|Stop-Loss 100 shares of COMMON of Atlantic Data Services, Inc.
+200000000000075|2005-01-03 09:00:09.309|3998.04|Stop-Loss 200 shares of COMMON of Transportadora de Gas del Sur
+200000000000074|2005-01-03 09:00:09.528|-9334.26|Market-Buy 400 shares of COMMON of Calpin Corporation
+200000000000083|2005-01-03 09:00:09.569|-2585.74|Market-Buy 100 shares of PREF_A of Viad Corporation
+200000000000087|2005-01-03 09:00:09.604|8690.09|Market-Sell 400 shares of PREF_A of Zi Corporation
+200000000000071|2005-01-03 09:00:09.980|-19932.56|Market-Buy 800 shares of COMMON of Constellation Energy Group, Inc.
+200000000000091|2005-01-03 09:00:10.040|-4534.56|Market-Buy 200 shares of COMMON of American Financial Holdings, Inc.
+200000000000078|2005-01-03 09:00:10.111|2101.19|Market-Sell 100 shares of PREF_B of Winston Hotels, Inc.
+200000000000093|2005-01-03 09:00:10.180|-22175.59|Market-Buy 800 shares of COMMON of 1st Constitution Bancorp
+200000000000084|2005-01-03 09:00:10.476|5597.26|Market-Sell 200 shares of COMMON of Amtech Systems, Inc.
+200000000000082|2005-01-03 09:00:10.757|20809.06|Market-Sell 800 shares of COMMON of BanColombia S.A.
+200000000000096|2005-01-03 09:00:10.820|5384.03|Market-Sell 200 shares of COMMON of Alliance Atlantis Communications, Inc.
+200000000000070|2005-01-03 09:00:10.902|-5991.60|Market-Buy 200 shares of COMMON of Connecticut Water Service, Inc.
+200000000000101|2005-01-03 09:00:11.031|-18159.19|Market-Buy 800 shares of COMMON of Benihana, Inc.
+200000000000104|2005-01-03 09:00:11.251|22814.61|Market-Sell 800 shares of COMMON of Ambac Financial Group, Inc.
+200000000000090|2005-01-03 09:00:11.719|5615.46|Market-Sell 200 shares of COMMON of Adams Golf, Inc.
+200000000000072|2005-01-03 09:00:11.800|2078.82|Market-Sell 100 shares of COMMON of Travis Boats & Motors, Inc.
+200000000000098|2005-01-03 09:00:11.839|5815.97|Limit-Sell 200 shares of PREF_D of AmerUs Life Holding, Inc.
+200000000000088|2005-01-03 09:00:11.918|2976.33|Market-Sell 100 shares of COMMON of BancFirst Corporation
+200000000000112|2005-01-03 09:00:12.043|11098.33|Market-Sell 400 shares of COMMON of Applied Innovation, Inc.
+200000000000105|2005-01-03 09:00:12.286|2653.90|Market-Sell 100 shares of PREF_A of Transcend Services, Inc.
+200000000000110|2005-01-03 09:00:12.376|-10915.97|Market-Buy 400 shares of PREF_A of Twinlab Corporation
+200000000000119|2005-01-03 09:00:12.854|2625.00|Market-Sell 100 shares of COMMON of Vitesse Semiconductor Corporation
+200000000000118|2005-01-03 09:00:12.862|-2258.37|Market-Buy 100 shares of COMMON of Amgen, Inc.
+200000000000106|2005-01-03 09:00:13.052|-4171.45|Market-Buy 200 shares of COMMON of ZymoGenetics, Inc.
+200000000000097|2005-01-03 09:00:13.100|-16471.60|Limit-Buy 800 shares of COMMON of White Mount Insurance Group Limited
+200000000000108|2005-01-03 09:00:13.167|4655.66|Stop-Loss 200 shares of COMMON of CMS Energy Corporation
+200000000000115|2005-01-03 09:00:13.233|-18191.28|Market-Buy 800 shares of COMMON of Autodesk, Inc.
+200000000000095|2005-01-03 09:00:13.303|10405.08|Stop-Loss 400 shares of COMMON of Weider Nutrition International, Inc.
+200000000000109|2005-01-03 09:00:13.422|2703.22|Limit-Sell 100 shares of PREF_A of Women First HealthCare, Inc.
+200000000000099|2005-01-03 09:00:13.552|10710.79|Market-Sell 400 shares of PREF_A of 3DO Company (The)
+200000000000100|2005-01-03 09:00:13.816|22627.95|Market-Sell 800 shares of COMMON of Ballard Power Systems, Inc.
+200000000000086|2005-01-03 09:00:13.833|-20117.14|Limit-Buy 800 shares of COMMON of 1-800 FLOWERS.COM, Inc.
+200000000000123|2005-01-03 09:00:13.910|2323.03|Market-Sell 100 shares of COMMON of American Medical Technologies, Inc.
+200000000000124|2005-01-03 09:00:13.945|11729.83|Market-Sell 400 shares of COMMON of Amerigon, Inc.
+200000000000120|2005-01-03 09:00:14.244|-5959.86|Market-Buy 200 shares of COMMON of Blue Square
+200000000000135|2005-01-03 09:00:14.329|-10952.27|Market-Buy 400 shares of PREF_A of WVS Financial Corporation
+200000000000130|2005-01-03 09:00:14.399|-2543.62|Market-Buy 100 shares of COMMON of Analog Devices, Inc.
+200000000000085|2005-01-03 09:00:14.412|2225.64|Market-Sell 100 shares of COMMON of Amgen, Inc.
+200000000000114|2005-01-03 09:00:14.440|-2957.93|Market-Buy 100 shares of COMMON of AXA
+200000000000132|2005-01-03 09:00:14.713|-2588.77|Market-Buy 100 shares of PREF_A of Allen Telecom, Inc.
+200000000000121|2005-01-03 09:00:14.829|8435.90|Limit-Sell 400 shares of COMMON of BankAtlantic Bancorp, Inc.
+200000000000116|2005-01-03 09:00:15.049|4794.16|Market-Sell 200 shares of COMMON of ATMI, Inc.
+200000000000145|2005-01-03 09:00:15.449|-8867.81|Market-Buy 400 shares of COMMON of Buckeye Partners, L.P.
+200000000000136|2005-01-03 09:00:15.598|5358.12|Market-Sell 200 shares of PREF_A of Transcom WorldWide S.A.
+200000000000140|2005-01-03 09:00:15.769|-4210.93|Market-Buy 200 shares of COMMON of Alabama National BanCorporation
+200000000000143|2005-01-03 09:00:15.989|21294.69|Stop-Loss 800 shares of COMMON of AvantGo, Inc.
+200000000000147|2005-01-03 09:00:15.996|-4924.15|Market-Buy 200 shares of COMMON of Advanced Lighting Technologies, Inc.
+200000000000113|2005-01-03 09:00:16.051|8117.43|Market-Sell 400 shares of PREF_A of Varco International, Inc.
+200000000000144|2005-01-03 09:00:16.054|5393.83|Market-Sell 200 shares of PREF_A of Twinlab Corporation
+200000000000156|2005-01-03 09:00:16.386|-5024.51|Market-Buy 200 shares of COMMON of Bed Bath & Beyond, Inc.
+200000000000148|2005-01-03 09:00:16.398|4998.90|Market-Sell 200 shares of COMMON of Anadarko Petroleum Corporation
