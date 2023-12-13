@@ -59,10 +59,10 @@ def get_pgbench_options(db: DBParameters, workload: WorkloadParams) -> list[str]
     arg_values = {}
     arg_values.update(workload.model_dump())
     # fmt: on
-    for key, value in arg_values.items():
-        if isinstance(key, str):
-            placeholder = ''.join(['ARG_', str(key).upper()])
-            pgbench_command = pgbench_command.replace(placeholder, str(value))
+    # for key, value in arg_values.items():
+    #     if isinstance(key, str):
+    #         placeholder = ''.join(['ARG_', str(key).upper()])
+    #         pgbench_command = pgbench_command.replace(placeholder, str(value))
 
     benchmark_options = workload.options.get_dict()
     if benchmark_options is not None:

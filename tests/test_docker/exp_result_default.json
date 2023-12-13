@@ -1,6 +1,6 @@
 {
     "header": "PostgreSQL diagnostic report",
-    "description": "",
+    "description": "12/12/2023 15:32:51",
     "sections": {
         "system": {
             "header": "System properties <hn>",
@@ -12,7 +12,7 @@
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "uname_a.sh",
-                    "data": "Linux 5b0f520ee737 6.2.0-37-generic #38~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Nov  2 18:01:13 UTC 2 x86_64 GNU/Linux\r\n"
+                    "data": "Linux a0460dbfd6ef 6.2.0-37-generic #38~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Nov  2 18:01:13 UTC 2 x86_64 GNU/Linux\r\n"
                 },
                 "etc_os_release": {
                     "header": "/etc/os-release",
@@ -26,21 +26,21 @@
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "sys_memory_total.sh",
-                    "data": "MemTotal:       49024012 kB\r\nMemFree:        19543908 kB\r\nMemAvailable:   21143944 kB\r\nBuffers:            9520 kB\r\nCached:          4959168 kB\r\nSwapCached:            0 kB\r\nActive:          1983116 kB\r\nInactive:       17340112 kB\r\nActive(anon):     613608 kB\r\nInactive(anon): 16693432 kB\r\nActive(file):    1369508 kB\r\nInactive(file):   646680 kB\r\nUnevictable:       12724 kB\r\nMlocked:              64 kB\r\nSwapTotal:       2097148 kB\r\nSwapFree:        2097148 kB\r\nZswap:                 0 kB\r\nZswapped:              0 kB\r\nDirty:              1228 kB\r\nWriteback:             0 kB\r\nAnonPages:      14366528 kB\r\nMapped:         11301104 kB\r\nShmem:           2952468 kB\r\nKReclaimable:     128020 kB\r\nSlab:             505188 kB\r\nSReclaimable:     128020 kB\r\nSUnreclaim:       377168 kB\r\nKernelStack:       59952 kB\r\nPageTables:       177948 kB\r\nSecPageTables:         0 kB\r\nNFS_Unstable:          0 kB\r\nBounce:                0 kB\r\nWritebackTmp:          0 kB\r\nCommitLimit:    26609152 kB\r\nCommitted_AS:   55981492 kB\r\nVmallocTotal:   34359738367 kB\r\nVmallocUsed:      103928 kB\r\nVmallocChunk:          0 kB\r\nPercpu:            16768 kB\r\nHardwareCorrupted:     0 kB\r\nAnonHugePages:         0 kB\r\nShmemHugePages:  2201600 kB\r\nShmemPmdMapped:        0 kB\r\nFileHugePages:         0 kB\r\nFilePmdMapped:         0 kB\r\nHugePages_Total:       0\r\nHugePages_Free:        0\r\nHugePages_Rsvd:        0\r\nHugePages_Surp:        0\r\nHugepagesize:       2048 kB\r\nHugetlb:               0 kB\r\nDirectMap4k:      521664 kB\r\nDirectMap2M:    27490304 kB\r\nDirectMap1G:    23068672 kB\r\n"
+                    "data": "MemTotal:       49024012 kB\r\nMemFree:        25996380 kB\r\nMemAvailable:   27755816 kB\r\nBuffers:           15780 kB\r\nCached:          5315100 kB\r\nSwapCached:          132 kB\r\nActive:          1473152 kB\r\nInactive:       15014536 kB\r\nActive(anon):     301000 kB\r\nInactive(anon): 13792420 kB\r\nActive(file):    1172152 kB\r\nInactive(file):  1222116 kB\r\nUnevictable:       21232 kB\r\nMlocked:              64 kB\r\nSwapTotal:       2097148 kB\r\nSwapFree:        2095612 kB\r\nZswap:                 0 kB\r\nZswapped:              0 kB\r\nDirty:            138152 kB\r\nWriteback:             0 kB\r\nAnonPages:      11177780 kB\r\nMapped:          7774872 kB\r\nShmem:           2936608 kB\r\nKReclaimable:     165440 kB\r\nSlab:             526108 kB\r\nSReclaimable:     165440 kB\r\nSUnreclaim:       360668 kB\r\nKernelStack:       49808 kB\r\nPageTables:       135392 kB\r\nSecPageTables:         0 kB\r\nNFS_Unstable:          0 kB\r\nBounce:                0 kB\r\nWritebackTmp:          0 kB\r\nCommitLimit:    26609152 kB\r\nCommitted_AS:   42860160 kB\r\nVmallocTotal:   34359738367 kB\r\nVmallocUsed:       94188 kB\r\nVmallocChunk:          0 kB\r\nPercpu:            20544 kB\r\nHardwareCorrupted:     0 kB\r\nAnonHugePages:         0 kB\r\nShmemHugePages:  2107392 kB\r\nShmemPmdMapped:        0 kB\r\nFileHugePages:         0 kB\r\nFilePmdMapped:         0 kB\r\nHugePages_Total:       0\r\nHugePages_Free:        0\r\nHugePages_Rsvd:        0\r\nHugePages_Surp:        0\r\nHugepagesize:       2048 kB\r\nHugetlb:               0 kB\r\nDirectMap4k:      521664 kB\r\nDirectMap2M:    27490304 kB\r\nDirectMap1G:    23068672 kB\r\n"
                 },
                 "cpu_info": {
                     "header": "lscpu",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "cpu_info.sh",
-                    "data": "Architecture:            x86_64\r\n  CPU op-mode(s):        32-bit, 64-bit\r\n  Address sizes:         39 bits physical, 48 bits virtual\r\n  Byte Order:            Little Endian\r\nCPU(s):                  16\r\n  On-line CPU(s) list:   0-15\r\nVendor ID:               GenuineIntel\r\n  BIOS Vendor ID:        Intel(R) Corporation\r\n  Model name:            12th Gen Intel(R) Core(TM) i7-1260P\r\n    BIOS Model name:     12th Gen Intel(R) Core(TM) i7-1260P None CPU @ 2.1GHz\r\n    BIOS CPU family:     198\r\n    CPU family:          6\r\n    Model:               154\r\n    Thread(s) per core:  2\r\n    Core(s) per socket:  12\r\n    Socket(s):           1\r\n    Stepping:            3\r\n    CPU(s) scaling MHz:  68%\r\n    CPU max MHz:         4700.0000\r\n    CPU min MHz:         400.0000\r\n    BogoMIPS:            4992.00\r\n    Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc\r\n                         a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss \r\n                         ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art\r\n                          arch_perfmon pebs bts rep_good nopl xtopology nonstop_\r\n                         tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes6\r\n                         4 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xt\r\n                         pr pdcm sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_\r\n                         timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefet\r\n                         ch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced t\r\n                         pr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase ts\r\n                         c_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx sm\r\n                         ap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xget\r\n                         bv1 xsaves split_lock_detect avx_vnni dtherm ida arat p\r\n                         ln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_re\r\n                         q hfi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid\r\n                          movdiri movdir64b fsrm md_clear serialize arch_lbr ibt\r\n                          flush_l1d arch_capabilities\r\nVirtualization features: \r\n  Virtualization:        VT-x\r\nCaches (sum of all):     \r\n  L1d:                   448 KiB (12 instances)\r\n  L1i:                   640 KiB (12 instances)\r\n  L2:                    9 MiB (6 instances)\r\n  L3:                    18 MiB (1 instance)\r\nNUMA:                    \r\n  NUMA node(s):          1\r\n  NUMA node0 CPU(s):     0-15\r\nVulnerabilities:         \r\n  Gather data sampling:  Not affected\r\n  Itlb multihit:         Not affected\r\n  L1tf:                  Not affected\r\n  Mds:                   Not affected\r\n  Meltdown:              Not affected\r\n  Mmio stale data:       Not affected\r\n  Retbleed:              Not affected\r\n  Spec rstack overflow:  Not affected\r\n  Spec store bypass:     Mitigation; Speculative Store Bypass disabled via prctl\r\n  Spectre v1:            Mitigation; usercopy/swapgs barriers and __user pointer\r\n                          sanitization\r\n  Spectre v2:            Mitigation; Enhanced IBRS, IBPB conditional, RSB fillin\r\n                         g, PBRSB-eIBRS SW sequence\r\n  Srbds:                 Not affected\r\n  Tsx async abort:       Not affected\r\n"
+                    "data": "Architecture:            x86_64\r\n  CPU op-mode(s):        32-bit, 64-bit\r\n  Address sizes:         39 bits physical, 48 bits virtual\r\n  Byte Order:            Little Endian\r\nCPU(s):                  16\r\n  On-line CPU(s) list:   0-15\r\nVendor ID:               GenuineIntel\r\n  BIOS Vendor ID:        Intel(R) Corporation\r\n  Model name:            12th Gen Intel(R) Core(TM) i7-1260P\r\n    BIOS Model name:     12th Gen Intel(R) Core(TM) i7-1260P None CPU @ 2.1GHz\r\n    BIOS CPU family:     198\r\n    CPU family:          6\r\n    Model:               154\r\n    Thread(s) per core:  2\r\n    Core(s) per socket:  12\r\n    Socket(s):           1\r\n    Stepping:            3\r\n    CPU(s) scaling MHz:  39%\r\n    CPU max MHz:         4700.0000\r\n    CPU min MHz:         400.0000\r\n    BogoMIPS:            4992.00\r\n    Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc\r\n                         a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss \r\n                         ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art\r\n                          arch_perfmon pebs bts rep_good nopl xtopology nonstop_\r\n                         tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes6\r\n                         4 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xt\r\n                         pr pdcm sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_\r\n                         timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefet\r\n                         ch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced t\r\n                         pr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase ts\r\n                         c_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx sm\r\n                         ap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xget\r\n                         bv1 xsaves split_lock_detect avx_vnni dtherm ida arat p\r\n                         ln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_re\r\n                         q hfi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid\r\n                          movdiri movdir64b fsrm md_clear serialize arch_lbr ibt\r\n                          flush_l1d arch_capabilities\r\nVirtualization features: \r\n  Virtualization:        VT-x\r\nCaches (sum of all):     \r\n  L1d:                   448 KiB (12 instances)\r\n  L1i:                   640 KiB (12 instances)\r\n  L2:                    9 MiB (6 instances)\r\n  L3:                    18 MiB (1 instance)\r\nNUMA:                    \r\n  NUMA node(s):          1\r\n  NUMA node0 CPU(s):     0-15\r\nVulnerabilities:         \r\n  Gather data sampling:  Not affected\r\n  Itlb multihit:         Not affected\r\n  L1tf:                  Not affected\r\n  Mds:                   Not affected\r\n  Meltdown:              Not affected\r\n  Mmio stale data:       Not affected\r\n  Retbleed:              Not affected\r\n  Spec rstack overflow:  Not affected\r\n  Spec store bypass:     Mitigation; Speculative Store Bypass disabled via prctl\r\n  Spectre v1:            Mitigation; usercopy/swapgs barriers and __user pointer\r\n                          sanitization\r\n  Spectre v2:            Mitigation; Enhanced IBRS, IBPB conditional, RSB fillin\r\n                         g, PBRSB-eIBRS SW sequence\r\n  Srbds:                 Not affected\r\n  Tsx async abort:       Not affected\r\n"
                 },
                 "df_h": {
                     "header": "df -h",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "df_h.sh",
-                    "data": "Filesystem      Size  Used Avail Use% Mounted on\r\noverlay         916G  362G  508G  42% /\r\ntmpfs            64M     0   64M   0% /dev\r\nshm              64M  1.1M   63M   2% /dev/shm\r\n/dev/nvme0n1p2  916G  362G  508G  42% /etc/hosts\r\n"
+                    "data": "Filesystem      Size  Used Avail Use% Mounted on\r\noverlay         916G  439G  431G  51% /\r\ntmpfs            64M     0   64M   0% /dev\r\nshm              64M  1.1M   63M   2% /dev/shm\r\n/dev/nvme0n1p2  916G  439G  431G  51% /etc/hosts\r\n"
                 },
                 "etc_fstab": {
                     "header": "fstab",
@@ -54,14 +54,14 @@
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "mount.sh",
-                    "data": "overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/overlay2/l/OQY3ALQ4RNV3SI3EPAIPBGG4JM:/var/lib/docker/overlay2/l/PWWNSJMXMCEBMZ3MJYIPREIYDH:/var/lib/docker/overlay2/l/MZGC7BNUYOZH3KFEYMIRCZ6W6Q:/var/lib/docker/overlay2/l/A3TKVOIW747DDCQGGLBNUQ7QOV:/var/lib/docker/overlay2/l/E7MEKCHNH7EJD2UV7FRTFPSZXH:/var/lib/docker/overlay2/l/UEC6NA3NURMOMAQYBKC5SEZGEX:/var/lib/docker/overlay2/l/ZGF4TVXK7B772TDSDRPWEMR2SA:/var/lib/docker/overlay2/l/5DGM5SOH5GYCPUBNHRCD4MH7G7:/var/lib/docker/overlay2/l/PKE55UWMV7SSESM26YB36CXKU4:/var/lib/docker/overlay2/l/TBXRVQWOYWUTCH2LZDIQ4EJFO2:/var/lib/docker/overlay2/l/DX7MUMC62NXM5S46I5OBSYSMN2:/var/lib/docker/overlay2/l/AJAFIG55JPDISRX4PON2O3NARH:/var/lib/docker/overlay2/l/V7MJFF44KIR7HA66Z2MHSLKD4C:/var/lib/docker/overlay2/l/S6MOVLABZNRBKAL5K5QBVKQTWI,upperdir=/var/lib/docker/overlay2/3354fdb2c10cdd4550a63357a93a637168b1f6505856ba61e44ed054df1a34b7/diff,workdir=/var/lib/docker/overlay2/3354fdb2c10cdd4550a63357a93a637168b1f6505856ba61e44ed054df1a34b7/work,nouserxattr)\r\nproc on /proc type proc (rw,nosuid,nodev,noexec,relatime)\r\ntmpfs on /dev type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)\r\ndevpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666)\r\nsysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)\r\ncgroup on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)\r\nmqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)\r\nshm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,inode64)\r\n/dev/nvme0n1p2 on /etc/resolv.conf type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/hostname type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/hosts type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /var/lib/postgresql/data type ext4 (rw,relatime,errors=remount-ro)\r\n"
+                    "data": "overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/overlay2/l/JWR34J6JALYSIJV447XL2OST6B:/var/lib/docker/overlay2/l/ZQSPY7Y65K4KLLNLIB7WUVQX7Q:/var/lib/docker/overlay2/l/QHNO6ZCSPRHPJXWIC4JKSQISZV:/var/lib/docker/overlay2/l/OPJTUILYS6M3XEUBVL4HPQWEPQ:/var/lib/docker/overlay2/l/G3LFBUWUOUKIZ3NAS3CZKOMWFX:/var/lib/docker/overlay2/l/U224KWZ6ODGYZUI7Z25K3CTVUW:/var/lib/docker/overlay2/l/FUCF25ACSEYNLSSF4P4SG2VBHO:/var/lib/docker/overlay2/l/56WTDT5675T44SCV2Q5JIJ35FY:/var/lib/docker/overlay2/l/4WNRMLNBFOBYSHJVIXPWLLZFKH:/var/lib/docker/overlay2/l/VARBSNERHLXJQZIEIJ6ISV73IZ:/var/lib/docker/overlay2/l/M73FMKOLYBVUJ7Y7CFEGZOCYSA:/var/lib/docker/overlay2/l/W6TFY5GMWYPK5FUUXQZ6HKZ4Y6:/var/lib/docker/overlay2/l/CGLK5GLMGGFUU7SDPAVJKDLOPW:/var/lib/docker/overlay2/l/S6MOVLABZNRBKAL5K5QBVKQTWI,upperdir=/var/lib/docker/overlay2/1323ea212be569af1bc2a125ca1d384cf8b9192d428c61bf1311de0446bc5c87/diff,workdir=/var/lib/docker/overlay2/1323ea212be569af1bc2a125ca1d384cf8b9192d428c61bf1311de0446bc5c87/work,nouserxattr)\r\nproc on /proc type proc (rw,nosuid,nodev,noexec,relatime)\r\ntmpfs on /dev type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)\r\ndevpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666)\r\nsysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)\r\ncgroup on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)\r\nmqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)\r\nshm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,inode64)\r\n/dev/nvme0n1p2 on /etc/resolv.conf type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/hostname type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/hosts type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /var/lib/postgresql/data type ext4 (rw,relatime,errors=remount-ro)\r\n"
                 },
                 "ip_br_addr": {
                     "header": "ip -br addr",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "ip_br_addr.sh",
-                    "data": "bash: line 3: ip: command not found\r\n"
+                    "data": "127.0.0.1\tlocalhost\r\n::1\tlocalhost ip6-localhost ip6-loopback\r\nfe00::0\tip6-localnet\r\nff00::0\tip6-mcastprefix\r\nff02::1\tip6-allnodes\r\nff02::2\tip6-allrouters\r\n172.17.0.2\ta0460dbfd6ef\r\n"
                 }
             }
         },
@@ -1527,8 +1527,33 @@
                     ],
                     "data": [
                         [
-                            "tcn",
+                            "adminpack",
+                            "2.1",
+                            null
+                        ],
+                        [
+                            "amcheck",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "autoinc",
                             "1.0",
+                            null
+                        ],
+                        [
+                            "bloom",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "btree_gin",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "btree_gist",
+                            "1.7",
                             null
                         ],
                         [
@@ -1537,12 +1562,47 @@
                             null
                         ],
                         [
-                            "pg_buffercache",
-                            "1.3",
+                            "cube",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "dblink",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "dict_int",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "dict_xsyn",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "earthdistance",
+                            "1.1",
                             null
                         ],
                         [
                             "file_fdw",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "fuzzystrmatch",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "hstore",
+                            "1.8",
+                            null
+                        ],
+                        [
+                            "insert_username",
                             "1.0",
                             null
                         ],
@@ -1552,8 +1612,18 @@
                             null
                         ],
                         [
-                            "pgcrypto",
-                            "1.3",
+                            "intarray",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "isn",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "lo",
+                            "1.1",
                             null
                         ],
                         [
@@ -1562,27 +1632,7 @@
                             null
                         ],
                         [
-                            "insert_username",
-                            "1.0",
-                            null
-                        ],
-                        [
-                            "seg",
-                            "1.4",
-                            null
-                        ],
-                        [
-                            "pageinspect",
-                            "1.11",
-                            null
-                        ],
-                        [
-                            "dict_xsyn",
-                            "1.0",
-                            null
-                        ],
-                        [
-                            "tsm_system_time",
+                            "moddatetime",
                             "1.0",
                             null
                         ],
@@ -1592,33 +1642,13 @@
                             null
                         ],
                         [
-                            "pg_stat_statements",
-                            "1.10",
+                            "pageinspect",
+                            "1.11",
                             null
                         ],
                         [
-                            "earthdistance",
-                            "1.1",
-                            null
-                        ],
-                        [
-                            "postgres_fdw",
-                            "1.1",
-                            null
-                        ],
-                        [
-                            "pg_surgery",
-                            "1.0",
-                            null
-                        ],
-                        [
-                            "pgstattuple",
-                            "1.5",
-                            null
-                        ],
-                        [
-                            "bloom",
-                            "1.0",
+                            "pg_buffercache",
+                            "1.3",
                             null
                         ],
                         [
@@ -1627,8 +1657,23 @@
                             null
                         ],
                         [
-                            "autoinc",
+                            "pg_prewarm",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pg_stat_statements",
+                            "1.10",
+                            null
+                        ],
+                        [
+                            "pg_surgery",
                             "1.0",
+                            null
+                        ],
+                        [
+                            "pg_trgm",
+                            "1.6",
                             null
                         ],
                         [
@@ -1637,22 +1682,47 @@
                             null
                         ],
                         [
-                            "dblink",
-                            "1.2",
-                            null
-                        ],
-                        [
-                            "amcheck",
-                            "1.3",
-                            null
-                        ],
-                        [
-                            "moddatetime",
+                            "pg_walinspect",
                             "1.0",
                             null
                         ],
                         [
-                            "isn",
+                            "pgcrypto",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "pgrowlocks",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pgstattuple",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "plpgsql",
+                            "1.0",
+                            "1.0"
+                        ],
+                        [
+                            "postgres_fdw",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "refint",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "seg",
+                            "1.4",
+                            null
+                        ],
+                        [
+                            "sslinfo",
                             "1.2",
                             null
                         ],
@@ -1662,67 +1732,22 @@
                             null
                         ],
                         [
-                            "pg_walinspect",
+                            "tcn",
                             "1.0",
                             null
                         ],
                         [
-                            "plpgsql",
-                            "1.0",
-                            "1.0"
-                        ],
-                        [
-                            "cube",
-                            "1.5",
-                            null
-                        ],
-                        [
-                            "refint",
+                            "tsm_system_rows",
                             "1.0",
                             null
                         ],
                         [
-                            "hstore",
-                            "1.8",
-                            null
-                        ],
-                        [
-                            "fuzzystrmatch",
-                            "1.1",
-                            null
-                        ],
-                        [
-                            "pgrowlocks",
-                            "1.2",
-                            null
-                        ],
-                        [
-                            "adminpack",
-                            "2.1",
-                            null
-                        ],
-                        [
-                            "pg_prewarm",
-                            "1.2",
+                            "tsm_system_time",
+                            "1.0",
                             null
                         ],
                         [
                             "unaccent",
-                            "1.1",
-                            null
-                        ],
-                        [
-                            "btree_gist",
-                            "1.7",
-                            null
-                        ],
-                        [
-                            "intarray",
-                            "1.5",
-                            null
-                        ],
-                        [
-                            "lo",
                             "1.1",
                             null
                         ],
@@ -1732,33 +1757,8 @@
                             null
                         ],
                         [
-                            "dict_int",
-                            "1.0",
-                            null
-                        ],
-                        [
                             "xml2",
                             "1.1",
-                            null
-                        ],
-                        [
-                            "pg_trgm",
-                            "1.6",
-                            null
-                        ],
-                        [
-                            "sslinfo",
-                            "1.2",
-                            null
-                        ],
-                        [
-                            "tsm_system_rows",
-                            "1.0",
-                            null
-                        ],
-                        [
-                            "btree_gin",
-                            "1.3",
                             null
                         ]
                     ]
@@ -1781,40 +1781,16 @@
                     ],
                     "data": [
                         [
-                            "clear_logs",
-                            "False"
-                        ],
-                        [
-                            "debug",
-                            "False"
-                        ],
-                        [
-                            "version",
-                            "False"
-                        ],
-                        [
-                            "log_level",
-                            "debug"
-                        ],
-                        [
                             "benchmark_type",
                             "default"
                         ],
                         [
-                            "workload_path",
-                            "None"
-                        ],
-                        [
                             "pgbench_clients",
-                            "5,10,15"
-                        ],
-                        [
-                            "pgbench_jobs",
-                            "None"
+                            "[5, 10, 15]"
                         ],
                         [
                             "pgbench_time",
-                            "5"
+                            "[5]"
                         ],
                         [
                             "init_command",
@@ -1823,6 +1799,14 @@
                         [
                             "workload_command",
                             "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 4 -T ARG_PGBENCH_TIME --no-vacuum"
+                        ],
+                        [
+                            "pgbench_path",
+                            "pgbench"
+                        ],
+                        [
+                            "psql_path",
+                            "psql"
                         ],
                         [
                             "pg_host",
@@ -1838,7 +1822,7 @@
                         ],
                         [
                             "pg_user_password",
-                            "pswd"
+                            "****"
                         ],
                         [
                             "pg_database",
@@ -1851,42 +1835,6 @@
                         [
                             "pg_bin_path",
                             "/usr/lib/postgresql/15/bin"
-                        ],
-                        [
-                            "pgbench_path",
-                            "/usr/bin/pgbench"
-                        ],
-                        [
-                            "psql_path",
-                            "/usr/bin/psql"
-                        ],
-                        [
-                            "ssh_host",
-                            "None"
-                        ],
-                        [
-                            "ssh_port",
-                            "None"
-                        ],
-                        [
-                            "ssh_user",
-                            "None"
-                        ],
-                        [
-                            "ssh_key",
-                            "None"
-                        ],
-                        [
-                            "tunnel_remote_host",
-                            "None"
-                        ],
-                        [
-                            "tunnel_remote_port",
-                            "None"
-                        ],
-                        [
-                            "socket_path",
-                            "None"
                         ],
                         [
                             "image_name",
@@ -1902,7 +1850,7 @@
                         ],
                         [
                             "container_name",
-                            "cntr_expected"
+                            "cntr_test"
                         ]
                     ]
                 },
@@ -1918,15 +1866,15 @@
                     "data": [
                         [
                             0,
-                            "/usr/bin/pgbench -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -c 5 -j 4 -T 5 --no-vacuum"
+                            "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -c 5 -j 4 -T 5 --no-vacuum"
                         ],
                         [
                             1,
-                            "/usr/bin/pgbench -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -c 10 -j 4 -T 5 --no-vacuum"
+                            "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -c 10 -j 4 -T 5 --no-vacuum"
                         ],
                         [
                             2,
-                            "/usr/bin/pgbench -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -c 15 -j 4 -T 5 --no-vacuum"
+                            "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -c 15 -j 4 -T 5 --no-vacuum"
                         ]
                     ]
                 },
@@ -1967,23 +1915,23 @@
                         [
                             5,
                             null,
-                            2.072,
-                            3.766,
-                            2413.252061
+                            2.29,
+                            5.033,
+                            2183.276792
                         ],
                         [
                             10,
                             null,
-                            3.178,
-                            40.647,
-                            3146.642104
+                            3.259,
+                            43.628,
+                            3068.589402
                         ],
                         [
                             15,
                             null,
-                            5.729,
-                            40.412,
-                            2618.194296
+                            4.456,
+                            29.386,
+                            3366.049294
                         ]
                     ]
                 },
@@ -1999,15 +1947,15 @@
                                 "data": [
                                     [
                                         5,
-                                        2413.3
+                                        2183.3
                                     ],
                                     [
                                         10,
-                                        3146.6
+                                        3068.6
                                     ],
                                     [
                                         15,
-                                        2618.2
+                                        3366.0
                                     ]
                                 ]
                             }
