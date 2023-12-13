@@ -109,7 +109,7 @@ class Operations:
                 'port': test_params.pg_port,
                 'user': test_params.pg_user,
                 'password': test_params.pg_user_password,
-                'database': test_params.pg_db_name,
+                'database': "postgres",
             }
 
             try:
