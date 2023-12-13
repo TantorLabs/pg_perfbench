@@ -298,23 +298,3 @@ VA2|Virginia Income Tax for the elderly|0.03250
 VA3|Virginia Income Tax for blue collar workers|0.04500
 VA4|Virginia Income Tax for inherited wealth|0.05750
 VT1|Vermont Income Tax for school teachers|0.00000
-WA1|Washington Income Tax for doctors and lawyers|0.00000
-WI1|Wisconsin Income Tax for blue collar workers|0.04730
-WI2|Wisconsin Income Tax for the elderly|0.05400
-WI3|Wisconsin Income Tax for doctors and lawyers|0.06080
-WI4|Wisconsin Income Tax for inherited wealth|0.06750
-WV1|West Virginia Income Tax for school teachers|0.03000
-WV2|West Virginia Income Tax for the masses|0.03880
-WV3|West Virginia Income Tax for doctors and lawyers|0.04750
-WV4|West Virginia Income Tax for the elderly|0.05630
-WV5|West Virginia Income Tax for inherited wealth|0.06500
-WY1|Wyoming Income Tax for blue collar workers|0.00000
-YT1|Yukon Income Tax for the masses|0.00000
-YT2|Yukon Income Tax for school teachers|0.17470
-YT3|Yukon Income Tax for the elderly|0.23360
-YT4|Yukon Income Tax for the unemployed|0.26360
-YT5|Yukon Income Tax for blue collar workers|0.23360
-YT6|Yukon Income Tax for everyone else|0.32120
-YT7|Yukon Income Tax for those driving SUVs|0.37960
-YT8|Yukon Income Tax for doctors and lawyers|0.38550
-YT9|Yukon Income Tax for inherited wealth|0.43010
