@@ -199,10 +199,12 @@ python3.11 -m pg_perfbench --log-level=debug \
 --pgbench-path=/usr/bin/pgbench \
 --psql-path=/usr/bin/psql \
 --init-command="cd ARG_WORKLOAD_PATH && ARG_PSQL_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -f ARG_WORKLOAD_PATH/table-schema.sql" \
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER --no-vacuum --file=ARG_WORKLOAD_PATH/perf_1.sql --file=ARG_WORKLOAD_PATH/perf_2.sql ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T ARG_PGBENCH_TIME"```
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER --no-vacuum --file=ARG_WORKLOAD_PATH/perf_1.sql --file=ARG_WORKLOAD_PATH/perf_2.sql ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T ARG_PGBENCH_TIME"
+```
 
-  or standard pgbench load
-  (this example describes the full set of arguments for docker connection):
+
+or standard pgbench load
+(this example describes the full set of arguments for docker connection):
 ```
 python3.11 -m pg_perfbench --log-level=debug \
     --image-name=postgres:15 \
