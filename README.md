@@ -258,7 +258,7 @@ Add or remove reports of the following types:
 When testing the tool, a Docker connection is used. Preconfigure access to Docker for the user who is running the tool.
 - specify the `user` from which the tool is run:
 ```
-echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches' | sudo EDITOR='tee -a' visudo -f /etc/sudoers
+echo ' <pg_perfbench user> ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches' | sudo EDITOR='tee -a' visudo -f /etc/sudoers
 ```
 - set PYTHONPATH variable:
 ```
