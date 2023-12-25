@@ -1,47 +1,47 @@
 # PostgreSQL Performance Bench
 This tool provides methods to run standard(TPC-B) and custom pgbench benchmarks on a PostgreSQL 
-database with detailed `report` generation. An important feature of the tool is the ability to configure the report based on the type of information collected:
+database with detailed `report` generation. A key feature of the tool is its capability to configure reports according to the type of information gathered:
 
-* Adding the result of executing a bash script on the database host
-* Adding the result of executing an SQL script on the database
+* Adding the result of executing a bash script on the database host;
+* Adding the result of executing an SQL script on the database;
+  
+The application offers support for two configurations of database connections:
 
-The pg_perfbench tool supports two types of database connections:
-
-* `SSH` - remote
-* `Docker` - container
+* `SSH` - database located on a remote host;
+* `Container` - database located in a Docker container;
 
 ## Prerequisites
-- The `psql`, `pgbench` PostgreSQL client:
+- Pre-installed PostgreSQL client applications: `psql`, `pgbench`. For example, using:
 ```
-    sudo apt install postgresql-client
-    sudo apt install postgresql-contrib
+sudo apt install postgresql-client
+sudo apt install postgresql-contrib
  ```
 - Python 3.11 and pip3:
 ```
-    cd /usr/src
-    sudo wget https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tar.xz
-    sudo tar -xvf Python-3.11.0.tar.xz
-    sudo cd Python-3.11.0
+cd /usr/src
+sudo wget https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tar.xz
+sudo tar -xvf Python-3.11.7.tar.xz
+sudo cd Python-3.11.7
 
-    sudo apt-get install libssl-dev libffi-dev gcc
+sudo apt-get install libssl-dev libffi-dev gcc
 
-    ./configure --prefix=/opt/python3.11
-    make altinstall
+./configure --prefix=/opt/python3.11
+make altinstall
 
-    sudo ln -sf /opt/python3.11/bin/python3.11 /usr/bin/python3.11
-    sudo ln -sf /opt/python3.11/bin/pip3.11 /usr/bin/pip3.11
+sudo ln -sf /opt/python3.11/bin/python3.11 /usr/bin/python3.11
+sudo ln -sf /opt/python3.11/bin/pip3.11 /usr/bin/pip3.11
 
 
-    python3.11 --version
+python3.11 --version
 ```
-- For convenience, create a Python 3.11 virtual environment in the root directory of the project:
+- Create a Python 3.11 virtual environment in the project's root directory for ease of use:
 ```
-    cd pg_perfbench
-    python3.11 -m venv venv
-    source venv/bin/activate
+cd pg_perfbench
+python3.11 -m venv venv
+source venv/bin/activate
 ```
-- Install additional packages, for Python 3.11 eg. with:
- <br>`python3.11 -m pip install -r requirements.txt`
+- Install additional packages for Python 3.11, for example, using:
+ ```python3.11 -m pip install -r requirements.txt```
 - For the tool to work, the database must be accessible under the user postgres or another
 specified user with SUPERUSER rights
 - Before running the tests, install and configure Docker access for the user who will be running the tool:
@@ -56,7 +56,7 @@ chmod 666 /var/run/docker.sock
 ## Service options
 | Parameter      | Description                                                                                                                                             |
 |----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `--help`, `-h` | Lists all the available options or flags that can be used with the command,<br> along with a short description of what each option does and after which exit occurs.|
+| `--help`, `-h` | Lists all the available options or flags that can be used with the command, <br> along with a short description of what each option does and after which exit occurs.|
 | `--log-level`  | Application logging level: `info`, `debug`, `error`.<br/>Default - `info`                                                                               |
 | `--clear-logs` | Clearing logs from the tool's previous session. <br>Logs are located in the 'logs' folder of the root directory.                                        |
 
@@ -68,10 +68,10 @@ chmod 666 /var/run/docker.sock
 | `--ssh-port`        | Port for ssh connection (default: 22)                            |
 | `--ssh-host`        | IP address of the remote server                                  |
 | `--ssh-key`         | Path to the ssh connection private key file (must be configured) |
-| `--remote-pg-host`  | Host of the remote server's database(default: 127.0.0.1)         |
-| `--remote-pg-port`  | Port of the remote server's database(default: 5432)              |
+| `--remote-pg-host`  | Host of the remote server's database (default: 127.0.0.1)        |
+| `--remote-pg-port`  | Port of the remote server's database (default: 5432)             |
 
-* `The SSH connection user is postgres`.Configure SSH access keys on the database server to establish a connection to the postgres user:
+* `The SSH connection user is postgres`. Configure SSH access keys on the database server to establish a connection to the postgres user:
 
 ```
 # ========================================
@@ -119,12 +119,12 @@ Example of specified ssh connection arguments:
 ### Docker connection
 Preconfigure access to Docker for the user who is running the tool.
 
-| Parameter          | Description                                            |
-|--------------------|--------------------------------------------------------|
-| `--image-name`     | Docker image name(must be pre-installed)               |
-| `--container-name` | Name of creating container                             |
-| `--docker-pg-host` | Container PostgreSQL database host(default: 127.0.0.1) |
-| `--docker-pg-port` | Container PostgreSQL database port(default: 5432)      |      
+| Parameter          | Description                                             |
+|--------------------|---------------------------------------------------------|
+| `--image-name`     | Docker image name (must be pre-installed)               |
+| `--container-name` | Name of creating container                              |
+| `--docker-pg-host` | Container PostgreSQL database host (default: 127.0.0.1) |
+| `--docker-pg-port` | Container PostgreSQL database port (default: 5432)      |      
 
 <br>Example of specified docker connection arguments:<br>
 ```
@@ -136,9 +136,9 @@ Preconfigure access to Docker for the user who is running the tool.
 
 
 ### Common instruction
-When using `SSH connection`, grant the `postgres user` the privilege to clear the file 
-system cache `on the database server`. For `Docker connection`, specify the `user` from
-which the tool is run, and execute the following command `on the tool host`:
+When utilizing an SSH connection, ensure that the postgres user has the privilege to clear the file 
+system cache on the database server. For a Docker connection, identify the user operating the tool 
+and execute the following command on the tool host.:
 
 ```
 # ========================================
@@ -153,15 +153,15 @@ echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/
 The flags `pg_host` and `pg_port` are optional parameters for forwarding the address and port 
 from the current host to the database host, `used directly by the tool`.
 
-| Parameter            | Description                                                            |
-|----------------------|------------------------------------------------------------------------|
-| `--pg-port`          | Forwarded port (default `5432`, relative to the current host)          |
-| `--pg-host`          | Forwarded address (default `127.0.0.1`, relative to the current host)  |
-| `--pg-user`          | User of database(must be configured or set "postgres")                 |
-| `--pg-database`      | Database used for testing                                              |
-| `--pg-user-password` | Password for database connection(optional)                             |
-| `--pg-data-path`     | Path to the PostgreSQL data directory (relative to the database host)  |
-| `--pg-bin-path`      | Path to the PostgreSQL bin directory (relative to the database host)   |
+| Parameter            | Description                                                           |
+|----------------------|-----------------------------------------------------------------------|
+| `--pg-port`          | Forwarded port (default `5432`, relative to the current host)         |
+| `--pg-host`          | Forwarded address (default `127.0.0.1`, relative to the current host) |
+| `--pg-user`          | User of database (must be configured or set "postgres")               |
+| `--pg-database`      | Database used for testing                                             |
+| `--pg-user-password` | Password for database connection (optional)                           |
+| `--pg-data-path`     | Path to the PostgreSQL data directory (relative to the database host) |
+| `--pg-bin-path`      | Path to the PostgreSQL bin directory (relative to the database host)  |
 ### Workload options:
 | Parameter            | Description                                                                |
 |----------------------|----------------------------------------------------------------------------|
@@ -176,7 +176,7 @@ from the current host to the database host, `used directly by the tool`.
 
 - Use placeholders to set values in the table schema and load testing commands:
 configure placeholders like `'ARG_'+ <DB|Workload options>`.<br><br>  
-`For example`, you can configure pgbench by specifying the path of the load files 
+For example, you can configure pgbench by specifying the path of the load files 
 (this example describes the full set of arguments for ssh connection):
 ```
 python3.11 -m pg_perfbench --log-level=debug \
@@ -207,39 +207,40 @@ or standard pgbench load
 (this example describes the full set of arguments for docker connection):
 ```
 python3.11 -m pg_perfbench --log-level=debug \
-    --image-name=postgres:15 \
-    --container-name=cntr_expected \
-    --docker-pg-host=127.0.0.1 \
-    --docker-pg-port=5432 \
-    --pg-host=127.0.0.1 \
-    --pg-port=5435 \
-    --pg-user=postgres \
-    --pg-user-password=test_user_password \
-    --pg-database=tdb \
-    --pg-data-path=/var/lib/postgresql/tantor-se-1c-15/data \
-    --pg-bin-path=/opt/tantor/db/15/bin \
-    --benchmark-type=default \
-    --pgbench-clients=5,10,50 \
-    --pgbench-time=600 \
-    --pgbench-jobs=19 \
-    --init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT ARG_PG_HOST -U postgres ARG_PG_DATABASE" \
-    --workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
+--image-name=postgres:15 \
+--container-name=cntr_expected \
+--docker-pg-host=127.0.0.1 \
+--docker-pg-port=5432 \
+--pg-host=127.0.0.1 \
+--pg-port=5435 \
+--pg-user=postgres \
+--pg-user-password=test_user_password \
+--pg-database=tdb \
+--pg-data-path=/var/lib/postgresql/tantor-se-1c-15/data \
+--pg-bin-path=/opt/tantor/db/15/bin \
+--benchmark-type=default \
+--pgbench-clients=5,10,50 \
+--pgbench-time=600 \
+--pgbench-jobs=19 \
+--init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT ARG_PG_HOST -U postgres ARG_PG_DATABASE" \
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
 
 ```
 
 # Configuring report
 
-You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`: add or remove a report of the type:
+You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
+Add or remove reports of the following types:
 
 - "shell_command_file" - a report with the result of executing the specified bash script relative to the database host in the `pg_perfbench/commands/bash_commands` directory, for example:
 ```
-  "example_bash_report": {
-      "header": "example_bash_header",
-      "state": "collapsed",
-      "item_type": "plain_text",
-      "shell_command_file": "bash_example.sh",
-      "data": ""
-    }
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "plain_text",
+  "shell_command_file": "bash_example.sh",
+  "data": ""
+}
 ```
 
 - "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
@@ -261,20 +262,20 @@ echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/
 ```
 - set PYTHONPATH variable:
 ```
-    cd pg_perfbench
-    >>
-    pg_perfbench  requirements_dev.txt  tests
-    LICENSE log README.md requirements.txt
+cd pg_perfbench
+>>
+pg_perfbench  requirements_dev.txt  tests
+LICENSE log README.md requirements.txt
 
-    export PYTHONPATH=$(pwd)
+export PYTHONPATH=$(pwd)
 ```
-- single test running(for example):
-    ```
-    python -m unittest tests.test_cli.test_arg_parser -v --failfast
-    python -m unittest tests.test_context.test_workload -v --failfast
-    python -m unittest tests.test_docker.test_pg_perfbench -v --failfast
-    ```
-- full test running: 
-    <br>`python -m unittest discover tests`
+- single test running. Example of executing unit tests:
+```
+python -m unittest tests.test_cli.test_arg_parser -v --failfast
+python -m unittest tests.test_context.test_workload -v --failfast
+python -m unittest tests.test_docker.test_pg_perfbench -v --failfast
+```
+- executing all tests: 
+<br>`python -m unittest discover tests`
 ###
 ###
