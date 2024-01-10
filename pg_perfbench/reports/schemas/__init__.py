@@ -10,7 +10,7 @@ def _get_now_timestamp() -> str:
 
 
 class Report(BaseModel):
-    header: str = 'PostgreSQL diagnostic report'
+    header: str
     description: str = Field(default_factory=_get_now_timestamp)
     sections: dict[str, SectionItemReports]
 

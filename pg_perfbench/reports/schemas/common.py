@@ -55,11 +55,11 @@ class BaseReportChart(BaseReportItem):
     data: dict | str
 
     def set_data(self, data: dict[Any]) -> None:
-        self.data["series"].append(data)
+        self.data['series'].append(data)
 
 
 def read_file(file: str, file_path: Path) -> str:
-    with open(file_path/file) as file_content:
+    with open(file_path / file) as file_content:
         return file_content.read()
 
 
@@ -151,7 +151,17 @@ class ItemChartPython(BaseReportPythonCommand, BaseReportChart):
 
 
 class SectionItemReports(BaseModel):
-    reports: dict[str, Union[ItemPlainTextShell, ItemPlainTextSQL, ItemPlainTextPython,
-    ItemTableShell, ItemTableSQL, ItemTablePython,
-    ItemChartShell, ItemChartSQL, ItemChartPython],
+    reports: dict[
+        str,
+        Union[
+            ItemPlainTextShell,
+            ItemPlainTextSQL,
+            ItemPlainTextPython,
+            ItemTableShell,
+            ItemTableSQL,
+            ItemTablePython,
+            ItemChartShell,
+            ItemChartSQL,
+            ItemChartPython,
+        ],
     ]

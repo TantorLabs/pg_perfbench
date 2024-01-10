@@ -3,7 +3,6 @@ import subprocess
 from typing import Any
 import re
 
-from pg_perfbench.context.schemas.context import RawArgs
 from pg_perfbench.pgbench_utils import get_pgbench_options
 from pg_perfbench.context import Context
 from pg_perfbench.const import WorkloadTypes
@@ -26,19 +25,16 @@ class TableData:
 
 
 class JsonMethods:    # FIXME: this class needs a lot of fixes.....
-    raw_args: RawArgs
+    raw_args: dict[Any]
     pgbench_options: list[str]
     benchmark_result_data: list[Any]
     ctx: Context
-    def __init__(
-        self,
-        benchmark_result_data: list[Any],
-        ctx: Context
-    ) -> None:
+
+    def __init__(self, benchmark_result_data: list[Any], ctx: Context) -> None:
         self.raw_args = ctx.raw_args
         self.benchmark_result_data = benchmark_result_data
         self.ctx = ctx
-        self.pgbench_options = get_pgbench_options(ctx.db, ctx.workload)
+        self.pgbench_options = get_pgbench_options(ctx.workload)
 
     def pgbench_options_table(self) -> TableData:
         theader = ['iteration number', 'pgbench_options']

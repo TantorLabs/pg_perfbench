@@ -7,14 +7,16 @@ import asyncpg
 
 from pg_perfbench.cli.args_parser import get_args_parser
 from pg_perfbench.connections import common as connection_common, get_connection
-from pg_perfbench.const import VERSION
-from pg_perfbench.context import Context, RawArgs, utils as context_utils
+from pg_perfbench.const import VERSION, WorkMode
+from pg_perfbench.context import Context, RawArgs, JoinContext, utils as context_utils
 from pg_perfbench.env_data import JsonMethods
 from pg_perfbench.exceptions import exception_helper, PerformTestError
 from pg_perfbench.logs import clear_logs, set_logger_level, setup_logger
 from pg_perfbench.operations import db as db_operations
 from pg_perfbench.pgbench_utils import get_init_execution_command, get_pgbench_commands
 from pg_perfbench.reports import report as general_reports, schemas as report_schemas
+from pg_perfbench.join_reports import join_reports
+
 
 log = logging.getLogger(__name__)
 logging.getLogger('paramiko').setLevel(logging.CRITICAL)
@@ -45,7 +47,7 @@ async def perform_test(
 ) -> dict[str, Any]:
     try:
         log.debug('Benchmark preparation')
-        await connection.drop_cache()
+        await connection.drop_cache()   # restart database
         await db_operations.wait_for_database_availability(ctx.db)
         await db_operations.init_db(db=ctx.db)
         init_cmd = get_init_execution_command(ctx.db, ctx.workload)

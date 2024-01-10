@@ -44,8 +44,10 @@ def exception_helper(show_traceback: bool = True) -> str:
 class PerformTestError(CommonException):
     """Error performing pgbench load testing."""
 
+
 class BashCommandException(Exception):
     """Core application error."""
+
     def __init__(self, code, text_error=''):
         self.code = code
         self.text_error = text_error

@@ -23,6 +23,7 @@ def get_args_parser() -> argparse.ArgumentParser:
         '--log-level',
         type=str,
         choices=list(map(str, LogLevel)),
+        default=str(LogLevel.INFO),
         help='Logging level',
     )
 
@@ -30,7 +31,7 @@ def get_args_parser() -> argparse.ArgumentParser:
     workload_group = general_group.add_argument_group(
         title='Workload options',
         description='Workload profile settings: '
-                    'select benchmark profile or pass paths to custom SQL scripts',
+        'select benchmark profile or pass paths to custom SQL scripts',
     )
     workload_group.add_argument(
         '--benchmark-type',
@@ -45,18 +46,21 @@ def get_args_parser() -> argparse.ArgumentParser:
     )
     workload_group.add_argument(
         '--pgbench-clients',
-        type=parse_pgbench_options, default=None,
-        help='pgbench benchmarking arguments: --clients'
+        type=parse_pgbench_options,
+        default=None,
+        help='pgbench benchmarking arguments: --clients',
     )
     workload_group.add_argument(
         '--pgbench-jobs',
-        type=parse_pgbench_options, default=None,
-        help='pgbench benchmarking arguments: --jobs'
+        type=parse_pgbench_options,
+        default=None,
+        help='pgbench benchmarking arguments: --jobs',
     )
     workload_group.add_argument(
         '--pgbench-time',
-        type=parse_pgbench_options, default=None,
-        help='pgbench benchmarking arguments: --time'
+        type=parse_pgbench_options,
+        default=None,
+        help='pgbench benchmarking arguments: --time',
     )
     workload_group.add_argument(
         '--init-command',
@@ -80,7 +84,9 @@ def get_args_parser() -> argparse.ArgumentParser:
     )
 
     ## Defining database parameters
-    db_group = general_group.add_argument_group(title='Database connection options')
+    db_group = general_group.add_argument_group(
+        title='Database connection options'
+    )
     db_group.add_argument(
         '--pg-host',
         type=str,
@@ -109,7 +115,7 @@ def get_args_parser() -> argparse.ArgumentParser:
     db_group.add_argument(
         '--pg-data-path',
         type=str,
-        help="Specify the PostgreSQL data directory",
+        help='Specify the PostgreSQL data directory',
     )
     db_group.add_argument(
         '--pg-bin-path',
@@ -156,7 +162,7 @@ def get_args_parser() -> argparse.ArgumentParser:
     docker_connection_group.add_argument(
         '--image-name',
         type=str,
-        help='Run command: `docker images` and use `IMAGE ID` param from needed docker image'
+        help='Run command: `docker images` and use `IMAGE ID` param from needed docker image',
     )
     docker_connection_group.add_argument(
         '--docker-pg-host',

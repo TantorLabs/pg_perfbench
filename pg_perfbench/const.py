@@ -54,10 +54,3 @@ class LogLevel(StrEnum):
         if self is LogLevel.DEBUG:
             return logging.DEBUG
         return logging.ERROR
-
-
-ConnTypeParams = {
-    ConnectionType.SSH: ['ssh_user', 'ssh_key', 'ssh_port', 'host'],
-    ConnectionType.LOCAL: ['port', 'host'],
-    ConnectionType.DOCKER: ['docker_image'],
-}
