@@ -90,18 +90,20 @@ async def run_command(program: str, args: list[str]) -> str:
     return stdout.decode('utf-8')
 
 
-async def run_command(command: str) -> str:
+async def run_command(command: str, check: bool = True) -> str:
     process = await asyncio.create_subprocess_shell(
         command,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        shell=True, # Important for running a shell command
+        shell=True,  # Important for running a shell command
         limit=262144,
     )
     stdout, stderr = await process.communicate()
 
-    if process.returncode != 0:
-        log.error('Standard Error: %s', stderr.decode('utf-8', errors='replace'))
+    if process.returncode != 0 and check:
+        log.error(
+            'Standard Error: %s', stderr.decode('utf-8', errors='replace')
+        )
         raise Exception
 
     await process.wait()  # Wait for the process to exit if it hasn't yet
