@@ -1,5 +1,5 @@
 {
-    "header": "PostgreSQL diagnostic report",
+    "header": "PostgreSQL database benchmark report",
     "description": "",
     "sections": {
         "system": {
@@ -8,59 +8,80 @@
             "state": "expanded",
             "reports": {
                 "uname_a": {
-                    "header": "uname -a",
+                    "header": "Disk space usage | df -h",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "uname_a.sh",
                     "data": ""
                 },
                 "etc_os_release": {
-                    "header": "/etc/os-release",
+                    "header": "OS distribution information | /etc/os-release",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "etc_os_release.sh",
                     "data": ""
                 },
                 "sys_memory_total": {
-                    "header": "meminfo",
+                    "header": "System memory information | /proc/meminfo",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "sys_memory_total.sh",
                     "data": ""
                 },
                 "cpu_info": {
-                    "header": "lscpu",
+                    "header": "CPU architecture and specification display tool | lscpu",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "cpu_info.sh",
                     "data": ""
                 },
                 "df_h": {
-                    "header": "df -h",
+                    "header": "Disk space usage | df -h",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "df_h.sh",
                     "data": ""
                 },
                 "etc_fstab": {
-                    "header": "fstab",
+                    "header": "File system mount configuration | fstab",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "etc_fstab.sh",
                     "data": ""
                 },
                 "mount": {
-                    "header": "mount",
+                    "header": "Current filesystem mounts and their details | mount",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "mount.sh",
                     "data": ""
                 },
                 "ip_br_addr": {
-                    "header": "ip -br addr",
+                    "header": "Local hostname-to-IP mapping | ip -br addr",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "ip_br_addr.sh",
+                    "data": ""
+                },
+                "sysctl_vm": {
+                    "header": "Kernel parameters related to virtual memory | /sbin/sysctl vm",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_vm.sh",
+                    "data": ""
+                },
+                "sysctl_net_ipv4_tcp": {
+                    "header": "Kernel parameters related to IPv4 TCP networking settings | /sbin/sysctl -a | grep \"^net\\.ipv4\\.tcp\"",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_net_ipv4_tcp.sh",
+                    "data": ""
+                },
+                "sysctl_net_ipv4_udp": {
+                    "header": "Kernel parameters related to IPv4 UDP networking settings | /sbin/sysctl -a | grep \"^net\\.ipv4\\.udp\"",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_net_ipv4_udp.sh",
                     "data": ""
                 }
             }
@@ -70,18 +91,18 @@
             "description": "Common info about current database",
             "state": "expanded",
             "reports": {
-                "version_full": {
+                "version_major": {
                     "header": "PostgreSQL full version",
                     "state": "collapsed",
                     "item_type": "plain_text",
-                    "sql_command_file": "sql_1.sql",
+                    "sql_command_file": "full_version.sql",
                     "data": ""
                 },
-                "maintenance_verison": {
+                "maintenance_version": {
                     "header": "PostgreSQL maintenance version",
                     "state": "hidden",
                     "item_type": "plain_text",
-                    "sql_command_file": "sql_1.sql",
+                    "sql_command_file": "server_version.sql",
                     "data": ""
                 },
                 "pg_config": {
@@ -95,7 +116,7 @@
                     "header": "PostgreSQL settings",
                     "state": "collapsed",
                     "item_type": "table",
-                    "sql_command_file": "sql_3.sql",
+                    "sql_command_file": "server_settings.sql",
                     "theader": [],
                     "data": []
                 },
@@ -103,7 +124,7 @@
                     "header": "PostgreSQL extensions",
                     "state": "collapsed",
                     "item_type": "table",
-                    "sql_command_file": "sql_2.sql",
+                    "sql_command_file": "available_server_extensions.sql",
                     "theader": [],
                     "data": []
                 }
