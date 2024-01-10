@@ -61,13 +61,18 @@ class DockerConnection(Connectable):
                 name=self.connection_params.container_name,
                 detach=True,
                 privileged=True,
-                ports={f'{str(self.connection_params.tunnel.remote.port)}/tcp':
-                          str(self.connection_params.tunnel.local.port)},
-                environment={
-                    'POSTGRES_HOST_AUTH_METHOD': 'trust'
+                ports={
+                    f'{str(self.connection_params.tunnel.remote.port)}/tcp': str(
+                        self.connection_params.tunnel.local.port
+                    )
                 },
+                environment={'POSTGRES_HOST_AUTH_METHOD': 'trust'},
                 volumes={
-                    f'/tmp/data/{self.connection_params.container_name}_data': {'bind': str(self.connection_params.data_path), 'mode': 'rw'},
+                    '/sbin/sysctl': {'bind': '/sbin/sysctl', 'mode': 'ro'},
+                    f'/tmp/data/{self.connection_params.container_name}_data': {
+                        'bind': str(self.connection_params.data_path),
+                        'mode': 'rw',
+                    },
                 },
             )
             log.info(f'Started Docker container: {self.connection_params.container_name}')
