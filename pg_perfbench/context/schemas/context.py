@@ -6,6 +6,10 @@ from typing import Any
 from typing import get_args
 from typing import get_origin
 from typing import Optional
+from typing import Union
+from typing import Literal
+from pydantic import validator
+import os
 
 import pydantic
 from pydantic import BaseModel
@@ -16,6 +20,7 @@ from pg_perfbench.context.schemas.connections import ConnectionParameters
 from pg_perfbench.context.schemas.db import DBParameters
 from pg_perfbench.context.schemas.workload import WorkloadParams
 from pg_perfbench.exceptions import format_pydantic_error
+from pg_perfbench.const import WorkMode, REPORT_FOLDER
 
 log = logging.getLogger(__name__)
 
@@ -77,6 +82,42 @@ class Context(BaseModel):
             return Context.model_validate(restructured_args)
         except pydantic.ValidationError as error:
             # TODO: add traceback print control
-            log.error(format_pydantic_error(error), exc_info=True)  # noqa: G201
+            log.error(
+                format_pydantic_error(error), exc_info=True
+            )  # noqa: G201
+
+        return None
+
+
+class JoinContext(BaseModel):
+    raw_args: RawArgs
+    join_task: str = ''
+    input_dir: str = Field(default=str(REPORT_FOLDER))
+    reference_report: str = ''
+
+    @classmethod
+    def from_args_map(
+        cls: type['JoinContext'],
+        args_map: dict[str, str | None],
+    ) -> Optional['JoinContext']:
+        # FIXME: Might be a better solution using validators to ensure 'benchmark' field
+        meaningful_args = {
+            k: v
+            for k, v in args_map.items()
+            if v is not None or k == 'benchmark'
+        }
+
+        restructured_args = restructure_args_dict(
+            Context.model_fields, meaningful_args
+        )
+        restructured_args['raw_args'] = args_map
+
+        try:
+            return JoinContext.model_validate(restructured_args)
+        except pydantic.ValidationError as error:
+            # TODO: add traceback print control
+            log.error(
+                format_pydantic_error(error), exc_info=True
+            )  # noqa: G201
 
         return None

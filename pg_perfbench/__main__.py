@@ -114,18 +114,31 @@ async def run_benchmark(ctx: Context) -> report_schemas.Report | None:
     return None
 
 
-if __name__ == '__main__':
+async def run():
+    report = None
     args = get_args_parser().parse_args()
     if args.clear_logs:
         print('Clearing logs folder')
         clear_logs()
     setup_logger()
     set_logger_level(args.log_level)
-    if (context := Context.from_args_map(vars(args))) is None:
-        log.error('Failed to parse CLI arguments or build context.')
+
+    try:
+        if args.mode == WorkMode.BENCHMARK and (context := Context.from_args_map(vars(args))):
+            report = await run_benchmark(context)
+        elif args.mode == WorkMode.JOIN and (context := JoinContext.from_args_map(vars(args))):
+            report = join_reports(context)
+    except Exception as e:
+        log.error(f'pg_perfbench error: {str(e)}.')
         sys.exit(1)
-    if (report := asyncio.run(run_benchmark(context))) is None:
-        log.error('Benchmark test did not return a report.')
-        sys.exit(1)
+    finally:
+        if report is None:
+            sys.exit(1)
+
     general_reports.save_report(report)
     log.info('Benchmark report saved successfully.')
+
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run())

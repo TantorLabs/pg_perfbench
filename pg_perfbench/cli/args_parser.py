@@ -1,5 +1,6 @@
 import argparse
 
+from pg_perfbench.const import WorkMode
 from pg_perfbench.const import WorkloadTypes
 from pg_perfbench.const import LogLevel
 
@@ -26,7 +27,13 @@ def get_args_parser() -> argparse.ArgumentParser:
         default=str(LogLevel.INFO),
         help='Logging level',
     )
-
+    general_group.add_argument(
+        '--mode',
+        type=str,
+        choices=list(map(str, WorkMode)),
+        help='pg_perfbench modes',
+    )
+    # Benchmark mode args
     ## Defining workload parameters
     workload_group = general_group.add_argument_group(
         title='Workload options',
@@ -175,7 +182,23 @@ def get_args_parser() -> argparse.ArgumentParser:
     docker_connection_group.add_argument(
         '--container-name',
         type=str,
-        help='Which name of your image do you prefer?'
+        help='Which name of your image do you prefer?',
     )
+    # Join mode args
+    join_group = general_group.add_argument_group(
+        title='Join mode options',
+        description='Workload profile settings: '
+        'select benchmark profile or pass paths to custom SQL scripts',
+    )
+    join_group.add_argument(
+        '--join-task', type=str, help='Criteria for comparing reports'
+    )
+    join_group.add_argument(
+        '--reference-report',
+        type=str,
+        default=None,
+        help='Criteria for comparing reports',
+    )
+    join_group.add_argument('--input-dir', type=str, help='Reports directory')
 
     return general_group

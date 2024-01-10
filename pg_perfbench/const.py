@@ -23,6 +23,12 @@ SQL_COMMANDS_PATH = SOURCE_ROOT_FOLDER / 'commands' / 'sql_commands'
 
 
 @enum.unique
+class WorkMode(StrEnum):
+    BENCHMARK = 'benchmark'
+    JOIN = 'join'
+
+
+@enum.unique
 class WorkloadTypes(StrEnum):
     CUSTOM = 'custom'
     DEFAULT = 'default'
