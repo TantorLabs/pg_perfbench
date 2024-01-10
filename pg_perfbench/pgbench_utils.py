@@ -5,7 +5,7 @@ import warnings
 from pg_perfbench.context.schemas.db import DBParameters
 from pg_perfbench.context.schemas.workload import WorkloadParams
 
-warnings.filterwarnings("ignore", category=UserWarning, module="pydantic.main")
+warnings.filterwarnings('ignore', category=UserWarning, module='pydantic.main')
 
 def get_init_execution_command(db: DBParameters, workload: WorkloadParams) -> str:
     # FIXME: this one looks a bit off this place. Maybe rename this module?
@@ -46,14 +46,16 @@ def get_pgbench_commands(db: DBParameters, workload: WorkloadParams) -> list[str
     benchmark_options = workload.options.get_dict()
     if benchmark_options is not None:
         return [
-            _format_command(str(pgbench_command), tuple(benchmark_options.keys()), values)
+            _format_command(
+                str(pgbench_command), tuple(benchmark_options.keys()), values
+            )
             for values in itertools.product(*benchmark_options.values())
         ]
 
     return [pgbench_command]
 
 
-def get_pgbench_options(db: DBParameters, workload: WorkloadParams) -> list[str]:
+def get_pgbench_options(workload: WorkloadParams) -> list[str]:
     # fmt: off
     pgbench_command = str(workload.workload_command)
     arg_values = {}
