@@ -37,6 +37,7 @@ class SSHConnection(Connectable):
 
     async def start(self) -> None:
         log.info('Establishing an SSH connection')
+
         try:
             self.client = await asyncssh.connect(
                 host=self.params.host,
@@ -44,8 +45,8 @@ class SSHConnection(Connectable):
                 username=self.params.user,
                 client_keys=self.params.key,
                 known_hosts=None,
+                env={'ARG_PG_BIN_PATH': f'{self.params.work_paths.pg_bin_path}'},
             )
-
             self.tunnel = SSHTunnelForwarder(
                 (self.params.host, self.params.port),
                 ssh_username=self.params.user,
@@ -80,13 +81,13 @@ class SSHConnection(Connectable):
     async def drop_cache(self) -> None:
         await self.run(
             f'{self.params.work_paths.pg_bin_path}/pg_ctl '
-            f'stop -D {self.params.work_paths.pg_data_directory_path}',
+            f'stop -D {self.params.work_paths.pg_data_path}',
         )
         await self.run('sync')
         await self.run('sudo /bin/sh -c "echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches"')
         await self.run(
             f'{self.params.work_paths.pg_bin_path}/pg_ctl start -D '
-            f'{self.params.work_paths.pg_data_directory_path}'
+            f'{self.params.work_paths.pg_data_path}'
         )
 
     def close(self) -> None:
@@ -95,3 +96,4 @@ class SSHConnection(Connectable):
         if hasattr(self, 'client'):
             self.client.close()
         log.info('Terminating the SSH connection')
+

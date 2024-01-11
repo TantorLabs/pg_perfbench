@@ -8,7 +8,7 @@
             "state": "expanded",
             "reports": {
                 "uname_a": {
-                    "header": "Disk space usage | df -h",
+                    "header": "Linux kernel version and machine architecture | uname -r -m",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "uname_a.sh",

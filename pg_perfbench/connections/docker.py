@@ -66,11 +66,12 @@ class DockerConnection(Connectable):
                         self.connection_params.tunnel.local.port
                     )
                 },
-                environment={'POSTGRES_HOST_AUTH_METHOD': 'trust'},
+                environment={'POSTGRES_HOST_AUTH_METHOD': 'trust',
+                             'ARG_PG_BIN_PATH': self.connection_params.work_paths.pg_bin_path},
                 volumes={
                     '/sbin/sysctl': {'bind': '/sbin/sysctl', 'mode': 'ro'},
                     f'/tmp/data/{self.connection_params.container_name}_data': {
-                        'bind': str(self.connection_params.data_path),
+                        'bind': str(self.connection_params.work_paths.pg_data_path),
                         'mode': 'rw',
                     },
                 },

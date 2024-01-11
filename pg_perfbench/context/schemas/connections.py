@@ -27,7 +27,7 @@ class TunnelParams(BaseModel):
 
 
 class WorkPaths(BaseModel):
-    pg_data_directory_path: str = Field(alias='pg_data_path')
+    pg_data_path: str = Field(alias='pg_data_path')
     pg_bin_path: str = Field(alias='pg_bin_path')
 
 
@@ -44,8 +44,7 @@ class DockerParams(BaseModel):
     image_name: str = Field(alias='image_name')
     container_name: str = Field('pg_perfbench', alias='container_name')
     tunnel: TunnelParams = Field(default_factory=TunnelParams)
-    data_path: Path = Field(alias='pg_data_path')
-
+    work_paths: WorkPaths
 
 class UnixParams(BaseModel):
     path: Path = Field(alias='socket_path')
