@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 from datetime import datetime
 
-from pg_perfbench.const import REPORT_FOLDER
+from pg_perfbench.const import REPORT_FOLDER, get_datetime_report
 from pg_perfbench.const import REPORT_TEMPLATE_FOLDER
 from pg_perfbench.const import TEMPLATE_JSON_PATH
 from pg_perfbench.const import TEMPLATE_JSON_NAME
@@ -56,10 +56,10 @@ def _save_html_report(new_report_json_path: str, path: Path) -> None:
 
 
 def save_report(report: Report) -> None:
-    timestamp = int(time.time())
     REPORT_FOLDER.mkdir(parents=True, exist_ok=True)
-    new_report_json_path = REPORT_FOLDER / f'report_{timestamp}.json'
-    new_report_html_path = REPORT_FOLDER / f'report_{timestamp}.html'
+    current_datetime = get_datetime_report('%Y-%m-%d_%H:%M:%S')
+    new_report_json_path = REPORT_FOLDER / f'report_{current_datetime}.json'
+    new_report_html_path = REPORT_FOLDER / f'report_{current_datetime}.html'
 
     _save_json_report(report, new_report_json_path)
     _save_html_report(new_report_json_path, new_report_html_path)

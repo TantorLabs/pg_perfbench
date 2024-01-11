@@ -1,6 +1,7 @@
 import enum
 import logging
 import sys
+from datetime import datetime
 from pathlib import Path
 
 if sys.version_info >= (3, 11):
@@ -20,6 +21,13 @@ TEMPLATE_JSON_PATH = REPORT_TEMPLATE_FOLDER / TEMPLATE_JSON_NAME
 
 SHELL_COMMANDS_PATH = SOURCE_ROOT_FOLDER / 'commands' / 'bash_commands'
 SQL_COMMANDS_PATH = SOURCE_ROOT_FOLDER / 'commands' / 'sql_commands'
+
+
+REPORT_TIMESTAMP = datetime.now()
+
+
+def get_datetime_report(format: str = '%d/%m/%Y %H:%M:%S'):
+    return REPORT_TIMESTAMP.strftime(format)
 
 
 @enum.unique
