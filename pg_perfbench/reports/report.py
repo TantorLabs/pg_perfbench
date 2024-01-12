@@ -3,7 +3,6 @@ import logging
 import time
 from pathlib import Path
 from typing import Any
-from datetime import datetime
 
 from pg_perfbench.const import REPORT_FOLDER, get_datetime_report
 from pg_perfbench.const import REPORT_TEMPLATE_FOLDER

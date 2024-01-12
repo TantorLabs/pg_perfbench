@@ -166,7 +166,7 @@
                 },
                 "custom_tables": {
                     "header": "pgbench tables",
-                    "description": "schema of the table for the pgbench load test",
+                    "description": "table schema for the pgbench load test",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "python_command": "workload_tables",
