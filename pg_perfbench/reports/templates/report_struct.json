@@ -23,6 +23,7 @@
                 },
                 "sys_memory_total": {
                     "header": "System memory information | /proc/meminfo",
+                    "description": "current state of the system's memory during the benchmarking",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "sys_memory_total.sh",
@@ -91,15 +92,23 @@
             "description": "Common info about current database",
             "state": "expanded",
             "reports": {
-                "version_major": {
+                "full_version": {
                     "header": "PostgreSQL full version",
+                    "description": "display detailed information about the installed PostgreSQL version, including the version number, system architecture, utilized compiler, and operating system",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "sql_command_file": "full_version.sql",
                     "data": ""
                 },
-                "maintenance_version": {
-                    "header": "PostgreSQL maintenance version",
+                "version_major": {
+                    "header": "PostgreSQL major version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": ""
+                },
+                "version_minor": {
+                    "header": "PostgreSQL minor version",
                     "state": "hidden",
                     "item_type": "plain_text",
                     "sql_command_file": "server_version.sql",
@@ -107,6 +116,7 @@
                 },
                 "pg_config": {
                     "header": "PostgreSQL pg_config",
+                    "description": "display information about the configuration of the installed PostgreSQL server",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "pg_config.sh",
@@ -114,6 +124,7 @@
                 },
                 "pg_settings": {
                     "header": "PostgreSQL settings",
+                    "description": "display information about the server's configuration settings",
                     "state": "collapsed",
                     "item_type": "table",
                     "sql_command_file": "server_settings.sql",
@@ -137,6 +148,7 @@
             "reports": {
                  "args": {
                      "header": "benchmark arguments info",
+                     "description": "arguments configured by the user",
                      "state": "collapsed",
                      "item_type": "table",
                      "python_command": "args",
@@ -145,6 +157,7 @@
                  },   
                 "options": {
                     "header": "pgbench options info",
+                    "description": "benchmark load configuration parameters for pgbench",
                     "state": "collapsed",
                     "item_type": "table",
                     "python_command": "pgbench_options_table",
@@ -153,6 +166,7 @@
                 },
                 "custom_tables": {
                     "header": "pgbench tables",
+                    "description": "schema of the table for the pgbench load test",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "python_command": "workload_tables",
@@ -160,6 +174,7 @@
                 },
                 "custom_workload": {
                     "header": "pgbench workload",
+                    "description": "pgbench load testing scripts",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "python_command": "workload",
