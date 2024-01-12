@@ -7,7 +7,7 @@ import asyncpg
 
 from pg_perfbench.cli.args_parser import get_args_parser
 from pg_perfbench.connections import common as connection_common, get_connection
-from pg_perfbench.const import VERSION, WorkMode
+from pg_perfbench.const import VERSION, WorkMode, get_datetime_report
 from pg_perfbench.context import Context, RawArgs, JoinContext, utils as context_utils
 from pg_perfbench.env_data import JsonMethods
 from pg_perfbench.exceptions import exception_helper, PerformTestError
@@ -92,6 +92,9 @@ async def run_benchmark(ctx: Context) -> report_schemas.Report | None:
                 database='postgres',
                 password=ctx.db.pg_password,
             )
+
+            main_report.description = get_datetime_report('%d/%m/%Y %H:%M:%S')
+
             for key_s, section in main_report.sections.items():
                 log.debug(f'Executing section: "{key_s}"')
                 for key_r, report in section.reports.items():
