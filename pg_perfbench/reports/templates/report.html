@@ -18,8 +18,8 @@
 
 	<style>
 
-.acc {
-			background-color: rgba(219, 175, 0, 0.818);
+		.acc {
+			background-color: rgb(206, 173, 250);
 			color: #444;
 			cursor: pointer;
 			padding: 20px;
@@ -31,14 +31,13 @@
 
 		.acc_collapsed,
 		.accordion:hover {
-			background-color: rgb(255, 204, 0);
+			background-color: #ccc;
 		}
 
 		.panel {
 			padding: 0 20px 20px 20px;
 			display: none;
 			background-color: white;
-            /* background-color: #444; */
 			overflow: hidden;
 		}
 
@@ -79,8 +78,7 @@
 		.paginate_button,
 		.page-item,
 		.disabled>a {
-			background-color: rgb(223, 223, 223)  !important; 
-            /* rgba(216, 216, 216, 0.979) */
+			background-color: rgb(223, 223, 223) !important;
 		}
 
 		.dataTables_paginate,
@@ -129,7 +127,7 @@ if (report_item == 'sections') {
 				var section_id = "sections_" + section;
 				var d = $("<div id='" + section_id + "'></div>");
 				$("#main_content").append(d);
-				$("#" + section_id).append('<button class="acc">' + report_data.sections[section].header + '</button>');
+				$("#" + section_id).append('<button class="acc"  style="background-color: rgba(219, 175, 0, 0.818);">' + report_data.sections[section].header + '</button>');
 
 				if (report_data.sections[section].state == 'collapsed')
 					$("#" + section_id).append('<div class="panel" style="display: none"></div>');
@@ -154,7 +152,7 @@ if (report_item == 'sections') {
 						$("#" + report_id).append('<div class="panel" style="display: block"></div>');
 					}
 					if(report_data.sections[section].reports[report].description){
-					$("#" + report_id + " > .panel").append("<div class='highlight_wrapper' style='background-color: rgba(216, 216, 216, 0.979); width: 100%;'><p class='common_div' style='white-space: nowrap; padding: 1em; line-height: 1em; margin-right: 1em;'>" + report_data.sections[section].reports[report].description + "</p></div>");
+					$("#" + report_id + " > .panel").append("<p class='common_div'>" + report_data.sections[section].reports[report].description + "</p></div>");
 					}
 
 					if (report_data.sections[section].reports[report].item_type == 'plain_text') {
