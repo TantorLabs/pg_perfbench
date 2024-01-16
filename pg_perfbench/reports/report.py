@@ -57,11 +57,11 @@ def _save_html_report(new_report_json_path: str, path: Path) -> None:
         file.write(content)
 
 
-def save_report(report: Report) -> None:
+def save_report(report: Report, prefix:str = 'single') -> None:
     REPORT_FOLDER.mkdir(parents=True, exist_ok=True)
     current_datetime = get_datetime_report('%Y-%m-%d_%H:%M:%S')
-    new_report_json_path = REPORT_FOLDER / f'report_{current_datetime}.json'
-    new_report_html_path = REPORT_FOLDER / f'report_{current_datetime}.html'
+    new_report_json_path = REPORT_FOLDER / f'{prefix}_report_{current_datetime}.json'
+    new_report_html_path = REPORT_FOLDER / f'{prefix}_report_{current_datetime}.html'
 
     _save_json_report(report, new_report_json_path)
     _save_html_report(new_report_json_path, new_report_html_path)
