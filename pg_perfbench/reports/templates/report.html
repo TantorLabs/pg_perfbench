@@ -115,7 +115,7 @@ if (report_item == 'header') {
 	$("#main_content").append("<h2 style='text-align: center'>" + report_data[report_item] + "</h2>");
 }
 if (report_item == 'description') {
-	var d = $("<div class='common_div'></div>");
+	var d = $("<div class='common_div' style='white-space: pre-wrap;'></div>");
 	d.html(report_data[report_item]);
 	$( "#main_content" ).append(d);
 }
