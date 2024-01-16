@@ -137,7 +137,7 @@ async def run():
         if report is None:
             sys.exit(1)
 
-    general_reports.save_report(report)
+    general_reports.save_report(report, args.mode)
     log.info('Benchmark report saved successfully.')
 
 
