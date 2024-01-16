@@ -32,6 +32,9 @@ def _save_json_report(report: Report, new_report_path: Path) -> None:
     with open(TEMPLATE_JSON_PATH) as json_struct:
         full_json = json.load(json_struct)
 
+    if 'header' in full_json:
+        full_json['header'] = report.header
+
     if 'description' in full_json:
         full_json['description'] = report.description
 

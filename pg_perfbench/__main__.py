@@ -92,9 +92,8 @@ async def run_benchmark(ctx: Context) -> report_schemas.Report | None:
                 database='postgres',
                 password=ctx.db.pg_password,
             )
-
+            main_report.header = 'PostgreSQL database benchmark report'
             main_report.description = get_datetime_report('%d/%m/%Y %H:%M:%S')
-
             for key_s, section in main_report.sections.items():
                 log.debug(f'Executing section: "{key_s}"')
                 for key_r, report in section.reports.items():
