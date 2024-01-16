@@ -94,7 +94,7 @@
             "reports": {
                 "full_version": {
                     "header": "PostgreSQL full version",
-                    "description": "information about the installed PostgreSQL version, including the version number, system architecture, utilized compiler, and operating system",
+                    "description": "Information about the installed PostgreSQL version, including the version number, system architecture, utilized compiler, and operating system",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "sql_command_file": "full_version.sql",
@@ -116,7 +116,7 @@
                 },
                 "pg_config": {
                     "header": "PostgreSQL pg_config",
-                    "description": "configuration parameters of the currently installed PostgreSQL version",
+                    "description": "Configuration parameters of the currently installed PostgreSQL version",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "pg_config.sh",
@@ -124,7 +124,7 @@
                 },
                 "pg_settings": {
                     "header": "PostgreSQL settings",
-                    "description": "configuration settings of the PostgreSQL server",
+                    "description": "Configuration settings of the PostgreSQL server",
                     "state": "collapsed",
                     "item_type": "table",
                     "sql_command_file": "server_settings.sql",
@@ -148,7 +148,7 @@
             "reports": {
                  "args": {
                      "header": "benchmark arguments info",
-                     "description": "arguments configured by the user",
+                     "description": "Arguments configured by the user",
                      "state": "collapsed",
                      "item_type": "table",
                      "python_command": "args",
@@ -157,7 +157,7 @@
                  },   
                 "options": {
                     "header": "pgbench options info",
-                    "description": "benchmark load configuration parameters for pgbench",
+                    "description": "Benchmark load configuration parameters for pgbench",
                     "state": "collapsed",
                     "item_type": "table",
                     "python_command": "pgbench_options_table",
@@ -166,7 +166,7 @@
                 },
                 "custom_tables": {
                     "header": "pgbench tables",
-                    "description": "table schema for the pgbench load test",
+                    "description": "Table schema for the pgbench load test",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "python_command": "workload_tables",
@@ -174,7 +174,7 @@
                 },
                 "custom_workload": {
                     "header": "pgbench workload",
-                    "description": "pgbench load testing scripts",
+                    "description": "Load testing scripts",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "python_command": "workload",
