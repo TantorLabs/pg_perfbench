@@ -10,7 +10,7 @@ from pg_perfbench.const import get_datetime_report
 
 log = logging.getLogger(__name__)
 
-JOIN_TASKS_PATH = os.path.join(str(PROJECT_ROOT_FOLDER), 'join_tasks/')
+JOIN_TASKS_PATH = os.path.join(str(PROJECT_ROOT_FOLDER), 'join_tasks')
 
 REF_REPORT_IDX = 0
 
@@ -87,12 +87,13 @@ def _compare_report_data(
 
 def join_reports(join_ctx: JoinContext) -> report_schemas.Report | None:
     joined_report = None
+    task_path = os.path.join(JOIN_TASKS_PATH, join_ctx.join_task)
     rep_names, rep_list = _read_report_files(
         join_ctx.input_dir, join_ctx.reference_report
     )
     compare_items = [
         item.split('.')
-        for item in json.load(open(os.path.join(JOIN_TASKS_PATH, join_ctx.join_task), 'r')
+        for item in json.load(open(task_path, 'r')
         ).get('items', [])
     ]
 
@@ -110,9 +111,12 @@ def join_reports(join_ctx: JoinContext) -> report_schemas.Report | None:
             log.error('Comparison of reports failed')
             return None
 
-        joined_report.description = '\n'.join([joined_report.description, name])
         joined_report.sections['result'].reports['chart'].data['series'].append(
             report.sections['result'].reports['chart'].data['series'][0]
         )
+
+    joined_report.header = f'Result of joined reports {get_datetime_report("%d/%m/%Y %H:%M:%S")}'
+    joined_report.description = '\r\n'.join(rep_names)
+    joined_report.description = '\r\n'.join([joined_report.description, '\r\nJoined by:\r\n', open(task_path).read()])
 
     return joined_report
