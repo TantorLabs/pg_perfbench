@@ -1,5 +1,6 @@
 {
-    "items": [
+        "description": "Comparison of database performance across different configurations in the same environment using the same PostgreSQL version",
+        "items": [
             "system.reports.sysctl_vm.data",
             "system.reports.sysctl_net_ipv4_tcp.data",
             "system.reports.sysctl_net_ipv4_udp.data",
@@ -12,5 +13,5 @@
             "benchmark.reports.options.data",
             "benchmark.reports.custom_tables.data",
             "benchmark.reports.custom_workload.data"
-    ]
+        ]
 }

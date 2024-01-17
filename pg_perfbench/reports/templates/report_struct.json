@@ -23,7 +23,7 @@
                 },
                 "sys_memory_total": {
                     "header": "System memory information | /proc/meminfo",
-                    "description": "current state of the system's memory during the benchmarking",
+                    "description": "Current state of the system's memory during the benchmarking",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "sys_memory_total.sh",
