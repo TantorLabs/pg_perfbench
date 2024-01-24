@@ -150,22 +150,18 @@
 								var listview_id = 'lv_' + report_id;
 								var value = report_data.sections[section].reports[report].data;
 								if (Array.isArray(value)) {
-									// Логика обработки, если value - это список
-									// Например, вы можете перебрать элементы списка и добавить их в HTML
 									value.forEach(item => {
 										$("#" + report_id + " > .panel").append('<br>');
 										$("#" + report_id + " > .panel").append("<p class='common_div'>" + item[0] + "</p></div>");
 										$("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + item[1] + "</p>");
 									});
 								} else {
-									// Логика обработки, если value - не список
 									$("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + value + "</p>");
 								}
-								// $("#" + report_id + " > .panel").append("<p class='consolas-font'>" + value + "</p>");
 							}
 							if (report_data.sections[section].reports[report].item_type == 'table') {
 								var tbl_id = 'tbl_' + report_id;
-								var tblData = report_data.sections[section].reports[report].data; // Sample data for headers and rows
+								var tblData = report_data.sections[section].reports[report].data;
 								var tbl_header = report_data.sections[section].reports[report].theader;
 
 								if (Array.isArray(tblData) && tblData.length > 0 && typeof tblData[0][0] === 'string' && Array.isArray(tblData[0][1])) {
@@ -217,12 +213,10 @@
 							}
 							if (report_data.sections[section].reports[report].item_type == 'chart') {
 								var chartData = report_data.sections[section].reports[report].data;
-								// Добавляем контейнер для графика
 								var chartContainerId = 'chart_' + report_id;
 								var chartContainer = $("<div id='" + chartContainerId + "'></div>");
 								$("#" + report_id + " > .panel").append(chartContainer);
 
-								// Инициализация и отрисовка графика
 								var chartOptions = JSON.parse(JSON.stringify(chartData));
 								var chart = new ApexCharts(document.querySelector("#" + chartContainerId), chartOptions);
 								chart.render();
