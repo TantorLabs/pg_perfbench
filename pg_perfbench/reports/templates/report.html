@@ -17,7 +17,6 @@
 
 
 	<style>
-
 		.acc {
 			background-color: rgb(206, 173, 250);
 			color: #444;
@@ -51,16 +50,8 @@
 
 
 		p.consolas-font {
-			font-family: Consolas, monospace;
-			/* background-color: #f5f5f5; */
-			/* color: #333; */
-			padding: 10px;
-			white-space: pre-wrap;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			background-color: #1a1a1a;
-			color: #fff;
-			border-color: #444;
+			color: #333;
+            white-space: pre-wrap;
 		}
 
 		.paginate_button,
@@ -109,103 +100,137 @@
 		$(document).ready(function () {
 
 
-            for (const report_item in report_data) {
+			for (const report_item in report_data) {
 
-if (report_item == 'header') {
-	$("#main_content").append("<h2 style='text-align: center'>" + report_data[report_item] + "</h2>");
-}
-if (report_item == 'description') {
-	var d = $("<div class='common_div' style='white-space: pre-wrap;'></div>");
-	d.html(report_data[report_item]);
-	$( "#main_content" ).append(d);
-}
+				if (report_item == 'header') {
+					$("#main_content").append("<h2 style='text-align: center'>" + report_data[report_item] + "</h2>");
+				}
+				if (report_item == 'description') {
+					var d = $("<div class='common_div' style='white-space: pre-wrap;'></div>");
+					d.html(report_data[report_item]);
+					$("#main_content").append(d);
+				}
 
-if (report_item == 'sections') {
+				if (report_item == 'sections') {
 
-			for (const section in report_data.sections) {
+					for (const section in report_data.sections) {
 
-				var section_id = "sections_" + section;
-				var d = $("<div id='" + section_id + "'></div>");
-				$("#main_content").append(d);
-				$("#" + section_id).append('<button class="acc"  style="background-color: rgba(219, 175, 0, 0.818);">' + report_data.sections[section].header + '</button>');
+						var section_id = "sections_" + section;
+						var d = $("<div id='" + section_id + "'></div>");
+						$("#main_content").append(d);
+						$("#" + section_id).append('<button class="acc"  style="background-color: rgba(219, 175, 0, 0.818);">' + report_data.sections[section].header + '</button>');
 
-				if (report_data.sections[section].state == 'collapsed')
-					$("#" + section_id).append('<div class="panel" style="display: none"></div>');
-				if (report_data.sections[section].state == 'expanded')
-					$("#" + section_id).append('<div class="panel" style="display: block"></div>');
+						if (report_data.sections[section].state == 'collapsed')
+							$("#" + section_id).append('<div class="panel" style="display: none"></div>');
+						if (report_data.sections[section].state == 'expanded')
+							$("#" + section_id).append('<div class="panel" style="display: block"></div>');
 
-				$("#" + section_id + " > .panel").append("<p class='common_div'>" + report_data.sections[section].description + "</p>");
+						$("#" + section_id + " > .panel").append("<p class='common_div'>" + report_data.sections[section].description + "</p>");
 
 
-				for (const report in report_data.sections[section].reports) {
+						for (const report in report_data.sections[section].reports) {
 
-					var report_id = "reports_" + report;
-					var report_div = $("<div id='" + report_id + "'></div>");
-					$("#" + section_id + " > .panel").append(report_div);
+							var report_id = "reports_" + report;
+							var report_div = $("<div id='" + report_id + "'></div>");
+							$("#" + section_id + " > .panel").append(report_div);
 
-					if (report_data.sections[section].reports[report].state == 'collapsed') {
-						$("#" + report_id).append('<button class="acc acc_content acc_collapsed">' + report_data.sections[section].reports[report].header + '</button>');
-						$("#" + report_id).append('<div class="panel" style="display: none"></div>');
-					}
-					if (report_data.sections[section].reports[report].state == 'expanded') {
-						$("#" + report_id).append('<button class="acc acc_content">' + report_data.sections[section].reports[report].header + '</button>');
-						$("#" + report_id).append('<div class="panel" style="display: block"></div>');
-					}
-					if(report_data.sections[section].reports[report].description){
-					$("#" + report_id + " > .panel").append("<p class='common_div'>" + report_data.sections[section].reports[report].description + "</p></div>");
-					}
+							if (report_data.sections[section].reports[report].state == 'collapsed') {
+								$("#" + report_id).append('<button class="acc acc_content acc_collapsed">' + report_data.sections[section].reports[report].header + '</button>');
+								$("#" + report_id).append('<div class="panel" style="display: none"></div>');
+							}
+							if (report_data.sections[section].reports[report].state == 'expanded') {
+								$("#" + report_id).append('<button class="acc acc_content">' + report_data.sections[section].reports[report].header + '</button>');
+								$("#" + report_id).append('<div class="panel" style="display: block"></div>');
+							}
+							if (report_data.sections[section].reports[report].description && report_data.sections[section].reports[report].description.trim() !== "") {
+								$("#" + report_id + " > .panel").append("<p class='consolas-font'>" + report_data.sections[section].reports[report].description + "</p></div>");
+							}
+							if (report_data.sections[section].reports[report].item_type == 'plain_text') {
+								var font_style = 'font-family: Consolas, monospace; padding: 10px; white-space: pre-wrap; border: 1px solid #ccc; border-radius: 4px; background-color: #1a1a1a; color: #fff; border-color: #444;';
+								var listview_id = 'lv_' + report_id;
+								var value = report_data.sections[section].reports[report].data;
+								if (Array.isArray(value)) {
+									// Логика обработки, если value - это список
+									// Например, вы можете перебрать элементы списка и добавить их в HTML
+									value.forEach(item => {
+										$("#" + report_id + " > .panel").append('<br>');
+										$("#" + report_id + " > .panel").append("<p class='common_div'>" + item[0] + "</p></div>");
+										$("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + item[1] + "</p>");
+									});
+								} else {
+									// Логика обработки, если value - не список
+									$("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + value + "</p>");
+								}
+								// $("#" + report_id + " > .panel").append("<p class='consolas-font'>" + value + "</p>");
+							}
+							if (report_data.sections[section].reports[report].item_type == 'table') {
+								var tbl_id = 'tbl_' + report_id;
+								var tblData = report_data.sections[section].reports[report].data; // Sample data for headers and rows
+								var tbl_header = report_data.sections[section].reports[report].theader;
 
-					if (report_data.sections[section].reports[report].item_type == 'plain_text') {
-						var listview_id = 'lv_' + report_id;
-						var value = report_data.sections[section].reports[report].data;
-						$("#" + report_id + " > .panel").append("<p class='consolas-font'>" + value + "</p>");
-					}
-					if (report_data.sections[section].reports[report].item_type == 'table') {
-						var tbl_id = 'tbl_' + report_id;
-						var tblData = report_data.sections[section].reports[report].data; // Sample data for headers and rows
-						var tbl_header = report_data.sections[section].reports[report].theader;
-						$("#" + report_id + " > .panel").append('<table id="' + tbl_id + '" class="table table-striped" style="width:100%">');
-						$('#' + tbl_id).append('<thead></thead>');
+								if (Array.isArray(tblData) && tblData.length > 0 && typeof tblData[0][0] === 'string' && Array.isArray(tblData[0][1])) {
 
-						$('#' + tbl_id + " thead").append('<tr></tr>');
-						for (tbl_header_i in tbl_header) {
-							$('#' + tbl_id + " thead tr").append('<th>' + tbl_header[tbl_header_i] + '</th>');
-						}
+									$("#" + report_id + " > .panel").append('<br>');
 
-						$('#' + tbl_id).append('<tbody></tbody>');
-						for (var i = 0; i < tblData.length; i++) {
-							$('#' + tbl_id + " tbody").append('<tr></tr>');
-							for (var j = 0; j < tbl_header.length; j++) {
-								$('#' + tbl_id + " tbody tr:last").append('<td>' + tblData[i][j] + '</td>');
+									for (var table_index = 0; table_index < tblData.length; table_index++) {
+										for (var table_index = 0; table_index < tblData.length; table_index++) {
+											var table_item = tblData[table_index];
+											var tbl_id = 'tbl_' + report_id + '_' + table_index;
+											var tblDataItem = table_item[1];
+
+											$("#" + report_id + " > .panel").append("<p class='common_div'>" + table_item[0] + "</p>");
+
+
+											$("#" + report_id + " > .panel").append('<table id="' + tbl_id + '" class="table table-striped" style="width:100%; border: 1px solid grey;">');
+											$('#' + tbl_id).append('<thead ></thead>');
+											$('#' + tbl_id + " thead").append('<tr ></tr>');
+											for (var tbl_header_i in tbl_header) {
+												$('#' + tbl_id + " thead tr").append('<th >' + tbl_header[tbl_header_i] + '</th>');
+											}
+
+											$('#' + tbl_id).append('<tbody ></tbody>');
+											for (var i = 0; i < tblDataItem.length; i++) {
+												$('#' + tbl_id + " tbody").append('<tr ></tr>');
+												for (var j = 0; j < tbl_header.length; j++) {
+													$('#' + tbl_id + " tbody tr:last").append('<td>' + tblDataItem[i][j] + '</td>');
+												}
+											}
+										}
+									}
+									continue;
+								}
+								$("#" + report_id + " > .panel").append('<table id="' + tbl_id + '" class="table table-striped" style="width:100%">');
+								$('#' + tbl_id).append('<thead></thead>');
+
+								$('#' + tbl_id + " thead").append('<tr></tr>');
+								for (tbl_header_i in tbl_header) {
+									$('#' + tbl_id + " thead tr").append('<th>' + tbl_header[tbl_header_i] + '</th>');
+								}
+
+								$('#' + tbl_id).append('<tbody></tbody>');
+								for (var i = 0; i < tblData.length; i++) {
+									$('#' + tbl_id + " tbody").append('<tr></tr>');
+									for (var j = 0; j < tbl_header.length; j++) {
+										$('#' + tbl_id + " tbody tr:last").append('<td>' + tblData[i][j] + '</td>');
+									}
+								}
+							}
+							if (report_data.sections[section].reports[report].item_type == 'chart') {
+								var chartData = report_data.sections[section].reports[report].data;
+								// Добавляем контейнер для графика
+								var chartContainerId = 'chart_' + report_id;
+								var chartContainer = $("<div id='" + chartContainerId + "'></div>");
+								$("#" + report_id + " > .panel").append(chartContainer);
+
+								// Инициализация и отрисовка графика
+								var chartOptions = JSON.parse(JSON.stringify(chartData));
+								var chart = new ApexCharts(document.querySelector("#" + chartContainerId), chartOptions);
+								chart.render();
 							}
 						}
 					}
-					if (report_data.sections[section].reports[report].item_type == "chart") {
-						//1 chart tps(connections)
-						var value = 'charts';
-						var chartData = report_data.sections[section].reports[report].data;
-
-						var chartContainer = $("#" + report_id + " > .panel").append('<div class="panel" style="display: none"></div>');
-						$("#" + report_id).append(chartContainer);
-
-						var chartContainerId = 'chart_' + report_id;
-						chartContainer.attr("id", chartContainerId);
-						//Read and Filling and Draw chart object
-						var chartOptionsString = JSON.stringify(report_data.sections[section].reports[report].data);
-						var chartOptions = JSON.parse(chartOptionsString);
-
-						console.log(JSON.stringify(chartOptions));
-
-						var chart = new ApexCharts(
-							document.querySelector("#" + chartContainerId),
-							chartOptions
-						);
-						chart.render();
-					}
 				}
 			}
-		}
-	}
 
 			$('table[id^="tbl_"]').each(function () {
 				var table = $(this).DataTable({
