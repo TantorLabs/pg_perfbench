@@ -1,6 +1,5 @@
 import json
 import logging
-import time
 from pathlib import Path
 from typing import Any
 
@@ -30,22 +29,22 @@ def _get_report_html_template() -> str:
 def _save_json_report(report: Report, new_report_path: Path) -> None:
 
     with open(TEMPLATE_JSON_PATH) as json_struct:
-        full_json = json.load(json_struct)
+        report_json = json.load(json_struct)
 
-    if 'header' in full_json:
-        full_json['header'] = report.header
+    if 'header' in report_json:
+        report_json['header'] = report.header
 
-    if 'description' in full_json:
-        full_json['description'] = report.description
+    if 'description' in report_json:
+        report_json['description'] = report.description
 
     for sect_k, sect_v in report.sections.items():
         for report_k, report_v in sect_v.reports.items():
             for obj_k, obj_v in report_v:
-                if (obj_k == 'data' or obj_k == 'theader' or obj_k == 'item_type'):
-                    full_json['sections'][sect_k]['reports'][report_k][obj_k] = obj_v
+                if (obj_k == 'data' or obj_k == 'theader' or obj_k == 'item_type' or obj_k == 'header' or obj_k == 'description'):
+                    report_json['sections'][sect_k]['reports'][report_k][obj_k] = obj_v
 
     with open(new_report_path, 'w+') as new_json:
-        json.dump(full_json, new_json, indent=4, ensure_ascii=False)
+        json.dump(report_json, new_json, indent=4, ensure_ascii=False)
 
 
 def _save_html_report(new_report_json_path: str, path: Path) -> None:
@@ -57,7 +56,7 @@ def _save_html_report(new_report_json_path: str, path: Path) -> None:
         file.write(content)
 
 
-def save_report(report: Report, prefix:str = 'single') -> None:
+def save_report(report: Report, prefix: str = 'single') -> None:
     REPORT_FOLDER.mkdir(parents=True, exist_ok=True)
     current_datetime = get_datetime_report('%Y-%m-%d_%H:%M:%S')
     new_report_json_path = REPORT_FOLDER / f'{prefix}_report_{current_datetime}.json'

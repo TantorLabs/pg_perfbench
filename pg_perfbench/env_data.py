@@ -92,7 +92,7 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
 
     def chart_tps_clients(self) -> dict[Any]:
         return {
-            'name': f'Transactions per Second 1(tps)',
+            'name': 'Transactions per Second(tps)',
             # FIXME: set id of benchmark: timestamp or pid
             'data': [[val[0], round(val[4], 1)] for val in self.benchmark_result_data],
         }  # FIXME: create a model class for pgbench result
