@@ -26,6 +26,7 @@ class ReportTypes(StrEnum):
 
 
 class BaseReportItem(BaseModel):
+    header: str
     item_type: str
     data: Any
 
@@ -35,7 +36,7 @@ class BaseReportItem(BaseModel):
 
 class BaseReportPlainText(BaseReportItem):
     item_type: Literal[ReportTypes.PLAIN_TEXT]
-    data: str
+    data: str | list[list[str]]
 
     def set_data(self, text: str):
         self.data = text
@@ -53,6 +54,7 @@ class BaseReportTable(BaseReportItem):
 class BaseReportChart(BaseReportItem):
     item_type: Literal[ReportTypes.CHART]
     data: dict | str
+    description: str
 
     def set_data(self, data: dict[Any]) -> None:
         self.data['series'].append(data)
