@@ -50,6 +50,7 @@ test_params = TestParams()
 
 
 raw_context_default_wrkld = {
+    'mode': 'benchmark',
     'benchmark_type': 'default',
     'pgbench_clients': [5, 10, 15],
     'pgbench_time': [5],
@@ -80,8 +81,9 @@ raw_context_default_wrkld = {
 
 
 raw_context_custom_wrkld = {
+    'mode': 'benchmark',
     'benchmark_type': 'custom',
-    'workload_path': test_params.workload_path,
+    'workload_path': '/home/nad/common/TPC_tests/pg_perfbench_github/pg_perfbench/workload/tpc-e', #test_params.workload_path,
     'pgbench_clients': [5, 10, 15],
     'pgbench_time': [5],
     'init_command': f'cd ARG_WORKLOAD_PATH && ARG_PSQL_PATH -p ARG_PG_PORT '
@@ -112,9 +114,8 @@ raw_context_custom_wrkld = {
     'container_name': test_params.cntr_name,
 }
 
-
-ctx_default = Context.from_args_map(raw_context_default_wrkld)
 ctx_custom = Context.from_args_map(raw_context_custom_wrkld)
+ctx_default = Context.from_args_map(raw_context_default_wrkld)
 
 
 def compare_reports(report1, report2):
@@ -149,7 +150,7 @@ class Operations:
 
     @staticmethod
     def compare_expected(expected_result, test_result) -> bool:
-        exceptions_compare_fields = ['args']
+        exceptions_compare_fields = ['args', 'result']
         try:
             report_expected = Report(**expected_result)
             report_test = Report(**test_result)

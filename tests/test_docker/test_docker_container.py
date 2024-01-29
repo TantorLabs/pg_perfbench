@@ -12,6 +12,7 @@ import uvloop
 
 
 from pg_perfbench.connections.docker import DockerConnection
+from pg_perfbench.const import WorkloadTypes
 from pg_perfbench.context.schemas import connections, db
 from pg_perfbench.context.schemas.workload import WorkloadDefault
 from pg_perfbench.operations import db as db_operations
@@ -52,7 +53,10 @@ connection_params_ = {
         'local': {'pg_host': '127.0.0.1', 'pg_port': int(test_params.cntr_forwarded_port)},
         'remote': {'docker_pg_host': '127.0.0.1', 'docker_pg_port': 5432},
     },
-    'pg_data_path': test_params.cntr_cluster,
+    'work_paths': {
+            'pg_data_path': test_params.cntr_cluster,
+            'pg_bin_path': test_params.cntr_pg_bin
+    }
 }
 
 raw_db_params = {
@@ -66,7 +70,7 @@ raw_db_params = {
 }
 
 raw_workload_params = {
-    'benchmark_type': 'default',
+    'benchmark_type': WorkloadTypes.DEFAULT,
     'options': {'pgbench_clients': [10, 15, 20], 'pgbench_time': [6]},
     'init_command': 'ARG_PGBENCH_PATH -i --scale=10 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U'
     ' postgres ARG_PG_DATABASE',

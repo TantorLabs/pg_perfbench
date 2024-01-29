@@ -3,6 +3,7 @@ from argparse import Namespace
 from typing import Any
 
 from pg_perfbench.cli.args_parser import get_args_parser
+from pg_perfbench.const import WorkMode, LogLevel
 
 
 class TestArgParser(unittest.TestCase):
@@ -15,10 +16,11 @@ class TestArgParser(unittest.TestCase):
             self.assertEqual(getattr(result, key), value)
 
     def test_arg_parser_with_empty_input(self) -> None:
-        result = get_args_parser().parse_args([])
+        result = get_args_parser().parse_args(['--mode', str(WorkMode.BENCHMARK)])
         expected = {
             'clear_logs': False,
-            'log_level': None,
+            'log_level': str(LogLevel.INFO),
+            'mode': str(WorkMode.BENCHMARK),
             'benchmark_type': None,
             'workload_path': None,
             'pgbench_clients': None,
@@ -63,6 +65,8 @@ class TestArgParser(unittest.TestCase):
 
     def test_arg_parser_handling_pack_of_arguments(self) -> None:
         args = [
+            '--mode',
+            str(WorkMode.BENCHMARK),
             '--log-level',
             'info',
             '--clear-logs',
@@ -119,6 +123,7 @@ class TestArgParser(unittest.TestCase):
         result = get_args_parser().parse_args(args)
 
         expected = {
+            'mode': str(WorkMode.BENCHMARK),
             'log_level': 'info',
             'clear_logs': True,
             'ssh_host': 'test_user@test_host',

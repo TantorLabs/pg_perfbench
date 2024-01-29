@@ -1,10 +1,8 @@
 import pytest
 
-from pg_perfbench.pgbench_utils import get_pgbench_commands
+from pg_perfbench.const import WorkloadTypes
 from pg_perfbench.context.schemas.db import DBParameters
-from pg_perfbench.context.schemas.workload import WorkloadParams
 from pg_perfbench.context.schemas.workload import WorkloadDefault
-from pg_perfbench.pgbench_utils import get_pgbench_commands
 
 
 ssh_connection_params = {
@@ -23,18 +21,21 @@ ssh_connection_params = {
         },
     },
 }
-# 'pgbench_jobs': '',
+
 raw_workload_params = {
-    'benchmark_type': 'default',
-    'pgbench_clients': '13,10,200',
-    'pgbench_jobs': '',
-    'pgbench_time': '6, 10',
+    "benchmark_type": WorkloadTypes.DEFAULT,
+    "options": {
+        "pgbench_clients": [10, 20],
+        "pgbench_jobs": [1, 2],
+        "pgbench_time": [60, 120]
+    },
+    'pgbench_path': '/usr/bin/pgbench',
+    'psql_path': '/usr/bin/psql',
     'init_command': 'pgbench -i --scale=10 --foreign-keys -p 5432 -h 127.0.0.1 -U '
     'postgres ARG_PG_DATABASE',
     'workload_command': 'pgbench -p 5432 -h 127.0.0.1 -U postgres ARG_PG_DATABASE'
-    ' -c ARG_PGBENCH_CLIENTS -j 20 -T 10 --no-vacuum',
+    ' -c ARG_PGBENCH_CLIENTS -j 20 -T 10 --no-vacuum'
 }
-
 
 raw_db_params = {
     'pg_host': '127.0.0.1',
@@ -48,17 +49,7 @@ raw_db_params = {
 
 
 def test_collection_of_pgbench_commands():
-    try:
-        # conn_params = SSHConnectionParams(**ssh_connection_params)
-        db_params = DBParameters(**raw_db_params)
-        workload_params = WorkloadDefault(**raw_workload_params)
-        assert db_params
-        assert workload_params
-        # pgbench_commands = get_pgbench_commands_ref(db_params, workload_params)
-        # for command in pgbench_commands:
-        #     print('\n')
-        #     print(command)
-        return 0
-    except Exception as e:
-        print(str(e))
-        return 1
+    db_params = DBParameters(**raw_db_params)
+    workload_params = WorkloadDefault(**raw_workload_params)
+    assert db_params
+    assert workload_params

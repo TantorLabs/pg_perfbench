@@ -1,6 +1,6 @@
 {
-    "header": "PostgreSQL diagnostic report",
-    "description": "12/12/2023 15:33:28",
+    "header": "PostgreSQL database benchmark report",
+    "description": "",
     "sections": {
         "system": {
             "header": "System properties <hn>",
@@ -8,60 +8,82 @@
             "state": "expanded",
             "reports": {
                 "uname_a": {
-                    "header": "uname -a",
+                    "header": "Linux kernel version and machine architecture | uname -r -m",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "uname_a.sh",
-                    "data": "Linux c9916b9ebedb 6.2.0-37-generic #38~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Nov  2 18:01:13 UTC 2 x86_64 GNU/Linux\r\n"
+                    "data": "6.5.0-14-generic x86_64\r\n"
                 },
                 "etc_os_release": {
-                    "header": "/etc/os-release",
+                    "header": "OS distribution information | /etc/os-release",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "etc_os_release.sh",
                     "data": "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\r\nNAME=\"Debian GNU/Linux\"\r\nVERSION_ID=\"12\"\r\nVERSION=\"12 (bookworm)\"\r\nVERSION_CODENAME=bookworm\r\nID=debian\r\nHOME_URL=\"https://www.debian.org/\"\r\nSUPPORT_URL=\"https://www.debian.org/support\"\r\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\r\n"
                 },
                 "sys_memory_total": {
-                    "header": "meminfo",
+                    "header": "System memory information | /proc/meminfo",
+                    "description": "Current state of the system's memory during the benchmarking",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "sys_memory_total.sh",
-                    "data": "MemTotal:       49024012 kB\r\nMemFree:        26373808 kB\r\nMemAvailable:   27854868 kB\r\nBuffers:           20220 kB\r\nCached:          4925112 kB\r\nSwapCached:          132 kB\r\nActive:          1335520 kB\r\nInactive:       14784568 kB\r\nActive(anon):     271612 kB\r\nInactive(anon): 13732528 kB\r\nActive(file):    1063908 kB\r\nInactive(file):  1052040 kB\r\nUnevictable:       21296 kB\r\nMlocked:              64 kB\r\nSwapTotal:       2097148 kB\r\nSwapFree:        2095612 kB\r\nZswap:                 0 kB\r\nZswapped:              0 kB\r\nDirty:              3096 kB\r\nWriteback:             0 kB\r\nAnonPages:      11196100 kB\r\nMapped:          7778756 kB\r\nShmem:           2829376 kB\r\nKReclaimable:     165324 kB\r\nSlab:             525984 kB\r\nSReclaimable:     165324 kB\r\nSUnreclaim:       360660 kB\r\nKernelStack:       50400 kB\r\nPageTables:       137396 kB\r\nSecPageTables:         0 kB\r\nNFS_Unstable:          0 kB\r\nBounce:                0 kB\r\nWritebackTmp:          0 kB\r\nCommitLimit:    26609152 kB\r\nCommitted_AS:   43216640 kB\r\nVmallocTotal:   34359738367 kB\r\nVmallocUsed:       94476 kB\r\nVmallocChunk:          0 kB\r\nPercpu:            20544 kB\r\nHardwareCorrupted:     0 kB\r\nAnonHugePages:         0 kB\r\nShmemHugePages:  2107392 kB\r\nShmemPmdMapped:        0 kB\r\nFileHugePages:         0 kB\r\nFilePmdMapped:         0 kB\r\nHugePages_Total:       0\r\nHugePages_Free:        0\r\nHugePages_Rsvd:        0\r\nHugePages_Surp:        0\r\nHugepagesize:       2048 kB\r\nHugetlb:               0 kB\r\nDirectMap4k:      521664 kB\r\nDirectMap2M:    27490304 kB\r\nDirectMap1G:    23068672 kB\r\n"
+                    "data": "MemTotal:       49023532 kB\r\nMlocked:              64 kB\r\nSwapTotal:       2097148 kB\r\nSwapFree:        2097148 kB\r\nZswap:                 0 kB\r\nZswapped:              0 kB\r\nNFS_Unstable:          0 kB\r\nBounce:                0 kB\r\nCommitLimit:    26608912 kB\r\nVmallocTotal:   34359738367 kB\r\nVmallocChunk:          0 kB\r\nPercpu:            15680 kB\r\nHardwareCorrupted:     0 kB\r\nAnonHugePages:         0 kB\r\nFileHugePages:         0 kB\r\nUnaccepted:            0 kB\r\nHugePages_Total:       0\r\nHugePages_Free:        0\r\nHugePages_Rsvd:        0\r\nHugePages_Surp:        0\r\nHugepagesize:       2048 kB\r\nHugetlb:               0 kB\r\nDirectMap4k:      333248 kB\r\nDirectMap2M:    14047232 kB\r\nDirectMap1G:    36700160 kB\r\n"
                 },
                 "cpu_info": {
-                    "header": "lscpu",
+                    "header": "CPU architecture and specification display tool | lscpu",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "cpu_info.sh",
-                    "data": "Architecture:            x86_64\r\n  CPU op-mode(s):        32-bit, 64-bit\r\n  Address sizes:         39 bits physical, 48 bits virtual\r\n  Byte Order:            Little Endian\r\nCPU(s):                  16\r\n  On-line CPU(s) list:   0-15\r\nVendor ID:               GenuineIntel\r\n  BIOS Vendor ID:        Intel(R) Corporation\r\n  Model name:            12th Gen Intel(R) Core(TM) i7-1260P\r\n    BIOS Model name:     12th Gen Intel(R) Core(TM) i7-1260P None CPU @ 2.1GHz\r\n    BIOS CPU family:     198\r\n    CPU family:          6\r\n    Model:               154\r\n    Thread(s) per core:  2\r\n    Core(s) per socket:  12\r\n    Socket(s):           1\r\n    Stepping:            3\r\n    CPU(s) scaling MHz:  40%\r\n    CPU max MHz:         4700.0000\r\n    CPU min MHz:         400.0000\r\n    BogoMIPS:            4992.00\r\n    Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc\r\n                         a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss \r\n                         ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art\r\n                          arch_perfmon pebs bts rep_good nopl xtopology nonstop_\r\n                         tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes6\r\n                         4 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xt\r\n                         pr pdcm sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_\r\n                         timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefet\r\n                         ch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced t\r\n                         pr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase ts\r\n                         c_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx sm\r\n                         ap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xget\r\n                         bv1 xsaves split_lock_detect avx_vnni dtherm ida arat p\r\n                         ln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_re\r\n                         q hfi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid\r\n                          movdiri movdir64b fsrm md_clear serialize arch_lbr ibt\r\n                          flush_l1d arch_capabilities\r\nVirtualization features: \r\n  Virtualization:        VT-x\r\nCaches (sum of all):     \r\n  L1d:                   448 KiB (12 instances)\r\n  L1i:                   640 KiB (12 instances)\r\n  L2:                    9 MiB (6 instances)\r\n  L3:                    18 MiB (1 instance)\r\nNUMA:                    \r\n  NUMA node(s):          1\r\n  NUMA node0 CPU(s):     0-15\r\nVulnerabilities:         \r\n  Gather data sampling:  Not affected\r\n  Itlb multihit:         Not affected\r\n  L1tf:                  Not affected\r\n  Mds:                   Not affected\r\n  Meltdown:              Not affected\r\n  Mmio stale data:       Not affected\r\n  Retbleed:              Not affected\r\n  Spec rstack overflow:  Not affected\r\n  Spec store bypass:     Mitigation; Speculative Store Bypass disabled via prctl\r\n  Spectre v1:            Mitigation; usercopy/swapgs barriers and __user pointer\r\n                          sanitization\r\n  Spectre v2:            Mitigation; Enhanced IBRS, IBPB conditional, RSB fillin\r\n                         g, PBRSB-eIBRS SW sequence\r\n  Srbds:                 Not affected\r\n  Tsx async abort:       Not affected\r\n"
+                    "data": "Architecture:                       x86_64\r\nCPU op-mode(s):                     32-bit, 64-bit\r\nAddress sizes:                      39 bits physical, 48 bits virtual\r\nByte Order:                         Little Endian\r\nCPU(s):                             16\r\nOn-line CPU(s) list:                0-15\r\nVendor ID:                          GenuineIntel\r\nBIOS Vendor ID:                     Intel(R) Corporation\r\nModel name:                         12th Gen Intel(R) Core(TM) i7-1260P\r\nBIOS Model name:                    12th Gen Intel(R) Core(TM) i7-1260P None CPU @ 2.1GHz\r\nBIOS CPU family:                    198\r\nCPU family:                         6\r\nModel:                              154\r\nThread(s) per core:                 2\r\nCore(s) per socket:                 12\r\nSocket(s):                          1\r\nStepping:                           3\r\nCPU max MHz:                        4700.0000\r\nCPU min MHz:                        400.0000\r\nBogoMIPS:                           4992.00\r\nFlags:                              fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect avx_vnni dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid movdiri movdir64b fsrm md_clear serialize arch_lbr ibt flush_l1d arch_capabilities\r\nVirtualization:                     VT-x\r\nL1d cache:                          448 KiB (12 instances)\r\nL1i cache:                          640 KiB (12 instances)\r\nL2 cache:                           9 MiB (6 instances)\r\nL3 cache:                           18 MiB (1 instance)\r\nNUMA node(s):                       1\r\nNUMA node0 CPU(s):                  0-15\r\nVulnerability Gather data sampling: Not affected\r\nVulnerability Itlb multihit:        Not affected\r\nVulnerability L1tf:                 Not affected\r\nVulnerability Mds:                  Not affected\r\nVulnerability Meltdown:             Not affected\r\nVulnerability Mmio stale data:      Not affected\r\nVulnerability Retbleed:             Not affected\r\nVulnerability Spec rstack overflow: Not affected\r\nVulnerability Spec store bypass:    Mitigation; Speculative Store Bypass disabled via prctl\r\nVulnerability Spectre v1:           Mitigation; usercopy/swapgs barriers and __user pointer sanitization\r\nVulnerability Spectre v2:           Mitigation; Enhanced / Automatic IBRS, IBPB conditional, RSB filling, PBRSB-eIBRS SW sequence\r\nVulnerability Srbds:                Not affected\r\nVulnerability Tsx async abort:      Not affected\r\n"
                 },
                 "df_h": {
-                    "header": "df -h",
+                    "header": "Disk space usage | df -h",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "df_h.sh",
-                    "data": "Filesystem      Size  Used Avail Use% Mounted on\r\noverlay         916G  439G  431G  51% /\r\ntmpfs            64M     0   64M   0% /dev\r\nshm              64M  1.1M   63M   2% /dev/shm\r\n/dev/nvme0n1p2  916G  439G  431G  51% /etc/hosts\r\n"
+                    "data": "Filesystem      Size  Used Avail Use% Mounted on\r\noverlay         916G  438G  432G  51% /\r\ntmpfs            64M     0   64M   0% /dev\r\nshm              64M  1.1M   63M   2% /dev/shm\r\n/dev/nvme0n1p2  916G  438G  432G  51% /usr/sbin/sysctl\r\n"
                 },
                 "etc_fstab": {
-                    "header": "fstab",
+                    "header": "File system mount configuration | fstab",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "etc_fstab.sh",
                     "data": "# UNCONFIGURED FSTAB FOR BASE SYSTEM\r\n"
                 },
                 "mount": {
-                    "header": "mount",
+                    "header": "Current filesystem mounts and their details | mount",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "mount.sh",
-                    "data": "overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/overlay2/l/VM35OITYDIRTEN3XSGEXVVPBYH:/var/lib/docker/overlay2/l/ZQSPY7Y65K4KLLNLIB7WUVQX7Q:/var/lib/docker/overlay2/l/QHNO6ZCSPRHPJXWIC4JKSQISZV:/var/lib/docker/overlay2/l/OPJTUILYS6M3XEUBVL4HPQWEPQ:/var/lib/docker/overlay2/l/G3LFBUWUOUKIZ3NAS3CZKOMWFX:/var/lib/docker/overlay2/l/U224KWZ6ODGYZUI7Z25K3CTVUW:/var/lib/docker/overlay2/l/FUCF25ACSEYNLSSF4P4SG2VBHO:/var/lib/docker/overlay2/l/56WTDT5675T44SCV2Q5JIJ35FY:/var/lib/docker/overlay2/l/4WNRMLNBFOBYSHJVIXPWLLZFKH:/var/lib/docker/overlay2/l/VARBSNERHLXJQZIEIJ6ISV73IZ:/var/lib/docker/overlay2/l/M73FMKOLYBVUJ7Y7CFEGZOCYSA:/var/lib/docker/overlay2/l/W6TFY5GMWYPK5FUUXQZ6HKZ4Y6:/var/lib/docker/overlay2/l/CGLK5GLMGGFUU7SDPAVJKDLOPW:/var/lib/docker/overlay2/l/S6MOVLABZNRBKAL5K5QBVKQTWI,upperdir=/var/lib/docker/overlay2/9a3bd0fe5b358b0c490bac0a99d6e3fac239f548b86c5180cbd606922bcefc74/diff,workdir=/var/lib/docker/overlay2/9a3bd0fe5b358b0c490bac0a99d6e3fac239f548b86c5180cbd606922bcefc74/work,nouserxattr)\r\nproc on /proc type proc (rw,nosuid,nodev,noexec,relatime)\r\ntmpfs on /dev type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)\r\ndevpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666)\r\nsysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)\r\ncgroup on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)\r\nmqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)\r\nshm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,inode64)\r\n/dev/nvme0n1p2 on /etc/resolv.conf type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/hostname type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/hosts type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /var/lib/postgresql/data type ext4 (rw,relatime,errors=remount-ro)\r\n"
+                    "data": "overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/overlay2/l/HL5VC546D3ZUDMTTECFMLJB4LG:/var/lib/docker/overlay2/l/7SDEU5ANGVIRN2RPV4C4SOPPQE:/var/lib/docker/overlay2/l/OGBIKZ7S6VZM4IBC5ZBIVEUOER:/var/lib/docker/overlay2/l/JZP3IBYR5FES6LU4M6EXOXOOED:/var/lib/docker/overlay2/l/TZC6WWTKHD64HLVIX7J2INXK7N:/var/lib/docker/overlay2/l/E62OTHGNV75B5QWVGWCMEXVG2T:/var/lib/docker/overlay2/l/2436ATZKDKOT5EOLB5V42X2MI7:/var/lib/docker/overlay2/l/UQ23BYYEHEJMC354RAMNKRYNJ4:/var/lib/docker/overlay2/l/F7WXCOWPBGGQEYRDHZSNYZONCZ:/var/lib/docker/overlay2/l/YH55SMFLC3NPOYRSFGRSNLWAAV:/var/lib/docker/overlay2/l/6XWVPEXZUXTB5RHHLELSRKTFSA:/var/lib/docker/overlay2/l/BUE5T24OPRRLF6S6TKYSHRSNG6:/var/lib/docker/overlay2/l/TG3J6I4VNFX55IS3CXNYTYBHOC:/var/lib/docker/overlay2/l/2743BOK6K4YMPCMX5G4PIVQG2D:/var/lib/docker/overlay2/l/DO6COZQBZB5VHXEX33UKJSRKPW,upperdir=/var/lib/docker/overlay2/d2f302cd4cbcff8d76c072c376dfcf4089d9160f91fe68aa2810e40cb217aca3/diff,workdir=/var/lib/docker/overlay2/d2f302cd4cbcff8d76c072c376dfcf4089d9160f91fe68aa2810e40cb217aca3/work,nouserxattr)\r\nproc on /proc type proc (rw,nosuid,nodev,noexec,relatime)\r\ntmpfs on /dev type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)\r\ndevpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666)\r\nsysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)\r\ncgroup on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)\r\nmqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)\r\nshm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,inode64)\r\n/dev/nvme0n1p2 on /usr/sbin/sysctl type ext4 (ro,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/resolv.conf type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/hostname type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /etc/hosts type ext4 (rw,relatime,errors=remount-ro)\r\n/dev/nvme0n1p2 on /var/lib/postgresql/data type ext4 (rw,relatime,errors=remount-ro)\r\n"
                 },
                 "ip_br_addr": {
-                    "header": "ip -br addr",
+                    "header": "Local hostname-to-IP mapping | ip -br addr",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "ip_br_addr.sh",
-                    "data": "127.0.0.1\tlocalhost\r\n::1\tlocalhost ip6-localhost ip6-loopback\r\nfe00::0\tip6-localnet\r\nff00::0\tip6-mcastprefix\r\nff02::1\tip6-allnodes\r\nff02::2\tip6-allrouters\r\n172.17.0.2\tc9916b9ebedb\r\n"
+                    "data": "127.0.0.1\tlocalhost\r\n::1\tlocalhost ip6-localhost ip6-loopback\r\nfe00::0\tip6-localnet\r\nff00::0\tip6-mcastprefix\r\nff02::1\tip6-allnodes\r\nff02::2\tip6-allrouters\r\n172.17.0.2\t6a0b358a1341\r\n"
+                },
+                "sysctl_vm": {
+                    "header": "Kernel parameters related to virtual memory | /sbin/sysctl vm",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_vm.sh",
+                    "data": "vm.admin_reserve_kbytes = 8192\r\nvm.compact_unevictable_allowed = 1\r\nvm.compaction_proactiveness = 20\r\nvm.dirty_background_bytes = 0\r\nvm.dirty_background_ratio = 10\r\nvm.dirty_bytes = 0\r\nvm.dirty_expire_centisecs = 3000\r\nvm.dirty_ratio = 20\r\nvm.dirty_writeback_centisecs = 500\r\nvm.dirtytime_expire_seconds = 43200\r\nvm.extfrag_threshold = 500\r\nvm.hugetlb_optimize_vmemmap = 0\r\nvm.hugetlb_shm_group = 0\r\nvm.laptop_mode = 0\r\nvm.legacy_va_layout = 0\r\nvm.lowmem_reserve_ratio = 256\t256\t32\t0\t0\r\nvm.max_map_count = 65530\r\nvm.memfd_noexec = 0\r\nvm.memory_failure_early_kill = 0\r\nvm.memory_failure_recovery = 1\r\nvm.min_free_kbytes = 67584\r\nvm.min_slab_ratio = 5\r\nvm.min_unmapped_ratio = 1\r\nvm.mmap_min_addr = 65536\r\nvm.mmap_rnd_bits = 28\r\nvm.mmap_rnd_compat_bits = 8\r\nvm.nr_hugepages = 0\r\nvm.nr_hugepages_mempolicy = 0\r\nvm.nr_overcommit_hugepages = 0\r\nvm.numa_stat = 1\r\nvm.numa_zonelist_order = Node\r\nvm.oom_dump_tasks = 1\r\nvm.oom_kill_allocating_task = 0\r\nvm.overcommit_kbytes = 0\r\nvm.overcommit_memory = 0\r\nvm.overcommit_ratio = 50\r\nvm.page-cluster = 3\r\nvm.page_lock_unfairness = 5\r\nvm.panic_on_oom = 0\r\nvm.percpu_pagelist_high_fraction = 0\r\nvm.stat_interval = 1\r\nvm.swappiness = 60\r\nvm.unprivileged_userfaultfd = 0\r\nvm.user_reserve_kbytes = 131072\r\nvm.vfs_cache_pressure = 100\r\nvm.watermark_boost_factor = 15000\r\nvm.watermark_scale_factor = 10\r\nvm.zone_reclaim_mode = 0\r\n"
+                },
+                "sysctl_net_ipv4_tcp": {
+                    "header": "Kernel parameters related to IPv4 TCP networking settings | /sbin/sysctl -a | grep \"^net\\.ipv4\\.tcp\"",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_net_ipv4_tcp.sh",
+                    "data": "net.ipv4.tcp_abort_on_overflow = 0\r\nnet.ipv4.tcp_adv_win_scale = 1\r\nnet.ipv4.tcp_allowed_congestion_control = reno cubic\r\nnet.ipv4.tcp_app_win = 31\r\nnet.ipv4.tcp_autocorking = 1\r\nnet.ipv4.tcp_available_congestion_control = reno cubic\r\nnet.ipv4.tcp_base_mss = 1024\r\nnet.ipv4.tcp_challenge_ack_limit = 2147483647\r\nnet.ipv4.tcp_child_ehash_entries = 0\r\nnet.ipv4.tcp_comp_sack_delay_ns = 1000000\r\nnet.ipv4.tcp_comp_sack_nr = 44\r\nnet.ipv4.tcp_comp_sack_slack_ns = 100000\r\nnet.ipv4.tcp_congestion_control = cubic\r\nnet.ipv4.tcp_dsack = 1\r\nnet.ipv4.tcp_early_demux = 1\r\nnet.ipv4.tcp_early_retrans = 3\r\nnet.ipv4.tcp_ecn = 2\r\nnet.ipv4.tcp_ecn_fallback = 1\r\nnet.ipv4.tcp_ehash_entries = -524288\r\nnet.ipv4.tcp_fack = 0\r\nnet.ipv4.tcp_fastopen = 1\r\nnet.ipv4.tcp_fastopen_blackhole_timeout_sec = 0\r\nnet.ipv4.tcp_fastopen_key = 00000000-00000000-00000000-00000000\r\nnet.ipv4.tcp_fin_timeout = 60\r\nnet.ipv4.tcp_frto = 2\r\nnet.ipv4.tcp_fwmark_accept = 0\r\nnet.ipv4.tcp_invalid_ratelimit = 500\r\nnet.ipv4.tcp_keepalive_intvl = 75\r\nnet.ipv4.tcp_keepalive_probes = 9\r\nnet.ipv4.tcp_keepalive_time = 7200\r\nnet.ipv4.tcp_l3mdev_accept = 0\r\nnet.ipv4.tcp_limit_output_bytes = 1048576\r\nnet.ipv4.tcp_max_reordering = 300\r\nnet.ipv4.tcp_max_syn_backlog = 4096\r\nnet.ipv4.tcp_max_tw_buckets = 262144\r\nnet.ipv4.tcp_migrate_req = 0\r\nnet.ipv4.tcp_min_rtt_wlen = 300\r\nnet.ipv4.tcp_min_snd_mss = 48\r\nnet.ipv4.tcp_min_tso_segs = 2\r\nnet.ipv4.tcp_moderate_rcvbuf = 1\r\nnet.ipv4.tcp_mtu_probe_floor = 48\r\nnet.ipv4.tcp_mtu_probing = 0\r\nnet.ipv4.tcp_no_metrics_save = 0\r\nnet.ipv4.tcp_no_ssthresh_metrics_save = 1\r\nnet.ipv4.tcp_notsent_lowat = 4294967295\r\nnet.ipv4.tcp_orphan_retries = 0\r\nnet.ipv4.tcp_pacing_ca_ratio = 120\r\nnet.ipv4.tcp_pacing_ss_ratio = 200\r\nnet.ipv4.tcp_plb_cong_thresh = 128\r\nnet.ipv4.tcp_plb_enabled = 0\r\nnet.ipv4.tcp_plb_idle_rehash_rounds = 3\r\nnet.ipv4.tcp_plb_rehash_rounds = 12\r\nnet.ipv4.tcp_plb_suspend_rto_sec = 60\r\nnet.ipv4.tcp_probe_interval = 600\r\nnet.ipv4.tcp_probe_threshold = 8\r\nnet.ipv4.tcp_recovery = 1\r\nnet.ipv4.tcp_reflect_tos = 0\r\nnet.ipv4.tcp_reordering = 3\r\nnet.ipv4.tcp_retrans_collapse = 1\r\nnet.ipv4.tcp_retries1 = 3\r\nnet.ipv4.tcp_retries2 = 15\r\nnet.ipv4.tcp_rfc1337 = 0\r\nnet.ipv4.tcp_rmem = 4096\t131072\t6291456\r\nnet.ipv4.tcp_sack = 1\r\nnet.ipv4.tcp_shrink_window = 0\r\nnet.ipv4.tcp_slow_start_after_idle = 1\r\nnet.ipv4.tcp_stdurg = 0\r\nnet.ipv4.tcp_syn_linear_timeouts = 4\r\nnet.ipv4.tcp_syn_retries = 6\r\nnet.ipv4.tcp_synack_retries = 5\r\nnet.ipv4.tcp_syncookies = 1\r\nnet.ipv4.tcp_thin_linear_timeouts = 0\r\nnet.ipv4.tcp_timestamps = 1\r\nnet.ipv4.tcp_tso_rtt_log = 9\r\nnet.ipv4.tcp_tso_win_divisor = 3\r\nnet.ipv4.tcp_tw_reuse = 2\r\nnet.ipv4.tcp_window_scaling = 1\r\nnet.ipv4.tcp_wmem = 4096\t16384\t4194304\r\nnet.ipv4.tcp_workaround_signed_windows = 0\r\n"
+                },
+                "sysctl_net_ipv4_udp": {
+                    "header": "Kernel parameters related to IPv4 UDP networking settings | /sbin/sysctl -a | grep \"^net\\.ipv4\\.udp\"",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_net_ipv4_udp.sh",
+                    "data": "net.ipv4.udp_child_hash_entries = 0\r\nnet.ipv4.udp_early_demux = 1\r\nnet.ipv4.udp_hash_entries = -32768\r\nnet.ipv4.udp_l3mdev_accept = 0\r\nnet.ipv4.udp_rmem_min = 4096\r\nnet.ipv4.udp_wmem_min = 4096\r\n"
                 }
             }
         },
@@ -70,22 +92,31 @@
             "description": "Common info about current database",
             "state": "expanded",
             "reports": {
-                "version_full": {
+                "full_version": {
                     "header": "PostgreSQL full version",
+                    "description": "Information about the installed PostgreSQL version, including the version number, system architecture, utilized compiler, and operating system",
                     "state": "collapsed",
                     "item_type": "plain_text",
-                    "sql_command_file": "sql_1.sql",
+                    "sql_command_file": "full_version.sql",
                     "data": "PostgreSQL 15.5 (Debian 15.5-1.pgdg120+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit"
                 },
-                "maintenance_verison": {
-                    "header": "PostgreSQL maintenance version",
+                "version_major": {
+                    "header": "PostgreSQL major version",
                     "state": "hidden",
                     "item_type": "plain_text",
-                    "sql_command_file": "sql_1.sql",
+                    "sql_command_file": "full_version.sql",
                     "data": "PostgreSQL 15.5 (Debian 15.5-1.pgdg120+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit"
+                },
+                "version_minor": {
+                    "header": "PostgreSQL minor version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "server_version.sql",
+                    "data": "15.5 (Debian 15.5-1.pgdg120+1)"
                 },
                 "pg_config": {
                     "header": "PostgreSQL pg_config",
+                    "description": "Configuration parameters of the currently installed PostgreSQL version",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "shell_command_file": "pg_config.sh",
@@ -93,9 +124,10 @@
                 },
                 "pg_settings": {
                     "header": "PostgreSQL settings",
+                    "description": "Configuration settings of the PostgreSQL server",
                     "state": "collapsed",
                     "item_type": "table",
-                    "sql_command_file": "sql_3.sql",
+                    "sql_command_file": "server_settings.sql",
                     "theader": [
                         "name",
                         "setting"
@@ -1519,7 +1551,7 @@
                     "header": "PostgreSQL extensions",
                     "state": "collapsed",
                     "item_type": "table",
-                    "sql_command_file": "sql_2.sql",
+                    "sql_command_file": "available_server_extensions.sql",
                     "theader": [
                         "name",
                         "default_version",
@@ -1772,6 +1804,7 @@
             "reports": {
                 "args": {
                     "header": "benchmark arguments info",
+                    "description": "Arguments configured by the user",
                     "state": "collapsed",
                     "item_type": "table",
                     "python_command": "args",
@@ -1781,12 +1814,16 @@
                     ],
                     "data": [
                         [
+                            "mode",
+                            "benchmark"
+                        ],
+                        [
                             "benchmark_type",
                             "custom"
                         ],
                         [
                             "workload_path",
-                            "pg_perfbench/workload/tpc-e"
+                            "/home/nad/common/TPC_tests/pg_perfbench_github/pg_perfbench/workload/tpc-e"
                         ],
                         [
                             "pgbench_clients",
@@ -1826,7 +1863,7 @@
                         ],
                         [
                             "pg_user_password",
-                            "****"
+                            "pswd"
                         ],
                         [
                             "pg_database",
@@ -1860,6 +1897,7 @@
                 },
                 "options": {
                     "header": "pgbench options info",
+                    "description": "Benchmark load configuration parameters for pgbench",
                     "state": "collapsed",
                     "item_type": "table",
                     "python_command": "pgbench_options_table",
@@ -1884,6 +1922,7 @@
                 },
                 "custom_tables": {
                     "header": "pgbench tables",
+                    "description": "Table schema for the pgbench load test",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "python_command": "workload_tables",
@@ -1891,6 +1930,7 @@
                 },
                 "custom_workload": {
                     "header": "pgbench workload",
+                    "description": "Load testing scripts",
                     "state": "collapsed",
                     "item_type": "plain_text",
                     "python_command": "workload",
@@ -1918,48 +1958,49 @@
                     "data": [
                         [
                             5,
-                            null,
-                            2.097,
-                            3.039,
-                            2384.549901
+                            50576,
+                            0.988,
+                            3.361,
+                            5058.717471
                         ],
                         [
                             10,
-                            null,
-                            3.691,
-                            18.64,
-                            2708.985381
+                            38452,
+                            2.591,
+                            39.79,
+                            3859.628062
                         ],
                         [
                             15,
-                            null,
-                            5.562,
-                            33.935,
-                            2696.884012
+                            36513,
+                            4.095,
+                            36.304,
+                            3663.097371
                         ]
                     ]
                 },
                 "chart": {
                     "header": "benchmark plots",
+                    "description": "",
                     "state": "collapsed",
                     "item_type": "chart",
                     "python_command": "chart_tps_clients",
                     "data": {
                         "series": [
                             {
-                                "name": "Transactions per Second 1(tps)",
+                                "name": "Transactions per Second(tps)",
                                 "data": [
                                     [
                                         5,
-                                        2384.5
+                                        5058.7
                                     ],
                                     [
                                         10,
-                                        2709.0
+                                        3859.6
                                     ],
                                     [
                                         15,
-                                        2696.9
+                                        3663.1
                                     ]
                                 ]
                             }
