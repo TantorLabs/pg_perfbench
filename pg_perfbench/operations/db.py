@@ -134,7 +134,7 @@ def get_pgbench_results(pgbench_output: str) -> dict[str, Any]:
         ),
         'number of transactions actually processed': get_val(
             re.finditer(
-                r'number\sof\stransactions\sactually\sprocessed\:\s(\d+)/\d+',
+                r'number\sof\stransactions\sactually\sprocessed\:\s((\d+)/\d+|\d+)',
                 pgbench_output,
             ),
             'int',

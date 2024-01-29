@@ -150,6 +150,7 @@
 								var listview_id = 'lv_' + report_id;
 								var value = report_data.sections[section].reports[report].data;
 								if (Array.isArray(value)) {
+									$("#" + report_id + " > button.acc_collapsed").css("background-color", "pink");
 									value.forEach(item => {
 										$("#" + report_id + " > .panel").append('<br>');
 										$("#" + report_id + " > .panel").append("<p class='common_div'>" + item[0] + "</p></div>");
@@ -165,7 +166,7 @@
 								var tbl_header = report_data.sections[section].reports[report].theader;
 
 								if (Array.isArray(tblData) && tblData.length > 0 && typeof tblData[0][0] === 'string' && Array.isArray(tblData[0][1])) {
-
+									$("#" + report_id + " > button.acc_collapsed").css("background-color", "pink");
 									$("#" + report_id + " > .panel").append('<br>');
 
 									for (var table_index = 0; table_index < tblData.length; table_index++) {
@@ -195,7 +196,7 @@
 									}
 									continue;
 								}
-								$("#" + report_id + " > .panel").append('<table id="' + tbl_id + '" class="table table-striped" style="width:100%">');
+								$("#" + report_id + " > .panel").append('<table id="' + tbl_id + '" class="table table-striped" style="width:100%; border: 1px solid grey;">');
 								$('#' + tbl_id).append('<thead></thead>');
 
 								$('#' + tbl_id + " thead").append('<tr></tr>');
@@ -270,6 +271,7 @@
 			$("#expand_all").click(function () {
 				$('div.panel').css('display', 'block');
 				$("button.acc").removeClass('acc_collapsed');
+				tables.forEach(t => t.draw());
 			});
 
 			$("#collapse_all").click(function () {
