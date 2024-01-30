@@ -16,7 +16,7 @@ JOIN_TASKS_PATH = os.path.join(str(PROJECT_ROOT_FOLDER), 'join_tasks')
 REF_REPORT_IDX = 0
 
 SECTION = 0
-REPORT = 2
+REPORT = 1
 
 
 def _read_report_files(
@@ -29,7 +29,7 @@ def _read_report_files(
         ]
     )
 
-    if ref_report and ref_report in rep_names_list:
+    if ref_report in rep_names_list:
         ref_index = rep_names_list.index(ref_report)
         rep_names_list[REF_REPORT_IDX], rep_names_list[ref_index] = (
             rep_names_list[ref_index],
