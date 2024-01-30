@@ -53,6 +53,12 @@ chmod 666 /var/run/docker.sock
 - To ensure successful use, first thoroughly explore the capabilities of the tool and run the tests.
 
 # Configuring options
+pg_perfbench supports two modes: 'join' and 'benchmark'.
+<br> In 'benchmark' mode, the application loads the
+configured database instance and generates a report based on the report_struct.json template.<br>
+In 'join' mode, the application compares reports with each other, the path to which can be specified
+via the --input-dir flag (by default set to 'report' in the project root), according to criteria
+described in join_tasks JSON files in the project root.
 ## Service options
 | Parameter      | Description                                                                                                                                             |
 |----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -60,6 +66,7 @@ chmod 666 /var/run/docker.sock
 | `--log-level`  | Application logging level: `info`, `debug`, `error`.<br/>Default - `info`                                                                               |
 | `--clear-logs` | Clearing logs from the tool's previous session. <br>Logs are located in the 'logs' folder of the root directory.                                        |
 
+# Configuring pg_perfbench in `benchmark` mode
 ## Connection options 
 ### SSH connection
 
@@ -179,7 +186,8 @@ configure placeholders like `'ARG_'+ <DB|Workload options>`.<br><br>
 For example, you can configure pgbench by specifying the path of the load files 
 (this example describes the full set of arguments for ssh connection):
 ```
-python3.11 -m pg_perfbench --log-level=debug \
+python3.11 -m pg_perfbench --mode=benchmark \
+--log-level=debug \
 --ssh-port=22 \
 --ssh-key=path/to/private_key \
 --ssh-host=10.128.0.141 \
@@ -206,7 +214,8 @@ python3.11 -m pg_perfbench --log-level=debug \
 or standard pgbench load
 (this example describes the full set of arguments for docker connection):
 ```
-python3.11 -m pg_perfbench --log-level=debug \
+python3.11 -m pg_perfbench --mode=benchmark \
+--log-level=debug \
 --image-name=postgres:15 \
 --container-name=cntr_expected \
 --docker-pg-host=127.0.0.1 \
@@ -254,6 +263,32 @@ Add or remove reports of the following types:
 }
 ```
 
+# Configuring pg_perfbench in `join` mode
+
+| Parameter           | Description                                                                                                                                  |
+|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `--join-task`       | A JSON file containing a set of merge criteria,which are items of sections,<br/> should be located in join_tasks at the root of the project. |
+| `--input-dir`       | Directory with reports on the load of a single database instance, files with <br/>a 'join' prefix are ignored.                                    |
+| `--reference-report`| The report specified as a reference for comparison with other reports.                                                                       |
+
+Template for the comparison criteria file:
+```
+{
+        "description": "Comparison of database performance across different configurations in the same environment using the same PostgreSQL version",
+        "items": [
+            "<section_name_of_report_struct>.<report_name>.data",
+            ....
+            "system.uname_a.data",
+        ]
+}
+```
+Example of argument configuration in join mode:
+```
+--mode=join
+--join-task=task_compare_dbs_on_single_host.json
+--reference-report=benchmark_report.json
+--input-dir=/path/to/some/reports
+```
 # Running tests
 When testing the tool, a Docker connection is used. Preconfigure access to Docker for the user who is running the tool.
 - specify the `user` from which the tool is run:
