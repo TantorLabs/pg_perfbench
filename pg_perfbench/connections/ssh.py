@@ -46,6 +46,7 @@ class SSHConnection(Connectable):
                 client_keys=self.params.key,
                 known_hosts=None,
                 env={'ARG_PG_BIN_PATH': f'{self.params.work_paths.pg_bin_path}'},
+                connect_timeout=5
             )
             self.tunnel = SSHTunnelForwarder(
                 (self.params.host, self.params.port),
@@ -55,6 +56,9 @@ class SSHConnection(Connectable):
                 local_bind_address=(self.params.tunnel.local.host, self.params.tunnel.local.port),
             )
             self.tunnel.start()
+        except asyncio.TimeoutError as e:
+            log.error('Connection attempt timed out')
+            raise
         except Exception as e:
             raise
 
