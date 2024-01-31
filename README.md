@@ -265,11 +265,11 @@ Add or remove reports of the following types:
 
 # Configuring pg_perfbench in `join` mode
 
-| Parameter           | Description                                                                                                                                  |
-|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| `--join-task`       | A JSON file containing a set of merge criteria,which are items of sections,<br/> should be located in join_tasks at the root of the project. |
-| `--input-dir`       | Directory with reports on the load of a single database instance, files with <br/>a 'join' prefix are ignored.                                    |
-| `--reference-report`| The report specified as a reference for comparison with other reports.                                                                       |
+| Parameter           | Description                                                                                                                                                    |
+|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--join-task`       | A JSON file containing a set of merge criteria,which are items of sections,<br/> should be located in join_tasks at the root of the project                    |
+| `--input-dir`       | Directory with reports on the load of a single database instance, files with <br/>a 'join' prefix are ignored. The default directory set is 'report'           |
+| `--reference-report`| The report specified as a benchmark for comparison with other reports. By default, the first report listed alphabetically in the --input-dir path is selected  |
 
 Template for the comparison criteria file:
 ```
@@ -284,9 +284,9 @@ Template for the comparison criteria file:
 ```
 Example of argument configuration in join mode:
 ```
---mode=join
---join-task=task_compare_dbs_on_single_host.json
---reference-report=benchmark_report.json
+python3.11 -m pg_perfbench --mode=join \
+--join-task=task_compare_dbs_on_single_host.json \
+--reference-report=benchmark_report.json \
 --input-dir=/path/to/some/reports
 ```
 # Running tests
