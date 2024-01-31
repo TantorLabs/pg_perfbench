@@ -11,7 +11,7 @@ from pg_perfbench.const import VERSION, WorkMode, get_datetime_report
 from pg_perfbench.context import Context, RawArgs, JoinContext, utils as context_utils
 from pg_perfbench.env_data import JsonMethods
 from pg_perfbench.exceptions import exception_helper, PerformTestError
-from pg_perfbench.logs import clear_logs, set_logger_level, setup_logger
+from pg_perfbench.logs import clear_logs, setup_logger
 from pg_perfbench.operations import db as db_operations
 from pg_perfbench.pgbench_utils import get_init_execution_command, get_pgbench_commands
 from pg_perfbench.reports import report as general_reports, schemas as report_schemas
@@ -77,7 +77,7 @@ async def run_benchmark_tests_suit(
     return runs
 
 
-async def run_benchmark(ctx: Context) -> report_schemas.Report | None:
+async def run_benchmark(ctx: Context, log_level: int = logging.NOTSET) -> report_schemas.Report | None:
     print_benchmark_welcome(ctx.raw_args)
     connection = get_connection(ctx.connection)
     try:
@@ -111,25 +111,28 @@ async def run_benchmark(ctx: Context) -> report_schemas.Report | None:
         return main_report
     except Exception as e:
         log.error(str(e))
-        log.error(exception_helper(show_traceback=(ctx.service.log_level == 'debug')))
+        log.error(exception_helper(show_traceback=(log_level == logging.DEBUG)))
         log.error('Emergency program termination. No report has been generated.')
     return None
 
 
-async def run():
+async def run(args: Optional[Namespace] = None):
+    if not args:
+        args = get_args_parser().parse_args()
     report = None
-    args = get_args_parser().parse_args()
     if args.clear_logs:
         print('Clearing logs folder')
         clear_logs()
-    setup_logger()
-    set_logger_level(args.log_level)
+
+    log_level = setup_logger(args.log_level)
 
     try:
-        if args.mode == WorkMode.BENCHMARK and (context := Context.from_args_map(vars(args))):
-            report = await run_benchmark(context)
-        elif args.mode == WorkMode.JOIN and (context := JoinContext.from_args_map(vars(args))):
-            report = join_reports(context)
+        if args.mode == WorkMode.BENCHMARK:
+            context = Context.from_args_map(vars(args))
+            report = await run_benchmark(context, log_level)
+        elif args.mode == WorkMode.JOIN:
+            context = JoinContext.from_args_map(vars(args))
+            report = join_reports(context, log_level)
     except Exception as e:
         log.error(f'pg_perfbench error: {str(e)}.')
         sys.exit(1)

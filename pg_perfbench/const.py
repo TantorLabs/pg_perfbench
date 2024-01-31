@@ -62,9 +62,10 @@ class LogLevel(StrEnum):
     DEBUG = 'debug'
     ERROR = 'error'
 
-    def as_level_int_value(self) -> int:
+    def as_level_int_value(self) -> int | None:
         if self is LogLevel.INFO:
             return logging.INFO
-        if self is LogLevel.DEBUG:
+        elif self is LogLevel.DEBUG:
             return logging.DEBUG
-        return logging.ERROR
+        elif self is logging.ERROR:
+            return logging.ERROR

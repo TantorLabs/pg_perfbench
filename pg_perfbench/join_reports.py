@@ -8,6 +8,7 @@ from pg_perfbench.reports import schemas as report_schemas
 from pg_perfbench.context import JoinContext
 from pg_perfbench.const import PROJECT_ROOT_FOLDER
 from pg_perfbench.const import get_datetime_report
+from pg_perfbench.logs import setup_logger
 
 log = logging.getLogger(__name__)
 
@@ -100,7 +101,10 @@ def _compare_report_data(
     return False
 
 
-def join_reports(join_ctx: JoinContext) -> report_schemas.Report | None:
+def join_reports(join_ctx: JoinContext, log_level: int = logging.NOTSET) -> report_schemas.Report | None:
+    if log_level is logging.NOTSET:     #FIXME: Set up logging in any case
+        setup_logger(logging.INFO)
+
     joined_report = None
     task_path = os.path.join(JOIN_TASKS_PATH, join_ctx.join_task)
     rep_names, rep_list = _read_report_files(
