@@ -1,7 +1,8 @@
 import asyncio
 import logging
 import sys
-from typing import Any
+from argparse import Namespace
+from typing import Any, Optional
 
 import asyncpg
 
