@@ -22,12 +22,16 @@ TEMPLATE_JSON_PATH = REPORT_TEMPLATE_FOLDER / TEMPLATE_JSON_NAME
 SHELL_COMMANDS_PATH = SOURCE_ROOT_FOLDER / 'commands' / 'bash_commands'
 SQL_COMMANDS_PATH = SOURCE_ROOT_FOLDER / 'commands' / 'sql_commands'
 
+LOCAL_DB_LOGS_PATH = PROJECT_ROOT_FOLDER / 'db_logs'
 
 REPORT_TIMESTAMP = datetime.now()
 
 
 def get_datetime_report(format: str = '%d/%m/%Y %H:%M:%S'):
     return REPORT_TIMESTAMP.strftime(format)
+
+
+MAIN_REPORT_NAME = f'report_{get_datetime_report("%Y-%m-%d_%H:%M:%S")}'
 
 
 @enum.unique
