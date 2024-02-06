@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import os
+import zipfile
 from types import TracebackType
 from typing import Self
 
@@ -8,6 +10,7 @@ from asyncssh import SSHClientConnection
 from sshtunnel import SSHTunnelForwarder
 
 from pg_perfbench.connections.common import Connectable
+from pg_perfbench.const import MAIN_REPORT_NAME
 from pg_perfbench.context.schemas.connections import SSHConnectionParams
 from pg_perfbench.exceptions import BashCommandException
 
@@ -93,6 +96,34 @@ class SSHConnection(Connectable):
             f'{self.params.work_paths.pg_bin_path}/pg_ctl start -D '
             f'{self.params.work_paths.pg_data_path}'
         )
+
+    async def copy_db_log_files(self, remote_path, local_path) -> str | None:
+        logs_archive_path: str = ''
+
+        if not os.path.exists(local_path):
+            os.makedirs(local_path)
+
+        async with self.client.start_sftp_client() as sftp_client:
+            files = await sftp_client.listdir(remote_path)
+            list_log_files = [file for file in files if file.endswith('.log')]
+            for log_file in list_log_files:
+                file_on_remote_path = os.path.join(remote_path, log_file)
+                file_on_local_path = local_path
+                await sftp_client.get(file_on_remote_path, file_on_local_path)
+                log.info(f"Copied {file_on_remote_path} to {file_on_local_path}")
+
+        logs_archive_name = f'archive_logs_{MAIN_REPORT_NAME}'
+        logs_archive_path = os.path.join(local_path, logs_archive_name)
+        with zipfile.ZipFile(logs_archive_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk(local_path):
+                for file in files:
+                    if file.endswith('.log'):
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, local_path))
+                        # Удаление файла после добавления в архив
+                        os.remove(file_path)
+
+        return logs_archive_path
 
     def close(self) -> None:
         if hasattr(self, 'tunnel'):

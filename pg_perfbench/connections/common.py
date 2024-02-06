@@ -28,6 +28,9 @@ class Runnable(Protocol):
     async def drop_cache(self) -> None:
         ...
 
+    @abstractmethod
+    async def copy_db_log_files(self, remote_logs_path: str, local_report_file: str) -> None:
+        ...
 
 
 class IsAsyncContextManager(Protocol):
