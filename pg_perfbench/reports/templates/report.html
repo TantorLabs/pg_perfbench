@@ -160,6 +160,21 @@
 									$("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + value + "</p>");
 								}
 							}
+							if (report_data.sections[section].reports[report].item_type == 'link') {
+								var font_style = 'font-family: Consolas, monospace; padding: 10px; white-space: pre-wrap; border: 1px solid #ccc; border-radius: 4px; background-color: #1a1a1a; color: #fff; border-color: #444;';
+								var listview_id = 'lv_' + report_id;
+								var value = report_data.sections[section].reports[report].data;
+								if (Array.isArray(value)) {
+									$("#" + report_id + " > button.acc_collapsed").css("background-color", "pink");
+									value.forEach(item => {
+										$("#" + report_id + " > .panel").append("<br>");
+                                        $("#" + report_id + " > .panel").append("<p class='common_div'>" + item[0] + "</p></div>");
+                                        $("#" + report_id + " > .panel").append("<a href=" + item[1] + ".zip >" + item[1] + "</div>");
+									});
+								}else{
+									$("#" + report_id + " > .panel").append("<a href="+value+" >"+value+".zip</a>");
+								}
+							}
 							if (report_data.sections[section].reports[report].item_type == 'table') {
 								var tbl_id = 'tbl_' + report_id;
 								var tblData = report_data.sections[section].reports[report].data;
