@@ -169,6 +169,7 @@ from the current host to the database host, `used directly by the tool`.
 | `--pg-user-password` | Password for database connection (optional)                           |
 | `--pg-data-path`     | Path to the PostgreSQL data directory (relative to the database host) |
 | `--pg-bin-path`      | Path to the PostgreSQL bin directory (relative to the database host)  |
+| `--collect-pg-logs`  | Enable database logging (logging on the database is configurable independently)|
 ### Workload options:
 | Parameter            | Description                                                                |
 |----------------------|----------------------------------------------------------------------------|
