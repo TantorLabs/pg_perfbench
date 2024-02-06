@@ -41,6 +41,11 @@ def get_args_parser() -> argparse.ArgumentParser:
         'select benchmark profile or pass paths to custom SQL scripts',
     )
     workload_group.add_argument(
+        '--collect-pg-logs',
+        action='store_true',
+        help='DB log collection mode',
+    )
+    workload_group.add_argument(
         '--benchmark-type',
         type=str,
         choices=list(map(str, WorkloadTypes)),

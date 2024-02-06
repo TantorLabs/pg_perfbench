@@ -10,7 +10,7 @@ from pg_perfbench.cli.args_parser import get_args_parser
 from pg_perfbench.connections import common as connection_common, get_connection
 from pg_perfbench.const import VERSION, WorkMode, get_datetime_report
 from pg_perfbench.context import Context, RawArgs, JoinContext, utils as context_utils
-from pg_perfbench.env_data import JsonMethods
+from pg_perfbench.env_data import JsonMethods, collect_logs
 from pg_perfbench.exceptions import exception_helper, PerformTestError
 from pg_perfbench.logs import clear_logs, setup_logger
 from pg_perfbench.operations import db as db_operations
@@ -121,6 +121,7 @@ async def run(args: Optional[Namespace] = None):
     if not args:
         args = get_args_parser().parse_args()
     report = None
+
     if args.clear_logs:
         print('Clearing logs folder')
         clear_logs()

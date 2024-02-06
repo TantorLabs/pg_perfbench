@@ -11,3 +11,4 @@ class DBParameters(BaseModel):
     pg_password: str = Field(alias='pg_user_password')
     pg_data_directory_path: str = Field(alias='pg_data_path')
     pg_bin_path: str = Field(alias='pg_bin_path')
+    collect_pg_logs: bool = Field(alias='collect_pg_logs', default=False)
