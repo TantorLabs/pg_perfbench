@@ -39,9 +39,9 @@ def _save_json_report(report: Report, new_report_path: Path) -> None:
 
     for sect_k, sect_v in report.sections.items():
         for report_k, report_v in sect_v.reports.items():
+            report_json['sections'][sect_k]['reports'].setdefault(report_k, {})
             for obj_k, obj_v in report_v:
-                if (obj_k == 'data' or obj_k == 'theader' or obj_k == 'item_type' or obj_k == 'header' or obj_k == 'description'):
-                    report_json['sections'][sect_k]['reports'][report_k][obj_k] = obj_v
+                report_json['sections'][sect_k]['reports'][report_k][obj_k] = obj_v
 
     with open(new_report_path, 'w+') as new_json:
         json.dump(report_json, new_json, indent=4, ensure_ascii=False)

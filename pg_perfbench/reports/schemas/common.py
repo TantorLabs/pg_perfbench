@@ -23,12 +23,14 @@ class ReportTypes(StrEnum):
     PLAIN_TEXT = 'plain_text'
     TABLE = 'table'
     CHART = 'chart'
+    LINK = 'link'
 
 
 class BaseReportItem(BaseModel):
     header: str
     item_type: str
     data: Any
+    state: str
 
     def set_data(self, data: Any) -> None:
         ...
@@ -140,6 +142,13 @@ class ItemTablePython(BaseReportPythonCommand, BaseReportTable):
         self.data = table_data.data
 
 
+class ItemLink(BaseReportItem, BaseReportPythonCommand):
+    item_type: Literal[ReportTypes.LINK]
+
+    def set_data(self, data: Any) -> None:
+        self.data = data
+
+
 class ItemChartShell(BaseReportShellCommand, BaseReportChart):
     ...
 
@@ -165,5 +174,6 @@ class SectionItemReports(BaseModel):
             ItemChartShell,
             ItemChartSQL,
             ItemChartPython,
+            ItemLink
         ],
     ]
