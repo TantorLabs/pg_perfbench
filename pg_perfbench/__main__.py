@@ -108,6 +108,11 @@ async def run_benchmark(ctx: Context, log_level: int = logging.NOTSET) -> report
                     log.debug('Item completed')
                 log.info(f'Execution of the section completed - "{key_s}"')
 
+            if ctx.db.collect_pg_logs:
+                remote_logs_path = await dbconn.fetchval('SHOW log_directory;')
+                if (logs_item := await collect_logs(client, remote_logs_path)) is not None:
+                    main_report.sections['result'].reports['logs'] = logs_item
+
             await dbconn.close()
         return main_report
     except Exception as e:

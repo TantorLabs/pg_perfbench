@@ -1,11 +1,12 @@
 import logging
 import subprocess
-from typing import Any
+from typing import Any, Literal
 import re
 
 from pg_perfbench.pgbench_utils import get_pgbench_options
 from pg_perfbench.context import Context
-from pg_perfbench.const import WorkloadTypes
+from pg_perfbench.const import WorkloadTypes, LOCAL_DB_LOGS_PATH
+from pg_perfbench.reports.schemas.common import ItemLink, StateTypes, ReportTypes
 
 log = logging.getLogger(__name__)
 
@@ -96,3 +97,22 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
             # FIXME: set id of benchmark: timestamp or pid
             'data': [[val[0], round(val[4], 1)] for val in self.benchmark_result_data],
         }  # FIXME: create a model class for pgbench result
+
+
+async def collect_logs(connect, remote_logs_path) -> ItemLink | None:
+    report_item = ItemLink(
+        header='database logs',
+        description='Local path to the database log archive',
+        item_type=ReportTypes.LINK.value,
+        state=StateTypes.COLLAPSED.value,
+        python_command='collect_logs',
+        data=''
+    )
+    local_report_file = LOCAL_DB_LOGS_PATH
+    try:
+        report_item.set_data(await connect.copy_db_log_files(remote_logs_path, local_report_file))
+        return report_item
+    except Exception as e:
+        log.error('Error collecting log files')
+        log.error(str(e))
+        return None

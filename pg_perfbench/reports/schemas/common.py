@@ -144,7 +144,7 @@ class ItemTablePython(BaseReportPythonCommand, BaseReportTable):
 
 class ItemLink(BaseReportItem, BaseReportPythonCommand):
     item_type: Literal[ReportTypes.LINK]
-
+    description: str
     def set_data(self, data: Any) -> None:
         self.data = data
 
