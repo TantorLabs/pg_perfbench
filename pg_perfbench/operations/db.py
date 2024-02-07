@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import re
 import subprocess
 from typing import Any
@@ -8,6 +9,7 @@ import time
 import asyncpg
 
 from pg_perfbench.connections.common import Runnable
+from pg_perfbench.const import MAIN_REPORT_NAME
 from pg_perfbench.context.schemas.db import DBParameters
 from pg_perfbench.exceptions import exception_helper
 
@@ -172,8 +174,29 @@ async def wait_for_database_availability(db: DBParameters) -> bool:
             # log.info('Database is ready for queries.')
             return True
         except (asyncpg.PostgresError, ConnectionError) as e:
-            log.warning(f'Database not yet available. Attempt {attempt}/10. Error: {e}')
+            log.warning(
+                f'Database not yet available. Attempt {attempt}/10. Error: {e}'
+            )
             time.sleep(1)
     else:
         print('Failed to connect to the database after multiple attempts.')
         raise Exception('Database not available.')
+
+
+async def send_config_to_db_server(
+    connection: Runnable, local_config_path: str, remote_config_path: str
+) -> bool:
+    tmp_path = os.path.join('/tmp', f'postgresql_tmp_{MAIN_REPORT_NAME}.conf')
+
+    if os.path.isfile(local_config_path):
+        # Получаем расширение файла и проверяем, является ли оно .conf
+        _, file_extension = os.path.splitext(local_config_path)
+        if file_extension != '.conf':
+            log.error(
+                "The specified file is not a '*.conf' configuration file."
+            )
+            return False
+
+    await connection.send_to_db_server(local_config_path, tmp_path)
+    await connection.run(f'cat {tmp_path} >> {remote_config_path}')
+    return True

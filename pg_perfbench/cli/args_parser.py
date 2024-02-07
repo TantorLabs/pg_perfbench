@@ -100,6 +100,12 @@ def get_args_parser() -> argparse.ArgumentParser:
         title='Database connection options'
     )
     db_group.add_argument(
+        '--custom-config',
+        type=str,
+        default='',
+        help='Specify the PostgreSQL host',
+    )
+    db_group.add_argument(
         '--pg-host',
         type=str,
         help='Specify the PostgreSQL host',

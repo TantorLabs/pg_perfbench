@@ -160,16 +160,18 @@ echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/
 The flags `pg_host` and `pg_port` are optional parameters for forwarding the address and port 
 from the current host to the database host, `used directly by the tool`.
 
-| Parameter            | Description                                                           |
-|----------------------|-----------------------------------------------------------------------|
-| `--pg-port`          | Forwarded port (default `5432`, relative to the current host)         |
-| `--pg-host`          | Forwarded address (default `127.0.0.1`, relative to the current host) |
-| `--pg-user`          | User of database (must be configured or set "postgres")               |
-| `--pg-database`      | Database used for testing                                             |
+| Parameter         | Description                                                           |
+|-------------------|-----------------------------------------------------------------------|
+| `--pg-port`       | Forwarded port (default `5432`, relative to the current host)         |
+| `--pg-host`       | Forwarded address (default `127.0.0.1`, relative to the current host) |
+| `--pg-user`       | User of database (must be configured or set "postgres")               |
+| `--pg-database`   | Database used for testing                                             |
 | `--pg-user-password` | Password for database connection (optional)                           |
-| `--pg-data-path`     | Path to the PostgreSQL data directory (relative to the database host) |
-| `--pg-bin-path`      | Path to the PostgreSQL bin directory (relative to the database host)  |
-| `--collect-pg-logs`  | Enable database logging (logging on the database is configurable independently)|
+| `--pg-data-path`  | Path to the PostgreSQL data directory (relative to the database host) |
+| `--pg-bin-path`   | Path to the PostgreSQL bin directory (relative to the database host)  |
+| `--collect-pg-logs` | Enable database logging (logging on the database is configurable independently)|
+| `--custom-config`  | Append custom settings from a user '.conf' format configuration file (full path) to the postgresql.conf file|
+
 ### Workload options:
 | Parameter            | Description                                                                |
 |----------------------|----------------------------------------------------------------------------|
@@ -188,6 +190,8 @@ For example, you can configure pgbench by specifying the path of the load files
 (this example describes the full set of arguments for ssh connection):
 ```
 python3.11 -m pg_perfbench --mode=benchmark \
+--collect-pg-logs \
+--custom-config=/tmp/user_postgresql.conf \
 --log-level=debug \
 --ssh-port=22 \
 --ssh-key=path/to/private_key \

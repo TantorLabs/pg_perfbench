@@ -97,6 +97,11 @@ class SSHConnection(Connectable):
             f'{self.params.work_paths.pg_data_path}'
         )
 
+    async def send_to_db_server(self, local_path, remote_path) -> str | None:
+        async with self.client.start_sftp_client() as sftp_client:
+            await sftp_client.put(localpaths=local_path, remotepath=remote_path)
+            return remote_path
+
     async def copy_db_log_files(self, remote_path, local_path) -> str | None:
         logs_archive_path: str = ''
 
