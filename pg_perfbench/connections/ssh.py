@@ -115,6 +115,7 @@ class SSHConnection(Connectable):
                 file_on_remote_path = os.path.join(remote_path, log_file)
                 file_on_local_path = local_path
                 await sftp_client.get(file_on_remote_path, file_on_local_path)
+                await sftp_client.remove(file_on_remote_path)
                 log.info(f"Copied {file_on_remote_path} to {file_on_local_path}")
 
         logs_archive_name = f'archive_logs_{MAIN_REPORT_NAME}'
