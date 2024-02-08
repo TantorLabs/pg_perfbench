@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import os
+import zipfile
 from pathlib import Path
 from types import TracebackType
 from typing import Self
@@ -8,8 +10,10 @@ import docker
 from docker.errors import DockerException
 
 from pg_perfbench.connections import Connectable
+from pg_perfbench.const import MAIN_REPORT_NAME
 from pg_perfbench.context.schemas.connections import DockerParams
 from pg_perfbench.exceptions import BashCommandException
+from pg_perfbench.operations.common import config_format_check
 from pg_perfbench.operations.db import run_command
 
 log = logging.getLogger(__name__)
@@ -19,7 +23,7 @@ class DockerConnection(Connectable):
     params: DockerParams
 
     def __init__(self, connection_params: DockerParams) -> None:
-        self.connection_params = connection_params
+        self.params = connection_params
         self.docker_client = None
         self.container = None
 
@@ -44,7 +48,7 @@ class DockerConnection(Connectable):
             for source_path, destination_path in zip(source_paths, destination_paths):
                 self.container.put_archive('/', source_path)
                 log.info(
-                    f'Copied {source_path} to {self.connection_params.container_name}:'
+                    f'Copied {source_path} to {self.params.container_name}:'
                     f'{destination_path}',
                 )
         except DockerException as e:
@@ -56,30 +60,38 @@ class DockerConnection(Connectable):
         self.docker_client = docker.from_env()
         try:
 
+            volumes = {
+                '/sbin/sysctl': {'bind': '/sbin/sysctl', 'mode': 'ro'},
+                f'/tmp/data/{self.params.container_name}_data': {
+                    'bind': str(self.params.work_paths.pg_data_path),
+                    'mode': 'rw',
+                },
+            }
+
+            if self.params.custom_config:
+                if config_format_check(self.params.custom_config):
+                    volumes[self.params.custom_config] = {'bind': '/var/lib/postgresql/data/postgresql.conf', 'mode': 'rw'}
+
             self.container = self.docker_client.containers.run(
-                image=self.connection_params.image_name,
-                name=self.connection_params.container_name,
+                image=self.params.image_name,
+                name=self.params.container_name,
                 detach=True,
                 privileged=True,
                 ports={
-                    f'{str(self.connection_params.tunnel.remote.port)}/tcp': str(
-                        self.connection_params.tunnel.local.port
+                    f'{str(self.params.tunnel.remote.port)}/tcp': str(
+                        self.params.tunnel.local.port
                     )
                 },
                 environment={'POSTGRES_HOST_AUTH_METHOD': 'trust',
-                             'ARG_PG_BIN_PATH': self.connection_params.work_paths.pg_bin_path},
-                volumes={
-                    '/sbin/sysctl': {'bind': '/sbin/sysctl', 'mode': 'ro'},
-                    f'/tmp/data/{self.connection_params.container_name}_data': {
-                        'bind': str(self.connection_params.work_paths.pg_data_path),
-                        'mode': 'rw',
-                    },
-                },
-            )
-            log.info(f'Started Docker container: {self.connection_params.container_name}')
+                             'ARG_PG_BIN_PATH': self.params.work_paths.pg_bin_path},
+                volumes=volumes,
+                )
+
+            log.info(f'Started Docker container: {self.params.container_name}')
+
         except docker.errors.NotFound:
             log.error(
-                f'Container {self.connection_params.container_name} not found.'
+                f'Container {self.params.container_name} not found.'
                 f' Make sure it\'s running.',
             )
             raise Exception
@@ -129,10 +141,48 @@ class DockerConnection(Connectable):
 
         return result.output.decode('utf-8')
 
+    async def copy_db_log_files(self, source_logs_path, local_path) -> str | None:
+        logs_archive_path: str = ''
+        tmp_local_log_dir = os.path.join('/tmp', f'tmp_logs_files_{MAIN_REPORT_NAME}')
+
+        log_files = await self.bash_command(f"ls {source_logs_path}")
+        log_files = log_files.split("\r\n")
+        log_files = [file for file in log_files if file.endswith(".log")]
+        if log_files is []:
+            return None
+        os.makedirs(tmp_local_log_dir)
+
+        for log_file in log_files:
+            source_file_path = os.path.join(source_logs_path, log_file)
+            local_file_path = os.path.join(tmp_local_log_dir, log_file)
+            stream, _ = self.container.get_archive(source_file_path)
+            with open(local_file_path, 'wb') as f:
+                for chunk in stream:
+                    f.write(chunk)
+
+        logs_archive_name = f'archive_logs_{MAIN_REPORT_NAME}'
+        logs_archive_path = os.path.join(local_path, logs_archive_name)
+
+        if not os.path.exists(local_path):
+            os.makedirs(local_path)
+
+        with zipfile.ZipFile(logs_archive_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk(tmp_local_log_dir):
+                for file in files:
+                    if file.endswith('.log'):
+                        file_path = os.path.join(root, tmp_local_log_dir, file)
+                        zipf.write(file_path, os.path.relpath(file_path, local_path))
+                        os.remove(file_path)
+
+        if not os.path.exists(tmp_local_log_dir):
+            os.rmdir(tmp_local_log_dir)
+
+        return logs_archive_path
+
     def close(self) -> None:
         if self.container:
             self.container.stop()
             self.container.remove()
             log.info(
-                f'Stopped and removed Docker container: {self.connection_params.container_name}',
+                f'Stopped and removed Docker container: {self.params.container_name}',
             )

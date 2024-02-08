@@ -94,23 +94,22 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
     def chart_tps_clients(self) -> dict[Any]:
         return {
             'name': 'Transactions per Second(tps)',
-            # FIXME: set id of benchmark: timestamp or pid
             'data': [[val[0], round(val[4], 1)] for val in self.benchmark_result_data],
         }  # FIXME: create a model class for pgbench result
 
 
 async def collect_logs(connect, remote_logs_path) -> ItemLink | None:
-    report_item = ItemLink(
-        header='database logs',
-        description='Local path to the database log archive',
-        item_type=ReportTypes.LINK.value,
-        state=StateTypes.COLLAPSED.value,
-        python_command='collect_logs',
-        data=''
-    )
-    local_report_file = LOCAL_DB_LOGS_PATH
+
     try:
-        report_item.set_data(await connect.copy_db_log_files(remote_logs_path, local_report_file))
+        data = await connect.copy_db_log_files(remote_logs_path, LOCAL_DB_LOGS_PATH)
+        report_item = ItemLink(
+            header='database logs',
+            description='Local path to the database log archive',
+            item_type=ReportTypes.LINK.value,
+            state=StateTypes.COLLAPSED.value,
+            python_command='collect_logs',
+            data=data
+        )
         return report_item
     except Exception as e:
         log.error('Error collecting log files')

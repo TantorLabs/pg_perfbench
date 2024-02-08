@@ -13,6 +13,7 @@ from pg_perfbench.connections.common import Connectable
 from pg_perfbench.const import MAIN_REPORT_NAME
 from pg_perfbench.context.schemas.connections import SSHConnectionParams
 from pg_perfbench.exceptions import BashCommandException
+from pg_perfbench.operations.common import config_format_check
 
 log = logging.getLogger(__name__)
 
@@ -59,6 +60,12 @@ class SSHConnection(Connectable):
                 local_bind_address=(self.params.tunnel.local.host, self.params.tunnel.local.port),
             )
             self.tunnel.start()
+
+            if self.params.custom_config:
+                if config_format_check(self.params.custom_config):
+                    await self.send_config(self.params.custom_config, self.params.work_paths.pg_data_path)
+
+
         except asyncio.TimeoutError as e:
             log.error('Connection attempt timed out')
             raise
@@ -97,37 +104,46 @@ class SSHConnection(Connectable):
             f'{self.params.work_paths.pg_data_path}'
         )
 
-    async def send_to_db_server(self, local_path, remote_path) -> str | None:
+    async def send_config(self, local_path, data_dir) -> str | None:
+        remote_config_path = os.path.join(data_dir, 'postgresql.conf')
         async with self.client.start_sftp_client() as sftp_client:
-            await sftp_client.put(localpaths=local_path, remotepath=remote_path)
-            return remote_path
+            await sftp_client.put(localpaths=local_path, remotepath=remote_config_path)
+            return remote_config_path
 
-    async def copy_db_log_files(self, remote_path, local_path) -> str | None:
+    async def copy_db_log_files(self, source_logs_path, local_path) -> str | None:
         logs_archive_path: str = ''
-
+        tmp_local_log_dir = os.path.join('/tmp', f'tmp_logs_files_{MAIN_REPORT_NAME}')
         if not os.path.exists(local_path):
             os.makedirs(local_path)
 
         async with self.client.start_sftp_client() as sftp_client:
-            files = await sftp_client.listdir(remote_path)
+            files = await sftp_client.listdir(source_logs_path)
             list_log_files = [file for file in files if file.endswith('.log')]
+            if list_log_files is []:
+                return None
+            os.makedirs(tmp_local_log_dir)
             for log_file in list_log_files:
-                file_on_remote_path = os.path.join(remote_path, log_file)
-                file_on_local_path = local_path
-                await sftp_client.get(file_on_remote_path, file_on_local_path)
+                file_on_remote_path = os.path.join(source_logs_path, log_file)
+                await sftp_client.get(file_on_remote_path, tmp_local_log_dir)
                 await sftp_client.remove(file_on_remote_path)
-                log.info(f"Copied {file_on_remote_path} to {file_on_local_path}")
+                log.info(f"Copied {file_on_remote_path} to {tmp_local_log_dir}")
 
         logs_archive_name = f'archive_logs_{MAIN_REPORT_NAME}'
         logs_archive_path = os.path.join(local_path, logs_archive_name)
+
+        if not os.path.exists(local_path):
+            os.makedirs(local_path)
+
         with zipfile.ZipFile(logs_archive_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk(local_path):
+            for root, _, files in os.walk(tmp_local_log_dir):
                 for file in files:
                     if file.endswith('.log'):
-                        file_path = os.path.join(root, file)
+                        file_path = os.path.join(root, tmp_local_log_dir, file)
                         zipf.write(file_path, os.path.relpath(file_path, local_path))
-                        # Удаление файла после добавления в архив
                         os.remove(file_path)
+
+        if not os.path.exists(tmp_local_log_dir):
+            os.rmdir(tmp_local_log_dir)
 
         return logs_archive_path
 

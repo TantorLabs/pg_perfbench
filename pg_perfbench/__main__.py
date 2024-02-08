@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import os
 import sys
 from argparse import Namespace
 from typing import Any, Optional
@@ -15,15 +14,8 @@ from pg_perfbench.env_data import JsonMethods, collect_logs
 from pg_perfbench.exceptions import exception_helper, PerformTestError
 from pg_perfbench.logs import clear_logs, setup_logger
 from pg_perfbench.operations import db as db_operations
-from pg_perfbench.operations.db import send_config_to_db_server
-from pg_perfbench.pgbench_utils import (
-    get_init_execution_command,
-    get_pgbench_commands,
-)
-from pg_perfbench.reports import (
-    report as general_reports,
-    schemas as report_schemas,
-)
+from pg_perfbench.pgbench_utils import get_init_execution_command, get_pgbench_commands
+from pg_perfbench.reports import report as general_reports, schemas as report_schemas
 from pg_perfbench.join_reports import join_reports
 
 
@@ -77,20 +69,6 @@ async def run_benchmark_tests_suit(
     runs = []
     log.info('Start benchmarking')
     pgbench_commands = get_pgbench_commands(ctx.db, ctx.workload)
-    if ctx.db.custom_config:   # send config to db instance
-        if await send_config_to_db_server(
-            connection,
-            ctx.db.custom_config,
-            os.path.join(ctx.db.pg_data_directory_path, 'postgresql.conf'),
-        ):
-            log.info(
-                'Configuration file contents merged into '
-                'the database instance\'s current config'
-            )
-        else:
-            log.error(
-                'Config file contents not merged into the database\'s current config.'
-            )
 
     for chunk in pgbench_commands:
         log.info('Current benchmark iteration: %s', str(chunk))
@@ -132,8 +110,8 @@ async def run_benchmark(ctx: Context, log_level: int = logging.NOTSET) -> report
                 log.info(f'Execution of the section completed - "{key_s}"')
 
             if ctx.db.collect_pg_logs:
-                remote_logs_path = await dbconn.fetchval('SHOW log_directory;')
-                if (logs_item := await collect_logs(client, remote_logs_path)) is not None:
+                dest_logs_path = await dbconn.fetchval('SHOW log_directory;')
+                if (logs_item := await collect_logs(client, dest_logs_path)) is not None:
                     main_report.sections['result'].reports['logs'] = logs_item
 
             await dbconn.close()
