@@ -41,7 +41,9 @@ python3.11 -m venv venv
 source venv/bin/activate
 ```
 - Install additional packages for Python 3.11, for example, using:
- ```python3.11 -m pip install -r requirements.txt```
+ ```
+  pip install -r requirements.txt
+ ```
 - For the tool to work, the database must be accessible under the user postgres or another
 specified user with SUPERUSER rights
 - Before running the tests, install and configure Docker access for the user who will be running the tool:
