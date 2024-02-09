@@ -29,6 +29,7 @@ class TunnelParams(BaseModel):
 class WorkPaths(BaseModel):
     pg_data_path: str = Field(alias='pg_data_path')
     pg_bin_path: str = Field(alias='pg_bin_path')
+    custom_config: str = Field(alias='custom_config', default='')
 
 
 class SSHConnectionParams(BaseModel):
@@ -38,7 +39,6 @@ class SSHConnectionParams(BaseModel):
     key: str = Field(alias='ssh_key')
     tunnel: TunnelParams = Field(default_factory=TunnelParams)
     work_paths: WorkPaths
-    custom_config: str = Field(alias='custom_config', default='')
 
 
 class DockerParams(BaseModel):
@@ -46,7 +46,7 @@ class DockerParams(BaseModel):
     container_name: str = Field('pg_perfbench', alias='container_name')
     tunnel: TunnelParams = Field(default_factory=TunnelParams)
     work_paths: WorkPaths
-    custom_config: str = Field(alias='custom_config', default='')
+
 
 class UnixParams(BaseModel):
     path: Path = Field(alias='socket_path')

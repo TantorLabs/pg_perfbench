@@ -60,7 +60,7 @@ class DockerConnection(Connectable):
         self.docker_client = docker.from_env()
         try:
 
-            volumes = {
+            mount_files = {
                 '/sbin/sysctl': {'bind': '/sbin/sysctl', 'mode': 'ro'},
                 f'/tmp/data/{self.params.container_name}_data': {
                     'bind': str(self.params.work_paths.pg_data_path),
@@ -68,9 +68,11 @@ class DockerConnection(Connectable):
                 },
             }
 
-            if self.params.custom_config:
-                if config_format_check(self.params.custom_config):
-                    volumes[self.params.custom_config] = {'bind': '/var/lib/postgresql/data/postgresql.conf', 'mode': 'rw'}
+            if self.params.work_paths.custom_config:
+                if config_format_check(self.params.work_paths.custom_config):
+                    config_data_path = os.path.join(self.params.work_paths.pg_data_path,'postgresql.conf')
+                    mount_files[self.params.work_paths.custom_config] = {'bind': config_data_path, 'mode': 'rw'}
+                    log.info(f"Custom config moved to the data directory:{config_data_path}")
 
             self.container = self.docker_client.containers.run(
                 image=self.params.image_name,
@@ -84,7 +86,7 @@ class DockerConnection(Connectable):
                 },
                 environment={'POSTGRES_HOST_AUTH_METHOD': 'trust',
                              'ARG_PG_BIN_PATH': self.params.work_paths.pg_bin_path},
-                volumes=volumes,
+                volumes=mount_files,
                 )
 
             log.info(f'Started Docker container: {self.params.container_name}')
@@ -173,6 +175,7 @@ class DockerConnection(Connectable):
                         file_path = os.path.join(root, tmp_local_log_dir, file)
                         zipf.write(file_path, os.path.relpath(file_path, local_path))
                         os.remove(file_path)
+        log.info(f"Copied {source_logs_path} to {logs_archive_path}")
 
         if not os.path.exists(tmp_local_log_dir):
             os.rmdir(tmp_local_log_dir)

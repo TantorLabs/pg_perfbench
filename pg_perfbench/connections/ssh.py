@@ -61,9 +61,9 @@ class SSHConnection(Connectable):
             )
             self.tunnel.start()
 
-            if self.params.custom_config:
-                if config_format_check(self.params.custom_config):
-                    await self.send_config(self.params.custom_config, self.params.work_paths.pg_data_path)
+            if self.params.work_paths.custom_config:
+                if config_format_check(self.params.work_paths.custom_config):
+                    await self.send_config(self.params.work_paths.custom_config, self.params.work_paths.pg_data_path)
 
 
         except asyncio.TimeoutError as e:
@@ -108,6 +108,7 @@ class SSHConnection(Connectable):
         remote_config_path = os.path.join(data_dir, 'postgresql.conf')
         async with self.client.start_sftp_client() as sftp_client:
             await sftp_client.put(localpaths=local_path, remotepath=remote_config_path)
+            log.info(f"Custom config moved to the data directory:{remote_config_path}")
             return remote_config_path
 
     async def copy_db_log_files(self, source_logs_path, local_path) -> str | None:
@@ -126,7 +127,6 @@ class SSHConnection(Connectable):
                 file_on_remote_path = os.path.join(source_logs_path, log_file)
                 await sftp_client.get(file_on_remote_path, tmp_local_log_dir)
                 await sftp_client.remove(file_on_remote_path)
-                log.info(f"Copied {file_on_remote_path} to {tmp_local_log_dir}")
 
         logs_archive_name = f'archive_logs_{MAIN_REPORT_NAME}'
         logs_archive_path = os.path.join(local_path, logs_archive_name)
@@ -141,6 +141,7 @@ class SSHConnection(Connectable):
                         file_path = os.path.join(root, tmp_local_log_dir, file)
                         zipf.write(file_path, os.path.relpath(file_path, local_path))
                         os.remove(file_path)
+        log.info(f"Copied {source_logs_path} to {logs_archive_path}")
 
         if not os.path.exists(tmp_local_log_dir):
             os.rmdir(tmp_local_log_dir)
