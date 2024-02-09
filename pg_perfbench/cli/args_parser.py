@@ -14,7 +14,6 @@ def parse_pgbench_options(value):
 def get_args_parser() -> argparse.ArgumentParser:
     general_group = argparse.ArgumentParser()
 
-    ## Defining service parameters
     general_group.add_argument(
         '--clear-logs',
         action='store_true',
@@ -33,8 +32,7 @@ def get_args_parser() -> argparse.ArgumentParser:
         choices=list(map(str, WorkMode)),
         help='pg_perfbench modes',
     )
-    # Benchmark mode args
-    ## Defining workload parameters
+
     workload_group = general_group.add_argument_group(
         title='Workload options',
         description='Workload profile settings: '
@@ -95,7 +93,6 @@ def get_args_parser() -> argparse.ArgumentParser:
         help='Specify the psql path (relative to the current host)',
     )
 
-    ## Defining database parameters
     db_group = general_group.add_argument_group(
         title='Database connection options'
     )
@@ -140,7 +137,7 @@ def get_args_parser() -> argparse.ArgumentParser:
         type=str,
         help='Specify the PostgreSQL binaries directory',
     )
-    ## SSH connection arguments
+
     ssh_connection_group = general_group.add_argument_group(
         title='SSH connection options'
     )

@@ -11,7 +11,7 @@ from docker.errors import DockerException
 
 from pg_perfbench.connections import Connectable
 from pg_perfbench.const import MAIN_REPORT_NAME
-from pg_perfbench.context.schemas.connections import DockerParams
+from pg_perfbench.context.schemes.connections import DockerParams
 from pg_perfbench.exceptions import BashCommandException
 from pg_perfbench.operations.common import config_format_check
 from pg_perfbench.operations.db import run_command

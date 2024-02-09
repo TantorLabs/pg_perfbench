@@ -2,8 +2,8 @@ import itertools
 from pathlib import Path
 import warnings
 
-from pg_perfbench.context.schemas.db import DBParameters
-from pg_perfbench.context.schemas.workload import WorkloadParams
+from pg_perfbench.context.schemes.db import DBParameters
+from pg_perfbench.context.schemes.workload import WorkloadParams
 
 warnings.filterwarnings('ignore', category=UserWarning, module='pydantic.main')
 

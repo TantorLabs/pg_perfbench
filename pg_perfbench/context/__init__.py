@@ -1,7 +1,7 @@
 # ruff: noqa: F401
-from .schemas.context import Context
-from .schemas.context import RawArgs
-from .schemas.context import JoinContext
+from .schemes.context import Context
+from .schemes.context import RawArgs
+from .schemes.context import JoinContext
 
 
 __all__ = ['Context', 'RawArgs', 'JoinContext']

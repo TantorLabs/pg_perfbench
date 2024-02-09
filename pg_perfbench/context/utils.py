@@ -1,7 +1,7 @@
 import logging
 from copy import deepcopy
 
-from pg_perfbench.context.schemas.context import RawArgs
+from pg_perfbench.context.schemes.context import RawArgs
 
 log = logging.getLogger(__name__)
 

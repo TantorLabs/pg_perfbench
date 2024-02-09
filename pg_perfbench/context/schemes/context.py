@@ -6,21 +6,18 @@ from typing import Any
 from typing import get_args
 from typing import get_origin
 from typing import Optional
-from typing import Union
-from typing import Literal
-from pydantic import validator
-import os
+
 
 import pydantic
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic.fields import FieldInfo
 
-from pg_perfbench.context.schemas.connections import ConnectionParameters
-from pg_perfbench.context.schemas.db import DBParameters
-from pg_perfbench.context.schemas.workload import WorkloadParams
+from pg_perfbench.context.schemes.connections import ConnectionParameters
+from pg_perfbench.context.schemes.db import DBParameters
+from pg_perfbench.context.schemes.workload import WorkloadParams
 from pg_perfbench.exceptions import format_pydantic_error
-from pg_perfbench.const import WorkMode, REPORT_FOLDER
+from pg_perfbench.const import REPORT_FOLDER
 
 log = logging.getLogger(__name__)
 

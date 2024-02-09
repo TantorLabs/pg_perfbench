@@ -11,7 +11,7 @@ from sshtunnel import SSHTunnelForwarder
 
 from pg_perfbench.connections.common import Connectable
 from pg_perfbench.const import MAIN_REPORT_NAME
-from pg_perfbench.context.schemas.connections import SSHConnectionParams
+from pg_perfbench.context.schemes.connections import SSHConnectionParams
 from pg_perfbench.exceptions import BashCommandException
 from pg_perfbench.operations.common import config_format_check
 
