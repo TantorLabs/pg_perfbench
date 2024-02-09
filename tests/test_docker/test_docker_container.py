@@ -13,8 +13,8 @@ import uvloop
 
 from pg_perfbench.connections.docker import DockerConnection
 from pg_perfbench.const import WorkloadTypes
-from pg_perfbench.context.schemas import connections, db
-from pg_perfbench.context.schemas.workload import WorkloadDefault
+from pg_perfbench.context.schemes import connections, db
+from pg_perfbench.context.schemes.workload import WorkloadDefault
 from pg_perfbench.operations import db as db_operations
 from pg_perfbench.pgbench_utils import get_pgbench_commands
 from pg_perfbench.pgbench_utils import get_init_execution_command

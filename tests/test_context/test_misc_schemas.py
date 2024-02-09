@@ -1,5 +1,5 @@
 import unittest
-from pg_perfbench.context.schemas.db import DBParameters
+from pg_perfbench.context.schemes.db import DBParameters
 
 
 class TestDBParametersConstruction(unittest.TestCase):

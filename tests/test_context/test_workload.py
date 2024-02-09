@@ -1,5 +1,5 @@
 import unittest
-from pg_perfbench.context.schemas.workload import WorkloadDefault
+from pg_perfbench.context.schemes.workload import WorkloadDefault
 
 
 class TestWorkloads(unittest.TestCase):

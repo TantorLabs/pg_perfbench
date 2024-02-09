@@ -1,8 +1,8 @@
 import pytest
 
 from pg_perfbench.const import WorkloadTypes
-from pg_perfbench.context.schemas.db import DBParameters
-from pg_perfbench.context.schemas.workload import WorkloadDefault
+from pg_perfbench.context.schemes.db import DBParameters
+from pg_perfbench.context.schemes.workload import WorkloadDefault
 
 
 ssh_connection_params = {
