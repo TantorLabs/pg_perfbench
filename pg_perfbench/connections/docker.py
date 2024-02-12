@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import zipfile
 from pathlib import Path
 from types import TracebackType
 from typing import Self
@@ -10,7 +9,7 @@ import docker
 from docker.errors import DockerException
 
 from pg_perfbench.connections import Connectable
-from pg_perfbench.const import MAIN_REPORT_NAME
+from pg_perfbench.const import LOG_ARCHIVE_NAME
 from pg_perfbench.context.schemes.connections import DockerParams
 from pg_perfbench.exceptions import BashCommandException
 from pg_perfbench.operations.common import config_format_check
@@ -143,44 +142,27 @@ class DockerConnection(Connectable):
 
         return result.output.decode('utf-8')
 
-    async def copy_db_log_files(self, source_logs_path, local_path) -> str | None:
-        logs_archive_path: str = ''
-        tmp_local_log_dir = os.path.join('/tmp', f'tmp_logs_files_{MAIN_REPORT_NAME}')
-
-        log_files = await self.bash_command(f"ls {source_logs_path}")
-        log_files = log_files.split("\r\n")
-        log_files = [file for file in log_files if file.endswith(".log")]
-        if log_files is []:
-            return None
-        os.makedirs(tmp_local_log_dir)
-
-        for log_file in log_files:
-            source_file_path = os.path.join(source_logs_path, log_file)
-            local_file_path = os.path.join(tmp_local_log_dir, log_file)
-            stream, _ = self.container.get_archive(source_file_path)
-            with open(local_file_path, 'wb') as f:
-                for chunk in stream:
-                    f.write(chunk)
-
-        logs_archive_name = f'archive_logs_{MAIN_REPORT_NAME}'
-        logs_archive_path = os.path.join(local_path, logs_archive_name)
+    async def copy_db_log_files(self, log_source_path, local_path) -> str | None:
+        log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
+        log_archive_source_path = f'{os.path.dirname(log_source_path)}/{LOG_ARCHIVE_NAME}'
 
         if not os.path.exists(local_path):
             os.makedirs(local_path)
 
-        with zipfile.ZipFile(logs_archive_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk(tmp_local_log_dir):
-                for file in files:
-                    if file.endswith('.log'):
-                        file_path = os.path.join(root, tmp_local_log_dir, file)
-                        zipf.write(file_path, os.path.relpath(file_path, local_path))
-                        os.remove(file_path)
-        log.info(f"Copied {source_logs_path} to {logs_archive_path}")
+        await self.run(
+            f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)} '
+            f'{os.path.basename(log_source_path)}'
+        )
 
-        if not os.path.exists(tmp_local_log_dir):
-            os.rmdir(tmp_local_log_dir)
+        stream, _ = self.container.get_archive(log_archive_source_path)
+        with open(log_archive_local_path, 'wb') as f:
+            for chunk in stream:
+                f.write(chunk)
 
-        return logs_archive_path
+        await self.run(f'rm -rf {log_archive_source_path}')
+        log.info(f'The log archive has been sent to :{log_archive_local_path}')
+
+        return str(log_archive_local_path)
 
     def close(self) -> None:
         if self.container:
