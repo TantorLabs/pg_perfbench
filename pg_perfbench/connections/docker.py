@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-from pathlib import Path
 from types import TracebackType
 from typing import Self
 
@@ -9,7 +8,7 @@ import docker
 from docker.errors import DockerException
 
 from pg_perfbench.connections import Connectable
-from pg_perfbench.const import LOG_ARCHIVE_NAME
+from pg_perfbench.const import LOG_ARCHIVE_NAME, get_datetime_report
 from pg_perfbench.context.schemes.connections import DockerParams
 from pg_perfbench.exceptions import BashCommandException
 from pg_perfbench.operations.common import config_format_check
@@ -39,29 +38,15 @@ class DockerConnection(Connectable):
     ) -> None:
         self.close()
 
-    async def copy_files_to_container(self, source_paths: Path, destination_paths: Path) -> None:
-        if not self.container:
-            log.error('Container is not running.')
-            return
-        try:
-            for source_path, destination_path in zip(source_paths, destination_paths):
-                self.container.put_archive('/', source_path)
-                log.info(
-                    f'Copied {source_path} to {self.params.container_name}:'
-                    f'{destination_path}',
-                )
-        except DockerException as e:
-            log.error(f'Error when copying files to Docker container: {e!s}')
-        except Exception as e:
-            log.error(f'Error when copying files to Docker container: {e!s}')
-
     async def start(self) -> None:
+        data_dir_name = f'{self.params.container_name}_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}'
+        host_mount_data_catalog = os.path.join('/tmp', 'data', data_dir_name)
+
         self.docker_client = docker.from_env()
         try:
-
             mount_files = {
                 '/sbin/sysctl': {'bind': '/sbin/sysctl', 'mode': 'ro'},
-                f'/tmp/data/{self.params.container_name}_data': {
+                host_mount_data_catalog: {
                     'bind': str(self.params.work_paths.pg_data_path),
                     'mode': 'rw',
                 },
@@ -69,9 +54,16 @@ class DockerConnection(Connectable):
 
             if self.params.work_paths.custom_config:
                 if config_format_check(self.params.work_paths.custom_config):
-                    config_data_path = os.path.join(self.params.work_paths.pg_data_path,'postgresql.conf')
-                    mount_files[self.params.work_paths.custom_config] = {'bind': config_data_path, 'mode': 'rw'}
-                    log.info(f"Custom config moved to the data directory:{config_data_path}")
+                    config_data_path = os.path.join(
+                        self.params.work_paths.pg_data_path, 'postgresql.conf'
+                    )
+                    mount_files[self.params.work_paths.custom_config] = {
+                        'bind': config_data_path,
+                        'mode': 'rw',
+                    }
+                    log.info(
+                        f'Custom config moved to the data directory:{config_data_path}'
+                    )
 
             self.container = self.docker_client.containers.run(
                 image=self.params.image_name,
@@ -83,11 +75,12 @@ class DockerConnection(Connectable):
                         self.params.tunnel.local.port
                     )
                 },
-                environment={'POSTGRES_HOST_AUTH_METHOD': 'trust',
-                             'ARG_PG_BIN_PATH': self.params.work_paths.pg_bin_path},
-                volumes=mount_files,
-                )
-
+                environment={
+                    'POSTGRES_HOST_AUTH_METHOD': 'trust',
+                    'ARG_PG_BIN_PATH': self.params.work_paths.pg_bin_path,
+                },
+                volumes=mount_files
+            )
             log.info(f'Started Docker container: {self.params.container_name}')
 
         except docker.errors.NotFound:
@@ -100,7 +93,9 @@ class DockerConnection(Connectable):
             log.error(f'Error when connecting via Docker: {e!s}')
             raise Exception
         except Exception as e:
-            log.error(f'Error when connecting to the database inside the Docker container: {e!s}')
+            log.error(
+                f'Error when connecting to the database inside the Docker container: {e!s}'
+            )
             raise Exception
 
     async def run(self, cmd: str) -> str:
@@ -113,10 +108,14 @@ class DockerConnection(Connectable):
                 if 'start' in cmd:
                     exec_result = self.container.exec_run(exec_command)
                     await asyncio.sleep(1)
-                    log.info(f"Docker Result: {exec_result.output.decode('utf-8').strip()}")
+                    log.info(
+                        f"Docker Result: {exec_result.output.decode('utf-8').strip()}"
+                    )
                     return exec_result.output
                 exec_result = self.container.exec_run(exec_command)
-                log.info(f"Docker Result: {exec_result.output.decode('utf-8').strip()}")
+                log.info(
+                    f"Docker Result: {exec_result.output.decode('utf-8').strip()}"
+                )
                 return exec_result.output
             except Exception as e:
                 log.error(f'Error executing {cmd}: {e!s}')
@@ -125,7 +124,9 @@ class DockerConnection(Connectable):
     async def drop_cache(self) -> None:
         self.close()
         await run_command('sync')
-        await run_command('sudo /bin/sh -c "echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches"')
+        await run_command(
+            'sudo /bin/sh -c "echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches"'
+        )
         await self.start()
 
     async def bash_command(self, cmd: str) -> str:
@@ -138,11 +139,15 @@ class DockerConnection(Connectable):
             stderr=True,
         )
         if result.exit_code != 0:
-            raise BashCommandException(result.exit_code, result.output.decode('utf-8'))
+            raise BashCommandException(
+                result.exit_code, result.output.decode('utf-8')
+            )
 
         return result.output.decode('utf-8')
 
-    async def copy_db_log_files(self, log_source_path, local_path) -> str | None:
+    async def copy_db_log_files(
+        self, log_source_path, local_path
+    ) -> str | None:
         log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
         log_archive_source_path = f'{os.path.dirname(log_source_path)}/{LOG_ARCHIVE_NAME}'
 
@@ -164,8 +169,16 @@ class DockerConnection(Connectable):
 
         return str(log_archive_local_path)
 
+    def print_logs(self):
+        docker_logs = 'Docker logs: \n'
+        logs = self.container.logs()
+        for line in logs.decode('utf-8').splitlines():
+            docker_logs.join(f'{line}')
+        log.info(docker_logs)
+
     def close(self) -> None:
         if self.container:
+            self.print_logs()
             self.container.stop()
             self.container.remove()
             log.info(
