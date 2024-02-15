@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import os
 from types import TracebackType
@@ -39,8 +38,8 @@ class DockerConnection(Connectable):
         self.close()
 
     async def start(self) -> None:
-        data_dir_name = f'{self.params.container_name}_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}'
-        host_mount_data_catalog = os.path.join('/tmp', 'data', data_dir_name)
+        host_data_dir_name = f'{self.params.container_name}_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}'
+        host_mount_data_catalog = os.path.join('/tmp', 'data', host_data_dir_name)
 
         self.docker_client = docker.from_env()
         try:
@@ -54,9 +53,7 @@ class DockerConnection(Connectable):
 
             if self.params.work_paths.custom_config:
                 if config_format_check(self.params.work_paths.custom_config):
-                    config_data_path = os.path.join(
-                        self.params.work_paths.pg_data_path, 'postgresql.conf'
-                    )
+                    config_data_path = '/etc/postgresql/postgresql.conf'
                     mount_files[self.params.work_paths.custom_config] = {
                         'bind': config_data_path,
                         'mode': 'rw',
@@ -79,7 +76,8 @@ class DockerConnection(Connectable):
                     'POSTGRES_HOST_AUTH_METHOD': 'trust',
                     'ARG_PG_BIN_PATH': self.params.work_paths.pg_bin_path,
                 },
-                volumes=mount_files
+                volumes=mount_files,
+                command=f' -c config_file={config_data_path}',
             )
             log.info(f'Started Docker container: {self.params.container_name}')
 
@@ -101,18 +99,7 @@ class DockerConnection(Connectable):
     async def run(self, cmd: str) -> str:
         if self.container:
             try:
-                if 'sudo' in cmd:
-                    exec_command = cmd.replace('sudo', '')
-                else:
-                    exec_command = f"su - postgres -c '{cmd}'"
-                if 'start' in cmd:
-                    exec_result = self.container.exec_run(exec_command)
-                    await asyncio.sleep(1)
-                    log.info(
-                        f"Docker Result: {exec_result.output.decode('utf-8').strip()}"
-                    )
-                    return exec_result.output
-                exec_result = self.container.exec_run(exec_command)
+                exec_result = self.container.exec_run(cmd)
                 log.info(
                     f"Docker Result: {exec_result.output.decode('utf-8').strip()}"
                 )
@@ -149,7 +136,7 @@ class DockerConnection(Connectable):
         self, log_source_path, local_path
     ) -> str | None:
         log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
-        log_archive_source_path = f'{os.path.dirname(log_source_path)}/{LOG_ARCHIVE_NAME}'
+        log_archive_source_path = f'/{LOG_ARCHIVE_NAME}'
 
         if not os.path.exists(local_path):
             os.makedirs(local_path)
@@ -164,7 +151,7 @@ class DockerConnection(Connectable):
             for chunk in stream:
                 f.write(chunk)
 
-        await self.run(f'rm -rf {log_archive_source_path}')
+        await self.run(f'rm {log_archive_source_path}')
         log.info(f'The log archive has been sent to :{log_archive_local_path}')
 
         return str(log_archive_local_path)
