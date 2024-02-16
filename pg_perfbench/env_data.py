@@ -99,9 +99,7 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
 
 
 async def collect_logs(connect, remote_logs_path) -> ItemLink | None:
-
-    try:
-        data = await connect.copy_db_log_files(remote_logs_path, LOCAL_DB_LOGS_PATH)
+    if data := await connect.copy_db_log_files(remote_logs_path, LOCAL_DB_LOGS_PATH):
         report_item = ItemLink(
             header='database logs',
             description='Local path to the database log archive',
@@ -111,7 +109,6 @@ async def collect_logs(connect, remote_logs_path) -> ItemLink | None:
             data=data
         )
         return report_item
-    except Exception as e:
+    else:
         log.error('Error collecting log files')
-        log.error(str(e))
         return None
