@@ -39,8 +39,7 @@ class SSHConnection(Connectable):
         self.close()
 
     async def start(self) -> None:
-        log.info('Establishing an SSH connection')
-
+        log.info('Attempting to establish an SSH connection: ')
         try:
             self.client = await asyncssh.connect(
                 host=self.params.host,
@@ -48,27 +47,38 @@ class SSHConnection(Connectable):
                 username=self.params.user,
                 client_keys=self.params.key,
                 known_hosts=None,
-                env={'ARG_PG_BIN_PATH': f'{self.params.work_paths.pg_bin_path}'},
-                connect_timeout=5
+                env={
+                    'ARG_PG_BIN_PATH': f'{self.params.work_paths.pg_bin_path}'
+                },
+                connect_timeout=5,
             )
             self.tunnel = SSHTunnelForwarder(
                 (self.params.host, self.params.port),
                 ssh_username=self.params.user,
                 ssh_pkey=self.params.key,
-                remote_bind_address=(self.params.tunnel.remote.host, self.params.tunnel.remote.port),
-                local_bind_address=(self.params.tunnel.local.host, self.params.tunnel.local.port),
+                remote_bind_address=(
+                    self.params.tunnel.remote.host,
+                    self.params.tunnel.remote.port,
+                ),
+                local_bind_address=(
+                    self.params.tunnel.local.host,
+                    self.params.tunnel.local.port,
+                ),
             )
             self.tunnel.start()
 
             if self.params.work_paths.custom_config:
                 if config_format_check(self.params.work_paths.custom_config):
-                    await self.send_config(self.params.work_paths.custom_config, self.params.work_paths.pg_data_path)
-
-
-        except asyncio.TimeoutError as e:
-            log.error('Connection attempt timed out')
+                    await self.send_config(
+                        self.params.work_paths.custom_config,
+                        self.params.work_paths.pg_data_path,
+                    )
+            log.info('SSH connection established.')
+        except asyncio.TimeoutError:
+            log.error('Failed to establish SSH connection: Connection attempt timed out.')
             raise
         except Exception as e:
+            log.error(f'Failed to establish SSH connection:{str(e)}')
             raise
 
     async def run(self, cmd: str) -> str:
@@ -97,7 +107,9 @@ class SSHConnection(Connectable):
             f'stop -D {self.params.work_paths.pg_data_path}',
         )
         await self.run('sync')
-        await self.run('sudo /bin/sh -c "echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches"')
+        await self.run(
+            'sudo /bin/sh -c "echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches"'
+        )
         await self.run(
             f'{self.params.work_paths.pg_bin_path}/pg_ctl start -D '
             f'{self.params.work_paths.pg_data_path}'
@@ -107,10 +119,12 @@ class SSHConnection(Connectable):
         remote_config_path = os.path.join(data_dir, 'postgresql.conf')
         async with self.client.start_sftp_client() as sftp_client:
             await sftp_client.put(localpaths=local_path, remotepath=remote_config_path)
-            log.info(f"Custom config moved to the data directory:{remote_config_path}")
+            log.info(f'Custom config moved to the data directory:{remote_config_path}')
             return remote_config_path
 
-    async def copy_db_log_files(self, log_source_path, local_path) -> str | None:
+    async def copy_db_log_files(
+        self, log_source_path, local_path
+    ) -> str | None:
         log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
         log_archive_source_path = f'{os.path.dirname(log_source_path)}/{LOG_ARCHIVE_NAME}'
 
@@ -123,9 +137,11 @@ class SSHConnection(Connectable):
         )
 
         async with self.client.start_sftp_client() as sftp_client:
-            await sftp_client.get(log_archive_source_path, log_archive_local_path)
+            await sftp_client.get(
+                log_archive_source_path, log_archive_local_path
+            )
 
-        await self.run(f'rm -rf {log_archive_source_path}')
+        await self.run(f'rm {log_archive_source_path}')
         log.info(f'The log archive has been sent to :{log_archive_local_path}')
         return str(log_archive_local_path)
 
@@ -135,4 +151,3 @@ class SSHConnection(Connectable):
         if hasattr(self, 'client'):
             self.client.close()
         log.info('Terminating the SSH connection')
-
