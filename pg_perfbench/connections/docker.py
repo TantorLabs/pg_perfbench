@@ -84,9 +84,7 @@ class DockerConnection(Connectable):
 
             containers_run_parameters['volumes'] = mount_files
 
-            self.container = self.docker_client.containers.run(
-                **containers_run_parameters
-            )
+            self.container = self.docker_client.containers.run(**containers_run_parameters)
             log.info(f'Started Docker container: {self.params.container_name}')
 
         except docker.errors.NotFound:
@@ -104,17 +102,22 @@ class DockerConnection(Connectable):
             )
             raise Exception
 
-    async def run(self, cmd: str) -> str:
+    async def run(self, command: str, check: bool = False) -> str | None:
         if self.container:
             try:
-                exec_result = self.container.exec_run(cmd)
+                log.info(f"Executing command: {command}")
+                exec_result = self.container.exec_run(command)
+                if exec_result.exit_code and check:
+                    log.error(f"Error executing: {exec_result.output.decode('utf-8')!s}")
+                    return None
+
                 log.info(
                     f"Docker Result: {exec_result.output.decode('utf-8').strip()}"
                 )
                 return exec_result.output
             except Exception as e:
-                log.error(f'Error executing {cmd}: {e!s}')
-        return None
+                log.error(f'Error executing {command}: {e!s}')
+                return None
 
     async def drop_cache(self) -> None:
         self.close()
@@ -124,9 +127,9 @@ class DockerConnection(Connectable):
         )
         await self.start()
 
-    async def bash_command(self, cmd: str) -> str:
+    async def bash_command(self, command: str) -> str:
         result = self.container.exec_run(
-            cmd=f'bash -c "{cmd}"',
+            cmd=f'bash -c "{command}"',
             stdin=True,
             tty=True,
             detach=False,
@@ -149,16 +152,18 @@ class DockerConnection(Connectable):
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
 
-            await self.run(
+            if await self.run(
                 f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)} '
-                f'{os.path.basename(log_source_path)}'
+                f'{os.path.basename(log_source_path)}',
+                True
+            ) is None:
+                raise Exception
+
+            await run_command(
+                command=f'docker cp {self.params.container_name}:{log_archive_source_path} '
+                f'{log_archive_local_path}',
+                check=True
             )
-
-            stream, _ = self.container.get_archive(log_archive_source_path)
-            with open(log_archive_local_path, 'wb') as f:
-                for chunk in stream:
-                    f.write(chunk)
-
             await self.run(f'rm {log_archive_source_path}')
             log.info(
                 f'The log archive has been sent to :{log_archive_local_path}'
@@ -166,7 +171,7 @@ class DockerConnection(Connectable):
 
             return str(log_archive_local_path)
         except Exception as e:
-            log.error(f'Attempt to transfer database logs failed" :{str(e)}')
+            log.error(f'Attempt to transfer database logs failed')
             return None
 
     def print_logs(self):
