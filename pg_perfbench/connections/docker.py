@@ -38,13 +38,34 @@ class DockerConnection(Connectable):
         self.close()
 
     async def start(self) -> None:
+        containers_run_parameters = {
+            'image': self.params.image_name,
+            'name': self.params.container_name,
+            'detach': True,
+            'privileged': True,
+            'ports': {
+                f'{str(self.params.tunnel.remote.port)}/tcp': str(
+                    self.params.tunnel.local.port
+                )
+            },
+            'environment': {
+                'POSTGRES_HOST_AUTH_METHOD': 'trust',
+                'ARG_PG_BIN_PATH': self.params.work_paths.pg_bin_path,
+            },
+
+        }
         host_data_dir_name = f'{self.params.container_name}_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}'
-        host_mount_data_catalog = os.path.join('/tmp', 'data', host_data_dir_name)
+        host_mount_data_catalog = os.path.join(
+            '/tmp', 'data', host_data_dir_name
+        )
 
         self.docker_client = docker.from_env()
         try:
             mount_files = {
-                '/sbin/sysctl': {'bind': '/sbin/sysctl', 'mode': 'ro'},
+                '/sbin/sysctl': {
+                    'bind': '/sbin/sysctl',
+                    'mode': 'ro'
+                },
                 host_mount_data_catalog: {
                     'bind': str(self.params.work_paths.pg_data_path),
                     'mode': 'rw',
@@ -58,33 +79,20 @@ class DockerConnection(Connectable):
                         'bind': config_data_path,
                         'mode': 'rw',
                     }
-                    log.info(
-                        f'Custom config moved to the data directory:{config_data_path}'
-                    )
+                    containers_run_parameters['command'] = f' -c config_file={config_data_path}'
+                    log.info(f'Custom config moved to the data directory:{config_data_path}')
+
+            containers_run_parameters['volumes'] = mount_files
 
             self.container = self.docker_client.containers.run(
-                image=self.params.image_name,
-                name=self.params.container_name,
-                detach=True,
-                privileged=True,
-                ports={
-                    f'{str(self.params.tunnel.remote.port)}/tcp': str(
-                        self.params.tunnel.local.port
-                    )
-                },
-                environment={
-                    'POSTGRES_HOST_AUTH_METHOD': 'trust',
-                    'ARG_PG_BIN_PATH': self.params.work_paths.pg_bin_path,
-                },
-                volumes=mount_files,
-                command=f' -c config_file={config_data_path}',
+                **containers_run_parameters
             )
             log.info(f'Started Docker container: {self.params.container_name}')
 
         except docker.errors.NotFound:
             log.error(
                 f'Container {self.params.container_name} not found.'
-                f' Make sure it\'s running.',
+                f" Make sure it's running.",
             )
             raise Exception
         except DockerException as e:
@@ -152,7 +160,9 @@ class DockerConnection(Connectable):
                     f.write(chunk)
 
             await self.run(f'rm {log_archive_source_path}')
-            log.info(f'The log archive has been sent to :{log_archive_local_path}')
+            log.info(
+                f'The log archive has been sent to :{log_archive_local_path}'
+            )
 
             return str(log_archive_local_path)
         except Exception as e:

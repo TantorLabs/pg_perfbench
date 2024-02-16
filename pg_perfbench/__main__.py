@@ -111,7 +111,7 @@ async def run_benchmark(ctx: Context, log_level: int = logging.NOTSET) -> report
 
             if ctx.db.collect_pg_logs:
                 dest_logs_path = await dbconn.fetchval('SHOW log_directory;')
-                if (logs_item := await collect_logs(client, dest_logs_path)) is not None:
+                if logs_item := await collect_logs(client, dest_logs_path):
                     main_report.sections['result'].reports['logs'] = logs_item
 
             await dbconn.close()
