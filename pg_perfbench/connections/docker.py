@@ -137,24 +137,27 @@ class DockerConnection(Connectable):
     ) -> str | None:
         log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
         log_archive_source_path = f'/{LOG_ARCHIVE_NAME}'
+        try:
+            if not os.path.exists(local_path):
+                os.makedirs(local_path)
 
-        if not os.path.exists(local_path):
-            os.makedirs(local_path)
+            await self.run(
+                f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)} '
+                f'{os.path.basename(log_source_path)}'
+            )
 
-        await self.run(
-            f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)} '
-            f'{os.path.basename(log_source_path)}'
-        )
+            stream, _ = self.container.get_archive(log_archive_source_path)
+            with open(log_archive_local_path, 'wb') as f:
+                for chunk in stream:
+                    f.write(chunk)
 
-        stream, _ = self.container.get_archive(log_archive_source_path)
-        with open(log_archive_local_path, 'wb') as f:
-            for chunk in stream:
-                f.write(chunk)
+            await self.run(f'rm {log_archive_source_path}')
+            log.info(f'The log archive has been sent to :{log_archive_local_path}')
 
-        await self.run(f'rm {log_archive_source_path}')
-        log.info(f'The log archive has been sent to :{log_archive_local_path}')
-
-        return str(log_archive_local_path)
+            return str(log_archive_local_path)
+        except Exception as e:
+            log.error(f'Attempt to transfer database logs failed" :{str(e)}')
+            return None
 
     def print_logs(self):
         docker_logs = 'Docker logs: \n'

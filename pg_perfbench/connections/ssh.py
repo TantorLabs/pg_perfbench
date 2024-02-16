@@ -127,23 +127,26 @@ class SSHConnection(Connectable):
     ) -> str | None:
         log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
         log_archive_source_path = f'{os.path.dirname(log_source_path)}/{LOG_ARCHIVE_NAME}'
+        try:
+            if not os.path.exists(local_path):
+                os.makedirs(local_path)
 
-        if not os.path.exists(local_path):
-            os.makedirs(local_path)
-
-        await self.run(
-            f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)}'
-            f' {os.path.basename(log_source_path)}'
-        )
-
-        async with self.client.start_sftp_client() as sftp_client:
-            await sftp_client.get(
-                log_archive_source_path, log_archive_local_path
+            await self.run(
+                f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)}'
+                f' {os.path.basename(log_source_path)}'
             )
 
-        await self.run(f'rm {log_archive_source_path}')
-        log.info(f'The log archive has been sent to :{log_archive_local_path}')
-        return str(log_archive_local_path)
+            async with self.client.start_sftp_client() as sftp_client:
+                await sftp_client.get(
+                    log_archive_source_path, log_archive_local_path
+                )
+
+            await self.run(f'rm {log_archive_source_path}')
+            log.info(f'The log archive has been sent to :{log_archive_local_path}')
+            return str(log_archive_local_path)
+        except Exception as e:
+            log.error(f'Attempt to transfer database logs failed" :{str(e)}')
+            return None
 
     def close(self) -> None:
         if hasattr(self, 'tunnel'):
