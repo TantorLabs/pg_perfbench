@@ -22,7 +22,7 @@ compare_sections_fields = ['db', 'benchmark']
 
 
 class TestParams:
-    pg_version = '15'
+    pg_version = '15.5'
     root_path = Path(os.environ.get('PYTHONPATH', ''))
     cntr_image_name = f'postgres:{pg_version}'
     cntr_name = 'cntr_test'
@@ -83,7 +83,7 @@ raw_context_default_wrkld = {
 raw_context_custom_wrkld = {
     'mode': 'benchmark',
     'benchmark_type': 'custom',
-    'workload_path': '/home/nad/common/TPC_tests/pg_perfbench_github/pg_perfbench/workload/tpc-e', #test_params.workload_path,
+    'workload_path': f'{test_params.root_path}/pg_perfbench/workload/tpc-e',
     'pgbench_clients': [5, 10, 15],
     'pgbench_time': [5],
     'init_command': f'cd ARG_WORKLOAD_PATH && ARG_PSQL_PATH -p ARG_PG_PORT '
@@ -136,8 +136,6 @@ def compare_reports(report1, report2):
 class Operations:
     @staticmethod
     def run_command(cmd, print_output=True):
-        # print('='.join(['=' * 100]))
-        # print(str(' '.join(cmd)))
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = proc.communicate()
         if print_output:

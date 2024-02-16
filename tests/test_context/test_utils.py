@@ -5,7 +5,7 @@ from pg_perfbench.context.utils import get_deparsed_arguments, sanitize_raw_args
 class TestUtilsFunctions(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        print('\ntest_utils module')
+        print('\nTesting the Utils context scheme')
 
     def test_sanitize_raw_args(self):
         given = {'a': 'line', 'b': True, 'c': None}

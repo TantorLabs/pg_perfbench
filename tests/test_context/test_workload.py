@@ -1,30 +1,61 @@
 import unittest
-from pg_perfbench.context.schemes.workload import WorkloadDefault
+from pathlib import Path
+from pydantic import ValidationError
+
+from pg_perfbench.const import WorkloadTypes
+from pg_perfbench.context.schemes.workload import WorkloadDefault, PgbenchOptions, WorkloadCustom
 
 
-class TestWorkloads(unittest.TestCase):
-
+class TestWorkloadCustom(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        print('\ntest_workload module')
+        print('\nTesting the WorkloadCustom context scheme')
 
-    @staticmethod
-    def workload_params() -> dict[str, str]:
-        return {
-            'benchmark_type': 'default',
-            'options': {'pgbench_clients': [10, 15, 20], 'pgbench_time': [6]},
-            'init_command': 'ARG_PGBENCH_PATH -i --scale=10 --foreign-keys -p ARG_PG_PORT '
-            '-h ARG_PG_HOST -U postgres ARG_PG_DATABASE',
-            'workload_command': 'ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U '
-            'postgres ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 '
-            '-T 5 --no-vacuum',
-            'pgbench_path': '/usr/bin/pgbench',
-            'psql_path': '/usr/bin/psql'
+    def test_valid_workload_custom_initialization(self):
+        valid_params = {
+            'workload_path': Path('/valid/path'),
+            'options': PgbenchOptions(
+                pgbench_clients=[10],
+                pgbench_jobs=[1],
+                pgbench_time=[100]
+            ),
+            'init_command': 'init command',
+            'workload_command': 'workload command',
+            'benchmark_type': WorkloadTypes.CUSTOM
         }
+        workload = WorkloadCustom(**valid_params)
+        self.assertEqual(workload.benchmark_type, WorkloadTypes.CUSTOM)
 
-    def test_workload_common(self):
-        workload_params = self.workload_params()
-        data = WorkloadDefault(**workload_params)
-        self.assertEqual(data.options.pgbench_clients, [10, 15, 20])
-        self.assertEqual(data.options.pgbench_jobs, [])
-        self.assertEqual(data.options.pgbench_time, [6])
+    def test_invalid_workload_custom_path(self):
+        invalid_params = {
+            'workload_path': Path('/'),
+            'options': PgbenchOptions(),
+            'init_command': '',
+            'workload_command': ''
+        }
+        with self.assertRaises(ValidationError):
+            WorkloadCustom(**invalid_params)
+
+
+class TestWorkloadDefault(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        print('\nTesting the WorkloadDefault context scheme')
+
+    def test_valid_workload_default_initialization(self):
+        valid_params = {
+            'options': {
+                'pgbench_clients': [10],
+                'pgbench_jobs': [1],
+                'pgbench_time': [100]
+            },
+            'init_command': 'init command',
+            'workload_command': 'workload command',
+            'benchmark_type': WorkloadTypes.DEFAULT
+        }
+        workload = WorkloadDefault(**valid_params)
+        self.assertEqual(workload.benchmark_type, WorkloadTypes.DEFAULT)
+
+
+if __name__ == '__main__':
+    unittest.main()

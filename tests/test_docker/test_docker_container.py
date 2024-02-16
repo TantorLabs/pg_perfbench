@@ -26,7 +26,7 @@ logging.getLogger('pydantic').setLevel(logging.CRITICAL)
 
 
 class TestParams:
-    pg_version = '15'
+    pg_version = '15.5'
     home_path = Path(os.environ.get('PYTHONPATH', ''))
     cntr_image_name = f'postgres:{pg_version}'
     cntr_name = 'pg_default_workload'

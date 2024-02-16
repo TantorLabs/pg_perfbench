@@ -5,7 +5,7 @@ from pg_perfbench.context.schemes.db import DBParameters
 class TestDBParametersConstruction(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        print('\ntest_misc_schemas module')
+        print('\nTesting the DBParameters context scheme')
 
     def test_db_params_construction_with_default_params(self):
         given = {
