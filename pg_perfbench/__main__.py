@@ -141,11 +141,9 @@ async def run(args: Optional[Namespace] = None):
         elif args.mode == WorkMode.JOIN:
             context = JoinContext.from_args_map(vars(args))
             report = join_reports(context, log_level)
-    except Exception as e:
-        log.error(f'pg_perfbench error: {str(e)}.')
-        sys.exit(1)
     finally:
         if report is None:
+            log.error('Emergency program termination. No report has been generated.')
             sys.exit(1)
 
     general_reports.save_report(report, args.mode)
