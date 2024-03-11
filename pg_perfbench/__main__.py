@@ -36,7 +36,7 @@ async def run(args: Optional[Namespace] = None):
 
     if report is None:
         log.error('Emergency program termination. No report has been generated.')
-        raise
+        return None
 
     general_reports.save_report(report, args.mode)
     log.info('Benchmark report saved successfully.')

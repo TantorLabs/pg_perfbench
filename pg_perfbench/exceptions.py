@@ -46,7 +46,7 @@ class PerformTestError(CommonException):
 
 
 class BashCommandException(Exception):
-    """Core application error."""
+    """Bash script execution error."""
 
     def __init__(self, code, text_error=''):
         self.code = code
