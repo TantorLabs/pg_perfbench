@@ -177,7 +177,7 @@ from the current host to the database host, `used directly by the tool`.
 ### Workload options:
 | Parameter            | Description                                                                |
 |----------------------|----------------------------------------------------------------------------|
-| `--benchmark`        | The benchmark to use: `default`, `custom`                                  | 
+| `--benchmark-type`        | The benchmark to use: `default`, `custom`                                  | 
 | `--pgbench-clients`  | pgbench benchmarking arguments: --clients, is set as an array (e.g. 1,2,3) |
 | `--pgbench-jobs`     | pgbench benchmarking arguments: --jobs, is set as an array (e.g. 1,2,3)    |
 | `--pgbench-time`     | pgbench benchmarking arguments: --time, is set as an array (e.g. 1,2,3)    |
