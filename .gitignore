@@ -1,4 +1,8 @@
 log/
-venv/
+venv*/*
+venv*
 __pycache__/
 .idea/
+tmp*
+tmp*/*
+report/*
