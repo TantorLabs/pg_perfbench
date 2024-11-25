@@ -70,6 +70,7 @@ described in join_tasks JSON files in the project root.
 
 # Configuring pg_perfbench in `benchmark` mode
 ## Connection options 
+> **Note**: During testing, port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
 ### SSH connection
 
 | Parameter           | Description                                                      |
@@ -187,7 +188,7 @@ from the current host to the database host, `used directly by the tool`.
 | `--workload-command` | Terminal command for loading the database (relative to the current host)   |
 
 - Use placeholders to set values in the table schema and load testing commands:
-configure placeholders like `'ARG_'+ <DB|Workload options>`.<br><br>  
+configure placeholders like `'ARG_'+ <DB/Workload options>`.<br><br>  
 For example, you can configure pgbench by specifying the path of the load files 
 (this example describes the full set of arguments for ssh connection):
 ```
