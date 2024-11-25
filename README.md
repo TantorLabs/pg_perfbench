@@ -71,6 +71,22 @@ described in join_tasks JSON files in the project root.
 # Configuring pg_perfbench in `benchmark` mode
 ## Connection options 
 > **Note**: During testing, port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
+During the operation of pg_perfbench, it is necessary to set local environment variables within the session connecting to the database host.
+
+When establishing an SSH connection, you must first update the AcceptEnv parameter in the SSH configuration file (/etc/ssh/sshd_config) on the database server.
+Specify the argument pattern as 'ARG_*' to allow multiple variables to be passed in:
+<br>`/etc/ssh/sshd_config:` <br>
+```
+...
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_* ARG_*
+...
+```
+
+In a Docker container, environment variables can be passed during its startup.
+```
+docker run -e "MYVAR1=$(echo $MYVAR1)" -e "MYVAR2=$(echo $MYVAR2)" myimage
+```
 ### SSH connection
 
 | Parameter           | Description                                                      |
