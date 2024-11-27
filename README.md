@@ -5,7 +5,7 @@ database with detailed `report` generation. A key feature of the tool is its cap
 * Adding the result of executing a bash script on the database host;
 * Adding the result of executing an SQL script on the database;
   
-The application offers support for two configurations of database connections:
+The application supports two configurations for database connections, depending on its location:
 
 * `SSH` - database located on a remote host;
 * `Container` - database located in a Docker container;
