@@ -141,7 +141,7 @@ Example of specified ssh connection arguments:
 --remote-pg-port=5432
 ```
 
-
+see more details on benchmark configuration over an SSH connection [here](doc/ssh_mode_usage.md).
 ### Docker connection
 Preconfigure access to Docker for the user who is running the tool.
 
@@ -160,7 +160,7 @@ Preconfigure access to Docker for the user who is running the tool.
 --docker-pg-port=5432
 ```
 
-
+see more details on benchmark configuration for a database in a Docker container [here](doc/docker_mode_usage.md).
 ### Common instruction
 When utilizing an SSH connection, ensure that the postgres user has the privilege to clear the file 
 system cache on the database server. For a Docker connection, identify the user operating the tool 
