@@ -41,7 +41,7 @@ def get_args_parser() -> argparse.ArgumentParser:
     workload_group.add_argument(
         '--collect-pg-logs',
         action='store_true',
-        help='DB log collection mode',
+        help='DB log collection mode. Note that the database instance log directory is queried from the database using the command "SHOW log_directory;".',
     )
     workload_group.add_argument(
         '--benchmark-type',
