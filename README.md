@@ -141,6 +141,12 @@ Example of specified ssh connection arguments:
 --remote-pg-port=5432
 ```
 
+To archive the instance logs, install tar(Ubuntu example):
+```
+sudo apt update
+sudo apt install tar
+```
+
 see more details on benchmark configuration over an SSH connection [here](doc/ssh_mode_usage.md).
 ### Docker connection
 Preconfigure access to Docker for the user who is running the tool.
