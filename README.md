@@ -97,6 +97,13 @@ docker run -e "MYVAR1=$(echo $MYVAR1)" -e "MYVAR2=$(echo $MYVAR2)" myimage
 | `--remote-pg-host`  | Host of the remote server's database (default: 127.0.0.1)        |
 | `--remote-pg-port`  | Port of the remote server's database (default: 5432)             |
 
+
+* To archive the instance logs, install tar(Ubuntu example) on the data base server:
+```
+sudo apt update
+sudo apt install tar
+```
+
 * `The SSH connection user is postgres`. Configure SSH access keys on the database server to establish a connection to the postgres user:
 
 ```
@@ -139,12 +146,6 @@ Example of specified ssh connection arguments:
 --ssh-host=10.111.1.111
 --remote-pg-host=127.0.0.1
 --remote-pg-port=5432
-```
-
-To archive the instance logs, install tar(Ubuntu example):
-```
-sudo apt update
-sudo apt install tar
 ```
 
 see more details on benchmark configuration over an SSH connection [here](doc/ssh_mode_usage.md).
