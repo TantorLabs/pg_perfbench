@@ -29,6 +29,14 @@
                     "shell_command_file": "sys_memory_total.sh",
                     "data": ""
                 },
+                "total_ram": {
+                    "header": "Total RAM capacity | /proc/meminfo",
+                    "description": "Total database host RAM ",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "total_ram.sh",
+                    "data": ""
+                },
                 "cpu_info": {
                     "header": "CPU architecture and specification display tool | lscpu",
                     "state": "collapsed",
