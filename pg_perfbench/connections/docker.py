@@ -2,6 +2,8 @@ import logging
 import os
 from types import TracebackType
 from typing import Self
+import subprocess
+from pathlib import Path
 
 import docker
 from docker.errors import DockerException
@@ -147,24 +149,17 @@ class DockerConnection(Connectable):
         self, log_source_path, local_path
     ) -> str | None:
         log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
-        log_archive_source_path = f'/{LOG_ARCHIVE_NAME}'
         try:
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
 
-            if await self.run(
-                f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)} '
-                f'{os.path.basename(log_source_path)}',
-                True
-            ) is None:
-                raise Exception
+            archive_cmd = [
+                "docker", "exec", self.params.container_name,
+                "tar", "-cz", "-C", os.path.dirname(log_source_path), os.path.basename(log_source_path)
+            ]
+            with Path(str(log_archive_local_path)).open("wb") as archive_file:
+                subprocess.run(archive_cmd, stdout=archive_file, check=True)
 
-            await run_command(
-                command=f'docker cp {self.params.container_name}:{log_archive_source_path} '
-                f'{log_archive_local_path}',
-                check=True
-            )
-            await self.run(f'rm {log_archive_source_path}')
             log.info(
                 f'The log archive has been sent to :{log_archive_local_path}'
             )
