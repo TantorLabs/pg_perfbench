@@ -2,10 +2,17 @@
 ## Testing a PostgreSQL database instance located on a remote host
 
 #### General environment preparation 
+Review and follow the steps outlined in the README [preparation](../README.md#dependencies-and-installation).
 
-Review and follow the steps outlined in the README [Prerequisites](../README.md#prerequisites).
+
+#### Environment preparation for SSH connection
+Review and follow the steps outlined in the README [preparation for ssh connection](../README.md#connection-options)
+
+#### Logic for testing over SSH connection
+
 
 #### Simple test configuration of a PostgreSQL database instance located on a remote host 
+
 - `pg_perfbench`  is executed as a module:
 ```
 python -m pg_perfbench <args>
@@ -61,7 +68,6 @@ python -m pg_perfbench <args>
 - Final set of arguments for database workload over an SSH connection on a remote host:
 ```
 python -m pg_perfbench --mode=benchmark  \
---collect-pg-logs  \
 --log-level=debug  \
 --ssh-port=22  \
 --ssh-key=/path_to/private_key \
@@ -73,8 +79,8 @@ python -m pg_perfbench --mode=benchmark  \
 --pg-user=postgres  \
 --pg-user-password=pswd  \
 --pg-database=tdb  \
---pg-data-path=/var/lib/postgresql/tantor-se-16/data  \
---pg-bin-path=/opt/tantor/db/16/bin  \
+--pg-data-path=/var/lib/postgresql/16/data  \
+--pg-bin-path=/usr/lib/postgresql/16/bin  \
 --pgbench-path=/usr/bin/pgbench \
 --psql-path=/usr/bin/psql  \
 --pgbench-clients=5,7 \
@@ -107,8 +113,8 @@ Initial application log output with correct configuration:
 #   pg_user = postgres
 #   pg_user_password = ****
 #   pg_database = tdb
-#   pg_data_path = /var/lib/postgresql/tantor-se-16/data
-#   pg_bin_path = /opt/tantor/db/16/bin
+#   pg_data_path = /var/lib/postgresql/16/data
+#   pg_bin_path = /usr/lib/postgresql/16/bin
 #   ssh_host = 10.100.100.100
 #   ssh_port = 22
 #   ssh_key = *********************************************************************************
