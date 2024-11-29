@@ -60,5 +60,6 @@
   --workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
   ```
 
-### **Standard workload diagram **
+
+### **Default workload diagram**
 ![image lost](default_workload.png "workload items")
