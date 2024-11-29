@@ -10,7 +10,7 @@ The application supports two configurations for database connections, depending 
 * `SSH` - database located on a remote host;
 * `Container` - database located in a Docker container;
 
-## Prerequisites
+## Dependencies and installation
 - Pre-installed PostgreSQL client applications: `psql`, `pgbench`. For example, using:
 ```
 sudo apt install postgresql-client
