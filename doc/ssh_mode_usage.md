@@ -37,7 +37,7 @@ python -m pg_perfbench <args>
 
 
 
-- Logging level for output of application execution stages {info,debug,error}:
+- Logging level for output of application execution stages [`info`,`debug`,`error`]:
 ```
 --log-level=debug
 ```
@@ -58,7 +58,7 @@ python -m pg_perfbench <args>
 --init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE" 
 --workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
 ```
-- You can also specify arguments used as placeholders in command strings `--init-command`,  `--workload-command`:
+- You can also specify arguments used as placeholders in command strings `--init-command`,  `--workload-command`(see more [workload description](workload_description.md#how-to-configure-workload)):
 ```
 --pgbench-clients=5,7
 --pgbench-time=10
@@ -81,6 +81,7 @@ python -m pg_perfbench --mode=benchmark  \
 --pg-database=tdb  \
 --pg-data-path=/var/lib/postgresql/16/data  \
 --pg-bin-path=/usr/lib/postgresql/16/bin  \
+--benchmark-type=default \
 --pgbench-path=/usr/bin/pgbench \
 --psql-path=/usr/bin/psql  \
 --pgbench-clients=5,7 \
@@ -143,3 +144,5 @@ Database is available.
 2024-11-27 21:28:56,974      DEBUG      pg_perfbench.benchmark_running :   52 - Running performance test: /usr/bin/pgbench -p 5438 -h 127.0.0.1 -U postgres tdb -c 5 -j 2 -T 10 --no-vacuum
 
 ```
+### General scheme of workload stages at SSH connection
+![image lost](ssh_connection_stages.png "workload items ssh")

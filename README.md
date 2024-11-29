@@ -55,12 +55,12 @@ chmod 666 /var/run/docker.sock
 - To ensure successful use, first thoroughly explore the capabilities of the tool and run the tests.
 
 # Configuring options
-pg_perfbench supports two modes: 'join' and 'benchmark'.
-<br> In 'benchmark' mode, the application loads the
-configured database instance and generates a report based on the report_struct.json template.<br>
-In 'join' mode, the application compares reports with each other, the path to which can be specified
-via the --input-dir flag (by default set to 'report' in the project root), according to criteria
-described in join_tasks JSON files in the project root.
+**pg_perfbench** supports two modes: `benchmark` and `join`.
+- In `benchmark` mode, the application loads the
+configured database instance and generates a report based on the `report_struct.json` template.<br>
+- In `join` mode, the application compares reports with each other, the path to which can be specified
+via the `--input-dir` flag (by default set to `report`), according to criteria
+described in `join_tasks` JSON files in the project root.
 ## Service options
 | Parameter      | Description                                                                                                                                             |
 |----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -69,6 +69,7 @@ described in join_tasks JSON files in the project root.
 | `--clear-logs` | Clearing logs from the tool's previous session. <br>Logs are located in the 'logs' folder of the root directory.                                        |
 
 # Configuring pg_perfbench in `benchmark` mode
+![image lost](doc/user_workload_scenarios.png "user workload scenarios")
 ## Connection options 
 > **Note**: During testing, port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
 During the operation of pg_perfbench, it is necessary to set local environment variables within the session connecting to the database host.
@@ -83,10 +84,8 @@ AcceptEnv LANG LC_* ARG_*
 ...
 ```
 
-In a Docker container, environment variables can be passed during its startup.
-```
-docker run -e "MYVAR1=$(echo $MYVAR1)" -e "MYVAR2=$(echo $MYVAR2)" myimage
-```
+In the **Docker** container, variables are passed through when launching the pg_perfbench container.
+
 ### SSH connection
 
 | Parameter           | Description                                                      |
@@ -270,6 +269,8 @@ python3.11 -m pg_perfbench --mode=benchmark \
 
 ```
 
+See more details about workload configuration [here](doc/workload_description.md).
+
 # Configuring report
 
 You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
@@ -323,6 +324,7 @@ python3.11 -m pg_perfbench --mode=join \
 --reference-report=benchmark_report.json \
 --input-dir=/path/to/some/reports
 ```
+See more details about report configuration [here](doc/logic_building_and_comparing_reports.md).
 # Running tests
 When testing the tool, a Docker connection is used. Preconfigure access to Docker for the user who is running the tool.
 - specify the `user` from which the tool is run:
