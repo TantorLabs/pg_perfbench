@@ -57,7 +57,7 @@ python -m pg_perfbench <args>
 --init-command="cd ARG_WORKLOAD_PATH && psql -p ARG_PG_PORT -h ARG_PG_HOST -U postgres -d ARG_PG_DATABASE -f ARG_WORKLOAD_PATH/tpc-e_tables.sql"
 --workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER --no-vacuum --file=ARG_WORKLOAD_PATH/Broker_Volume_SELECT.sql --file=ARG_WORKLOAD_PATH/Customer_Position_SELECT.sql ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T 10 "
 ```
-- You can also specify arguments used as placeholders in command strings `--init-command`,  `--workload-command`:
+- You can also specify arguments used as placeholders in command strings `--init-command`,  `--workload-command` (see more [workload description](workload_description.md#how-to-configure-workload)):
 ```
 --pgbench-clients=5
 --pgbench-time=10
