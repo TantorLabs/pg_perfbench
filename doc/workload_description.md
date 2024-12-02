@@ -62,4 +62,7 @@
 
 
 ### **Default workload diagram**
-![image lost](default_workload.png "workload items")
+![image lost](default_workload.png "default workload items")
+
+### **Custom workload diagram**
+![image lost](custom_workload.png "custom workload items")
