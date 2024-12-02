@@ -27,7 +27,7 @@
 | `--psql-path`             | Specify the `psql` path (relative to the current host).                                                      |
 
 
-## **How to set up a load test**
+## **How to configure workload**
 #### **PostgreSQL Database Environment Configuration:**
 - A pre-initialized PostgreSQL instance is used.
 - `--pg-host`,`--pg-port` - Local forwarding address to the remote database.
