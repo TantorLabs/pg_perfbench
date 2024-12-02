@@ -81,6 +81,7 @@ python -m pg_perfbench --mode=benchmark  \
 --pg-database=tdb  \
 --pg-data-path=/var/lib/postgresql/16/data  \
 --pg-bin-path=/usr/lib/postgresql/16/bin  \
+--benchmark-type=default
 --pgbench-path=/usr/bin/pgbench \
 --psql-path=/usr/bin/psql  \
 --pgbench-clients=5,7 \
