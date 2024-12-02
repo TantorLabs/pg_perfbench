@@ -144,3 +144,5 @@ Database is available.
 2024-11-27 21:28:56,974      DEBUG      pg_perfbench.benchmark_running :   52 - Running performance test: /usr/bin/pgbench -p 5438 -h 127.0.0.1 -U postgres tdb -c 5 -j 2 -T 10 --no-vacuum
 
 ```
+### General scheme of workload stages at SSH connection
+![image lost](ssh_connection_stages.png "workload items ssh")
