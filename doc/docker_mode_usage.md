@@ -142,3 +142,6 @@ Database is available.
 2024-11-27 18:52:02,135      DEBUG      pg_perfbench.benchmark_running :   52 - Running performance test: /usr/bin/pgbench -p 5436 -h 127.0.0.1 -U postgres tdb -c 5 -j 2 -T 10 --no-vacuum
 
 ```
+
+### General scheme of workload stages at Docker connection
+![image lost](docker_connection_stages.png "workload items docker")
