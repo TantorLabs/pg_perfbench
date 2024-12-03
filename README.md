@@ -269,6 +269,8 @@ python3.11 -m pg_perfbench --mode=benchmark \
 
 ```
 
+See more details about workload configuration [here](doc/workload_description.md).
+
 # Configuring report
 
 You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
@@ -322,6 +324,7 @@ python3.11 -m pg_perfbench --mode=join \
 --reference-report=benchmark_report.json \
 --input-dir=/path/to/some/reports
 ```
+See more details about report configuration [here](doc/logic_building_and_comparing_reports.md).
 # Running tests
 When testing the tool, a Docker connection is used. Preconfigure access to Docker for the user who is running the tool.
 - specify the `user` from which the tool is run:
