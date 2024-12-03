@@ -69,6 +69,7 @@ described in join_tasks JSON files in the project root.
 | `--clear-logs` | Clearing logs from the tool's previous session. <br>Logs are located in the 'logs' folder of the root directory.                                        |
 
 # Configuring pg_perfbench in `benchmark` mode
+![image lost](user_workload_scenarios.png "user workload scenarios")
 ## Connection options 
 > **Note**: During testing, port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
 During the operation of pg_perfbench, it is necessary to set local environment variables within the session connecting to the database host.
@@ -83,10 +84,8 @@ AcceptEnv LANG LC_* ARG_*
 ...
 ```
 
-In a Docker container, environment variables can be passed during its startup.
-```
-docker run -e "MYVAR1=$(echo $MYVAR1)" -e "MYVAR2=$(echo $MYVAR2)" myimage
-```
+In the **Docker** container, variables are passed through when launching the pg_perfbench container.
+
 ### SSH connection
 
 | Parameter           | Description                                                      |
