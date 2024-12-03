@@ -1,4 +1,4 @@
-# Generating report in `benchmark`mode
+# Generating report in `benchmark` mode
 You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
 Add or remove reports of the following types:
 
