@@ -18,19 +18,9 @@ sudo apt install postgresql-contrib
  ```
 - Python 3.11 and pip3:
 ```
-cd /usr/src
-sudo wget https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tar.xz
-sudo tar -xvf Python-3.11.7.tar.xz
-sudo cd Python-3.11.7
+sudo apt install python3.11
 
-sudo apt-get install libssl-dev libffi-dev gcc
-
-./configure --prefix=/opt/python3.11
-make altinstall
-
-sudo ln -sf /opt/python3.11/bin/python3.11 /usr/bin/python3.11
-sudo ln -sf /opt/python3.11/bin/pip3.11 /usr/bin/pip3.11
-
+sudo apt install python3.11-venv
 
 python3.11 --version
 ```
@@ -61,15 +51,15 @@ configured database instance and generates a report based on the `report_struct.
 - In `join` mode, the application compares reports with each other, the path to which can be specified
 via the `--input-dir` flag (by default set to `report`), according to criteria
 described in `join_tasks` JSON files in the project root.
+# Configuring pg_perfbench in `benchmark` mode
+![image lost](doc/user_workload_scenarios.png "user workload scenarios")
+<br>
 ## Service options
 | Parameter      | Description                                                                                                                                             |
 |----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `--help`, `-h` | Lists all the available options or flags that can be used with the command, <br> along with a short description of what each option does and after which exit occurs.|
 | `--log-level`  | Application logging level: `info`, `debug`, `error`.<br/>Default - `info`                                                                               |
 | `--clear-logs` | Clearing logs from the tool's previous session. <br>Logs are located in the 'logs' folder of the root directory.                                        |
-
-# Configuring pg_perfbench in `benchmark` mode
-![image lost](doc/user_workload_scenarios.png "user workload scenarios")
 ## Connection options 
 > **Note**: During testing, port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
 During the operation of pg_perfbench, it is necessary to set local environment variables within the session connecting to the database host.
