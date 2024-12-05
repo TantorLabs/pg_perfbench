@@ -102,7 +102,6 @@ In the **Docker** container, variables are passed through when launching the pg_
 sudo apt update
 sudo apt install tar
 ```
-
 * `The SSH connection user is postgres`. Configure SSH access keys on the database server to establish a connection to the postgres user:
 
 ```
@@ -146,7 +145,13 @@ Example of specified ssh connection arguments:
 --remote-pg-host=127.0.0.1
 --remote-pg-port=5432
 ```
+* To allow the `postgres` user to execute `lshw` without a password, add the following privileges:
 
+```bash
+sudo visudo
+>>>
+postgres ALL=(root) NOPASSWD: /usr/bin/lshw
+```
 see more details on benchmark configuration over an SSH connection [here](doc/ssh_mode_usage.md).
 ### Docker connection
 Preconfigure access to Docker for the user who is running the tool.

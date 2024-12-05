@@ -92,6 +92,111 @@
                     "item_type": "plain_text",
                     "shell_command_file": "sysctl_net_ipv4_udp.sh",
                     "data": ""
+                },
+                "lshw_system": {
+                    "header": "System Components | lshw -class system",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_system.sh",
+                    "data": ""
+                },
+                "lshw_bus": {
+                    "header": "Buses and Interfaces | lshw -class bus",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_bus.sh",
+                    "data": ""
+                },
+                "lshw_memory": {
+                    "header": "System Memory Information | lshw -class memory",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_memory.sh",
+                    "data": ""
+                },
+                "lshw_processor": {
+                    "header": "Processor Details | lshw -class processor",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_processor.sh",
+                    "data": ""
+                },
+                "lshw_bridge": {
+                    "header": "Bridges and Controllers | lshw -class bridge",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_bridge.sh",
+                    "data": ""
+                },
+                "lshw_display": {
+                    "header": "Graphics Adapters | lshw -class display",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_display.sh",
+                    "data": ""
+                },
+                "lshw_network": {
+                    "header": "Network Interfaces | lshw -class network",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_network.sh",
+                    "data": ""
+                },
+                "lshw_storage": {
+                    "header": "Storage Controllers | lshw -class storage",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_storage.sh",
+                    "data": ""
+                },
+                "lshw_disk": {
+                    "header": "Hard Drives and SSDs | lshw -class disk",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_disk.sh",
+                    "data": ""
+                },
+                "lshw_volume": {
+                    "header": "Disk Partitions and Volumes | lshw -class volume",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_volume.sh",
+                    "data": ""
+                },
+                "lshw_input": {
+                    "header": "Input Devices | lshw -class input",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_input.sh",
+                    "data": ""
+                },
+                "lshw_communication": {
+                    "header": "Communication Devices | lshw -class communication",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_communication.sh",
+                    "data": ""
+                },
+                "lshw_multimedia": {
+                    "header": "Audio and Multimedia Devices | lshw -class multimedia",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_multimedia.sh",
+                    "data": ""
+                },
+                "lshw_power": {
+                    "header": "Power Components | lshw -class power",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_power.sh",
+                    "data": ""
+                },
+                "lshw_generic": {
+                    "header": "Generic Devices | lshw -class generic",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "lshw_generic.sh",
+                    "data": ""
                 }
             }
         },
