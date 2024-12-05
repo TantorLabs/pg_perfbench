@@ -12,7 +12,7 @@ Add or remove reports of the following types:
   "data": ""
 }
 ```
-
+Currently, only `plain_text` is supported for this group.
 - "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
 ```
 "example_sql_report": {
