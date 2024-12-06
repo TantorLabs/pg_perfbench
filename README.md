@@ -18,19 +18,9 @@ sudo apt install postgresql-contrib
  ```
 - Python 3.11 and pip3:
 ```
-cd /usr/src
-sudo wget https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tar.xz
-sudo tar -xvf Python-3.11.7.tar.xz
-sudo cd Python-3.11.7
+apt install python3.11
 
-sudo apt-get install libssl-dev libffi-dev gcc
-
-./configure --prefix=/opt/python3.11
-make altinstall
-
-sudo ln -sf /opt/python3.11/bin/python3.11 /usr/bin/python3.11
-sudo ln -sf /opt/python3.11/bin/pip3.11 /usr/bin/pip3.11
-
+sudo apt install python3.11-venv
 
 python3.11 --version
 ```
