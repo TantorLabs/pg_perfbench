@@ -2,7 +2,10 @@
 You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
 Add or remove reports of the following types:
 
-- "shell_command_file" - a report with the result of executing the specified bash script relative to the database host in the `pg_perfbench/commands/bash_commands` directory, for example:
+- "shell_command_file" - a report with the result of executing the specified bash script relative to the database host in the `pg_perfbench/commands/bash_commands` directory:
+
+&emsp; &emsp;- output type `plain_text`:
+
 ```
 "example_bash_report": {
   "header": "example_bash_header",
@@ -12,15 +15,42 @@ Add or remove reports of the following types:
   "data": ""
 }
 ```
-Currently, only `plain_text` is supported for this group.
+
+&emsp; &emsp;- output type `table`:
+
+> **Note**: this bash script should return data in the form of an array of objects on the basis of which the table is built, as an example you can see the output of lshw in the report pg_perfbench/reports/templates/report_struct.json
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "table",
+  "shell_command_file": "bash_example.sh", <----- 
+  "theader": [],
+  "data": []
+}
+```
 - "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
+
+&emsp; &emsp;- output type `plain_text`:
 ```
 "example_sql_report": {
     "header": "example_sql_header",
     "state": "collapsed",
-    "item_type": <"plain_text", "table">,
+    "item_type": "plain_text",
     "sql_command_file": "sql_example.sql",
     "data": ""
+}
+```
+&emsp; &emsp;- output type `table`:
+> **Note**: This sql script should return a tabular form of the data. Examples can be found in pg_perfbench/reports/templates/report_struct.json
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "table",
+  "shell_command_file": "sql_example.sql", <----- 
+  "theader": [],
+  "data": []
 }
 ```
 ### Logic of Report Information Collection
