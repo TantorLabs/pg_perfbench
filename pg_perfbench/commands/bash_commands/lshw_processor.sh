@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class processor
+
+sudo lshw -class processor -json

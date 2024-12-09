@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class bus
+
+sudo lshw -class bus -json

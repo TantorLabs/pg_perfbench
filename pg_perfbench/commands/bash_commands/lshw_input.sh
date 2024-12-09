@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class input
+
+sudo lshw -class input -json

@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class bridge
+
+sudo lshw -class bridge -json

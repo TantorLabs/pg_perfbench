@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class communication
+
+sudo lshw -class communication -json

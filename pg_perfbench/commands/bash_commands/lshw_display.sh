@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class display
+
+sudo lshw -class display -json

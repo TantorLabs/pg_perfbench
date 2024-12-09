@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class disk
+
+sudo lshw -class disk -json

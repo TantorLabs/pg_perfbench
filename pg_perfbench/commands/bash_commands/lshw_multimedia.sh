@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class multimedia
+
+sudo lshw -class multimedia -json

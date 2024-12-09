@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class volume
+
+sudo lshw -class volume -json

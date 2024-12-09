@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class network
+
+sudo lshw -class network -json

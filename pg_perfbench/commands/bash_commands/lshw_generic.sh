@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class generic
+
+sudo lshw -class generic -json

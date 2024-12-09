@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class system
+
+sudo lshw -class system -json

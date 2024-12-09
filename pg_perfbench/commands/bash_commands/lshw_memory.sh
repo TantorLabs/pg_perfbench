@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo lshw -class memory
+
+sudo lshw -class memory -json
