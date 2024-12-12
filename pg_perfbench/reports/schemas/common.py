@@ -3,6 +3,8 @@ from typing import Any
 from typing import Union
 from typing import Literal
 from pathlib import Path
+import json
+
 
 from pydantic import BaseModel
 
@@ -120,7 +122,28 @@ class ItemPlainTextPython(BaseReportPythonCommand, BaseReportPlainText):
 
 
 class ItemTableShell(BaseReportShellCommand, BaseReportTable):
-    ...
+    async def set_data(self, connection):
+        try:
+            data = await connection.bash_command(self.get_shell_raw_script()) # json format
+            data = json.loads(data)
+
+            for obj in data:
+                for key in obj.keys():
+                    if key not in self.theader:
+                        self.theader.append(key)
+
+            for obj in data:
+                row = []
+                for key in self.theader:
+                    value = obj.get(key, None)
+                    row.append(value)
+                self.data.append(row)
+
+        except Exception as e:
+            text_error = f'{self.shell_command_file} execution error: {str(e)}'
+            log.error(text_error)
+            self.data = text_error
+            self.item_type = ReportTypes.PLAIN_TEXT
 
 
 class ItemTableSQL(BaseReportSQLCommand, BaseReportTable):

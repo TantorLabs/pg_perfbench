@@ -33,7 +33,7 @@ MAIN_REPORT_NAME = f'report_{get_datetime_report("%Y-%m-%d_%H:%M:%S")}'
 
 LOCAL_DB_LOGS_PATH = PROJECT_ROOT_FOLDER / 'db_logs'
 LOG_ARCHIVE_NAME = f'logs_archive_report_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}.tar.gz'
-
+LOG_ARCHIVE_DIR = '/tmp/log_archive'
 
 @enum.unique
 class WorkMode(StrEnum):
