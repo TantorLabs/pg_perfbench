@@ -61,12 +61,6 @@ def get_args_parser() -> argparse.ArgumentParser:
         help='pgbench benchmarking arguments: --clients',
     )
     workload_group.add_argument(
-        '--pgbench-jobs',
-        type=parse_pgbench_options,
-        default=None,
-        help='pgbench benchmarking arguments: --jobs',
-    )
-    workload_group.add_argument(
         '--pgbench-time',
         type=parse_pgbench_options,
         default=None,

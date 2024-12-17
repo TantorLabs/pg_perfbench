@@ -198,7 +198,6 @@ from the current host to the database host, `used directly by the tool`.
 | `--benchmark-type`   | The benchmark to use: `default`, `custom`                                  | 
 | `--workload-path`    | Path to the load scripts directory                                         |
 | `--pgbench-clients`  | pgbench benchmarking arguments: --clients, is set as an array (e.g. 1,2,3) |
-| `--pgbench-jobs`     | pgbench benchmarking arguments: --jobs, is set as an array (e.g. 1,2,3)    |
 | `--pgbench-time`     | pgbench benchmarking arguments: --time, is set as an array (e.g. 1,2,3)    |
 | `--pgbench-path`     | Specify the pgbench path (relative to the current host)                    |
 | `--psql-path`        | Specify the psql path (relative to the current host)                       |
@@ -228,12 +227,11 @@ python3.11 -m pg_perfbench --mode=benchmark \
 --pg-bin-path=/usr/lib/postgresql/15/bin \
 --benchmark-type=custom \
 --pgbench-clients=5,10,50 \
---pgbench-time=600 \
 --workload-path=/path/to/workload \
 --pgbench-path=/usr/bin/pgbench \
 --psql-path=/usr/bin/psql \
 --init-command="cd ARG_WORKLOAD_PATH && ARG_PSQL_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -f ARG_WORKLOAD_PATH/table-schema.sql" \
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER --no-vacuum --file=ARG_WORKLOAD_PATH/perf_1.sql --file=ARG_WORKLOAD_PATH/perf_2.sql ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T ARG_PGBENCH_TIME"
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER --no-vacuum --file=ARG_WORKLOAD_PATH/custom_script_1.sql --file=ARG_WORKLOAD_PATH/custom_script_2.sql ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T 10"
 ```
 
 
@@ -256,11 +254,9 @@ python3.11 -m pg_perfbench --mode=benchmark \
 --pg-data-path=/var/lib/postgresql/tantor-se-1c-15/data \
 --pg-bin-path=/opt/tantor/db/15/bin \
 --benchmark-type=default \
---pgbench-clients=5,10,50 \
---pgbench-time=600 \
---pgbench-jobs=19 \
+--pgbench-time=600,1200 \
 --init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT ARG_PG_HOST -U postgres ARG_PG_DATABASE" \
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c 5 -j 5 -T ARG_PGBENCH_TIME --no-vacuum"
 
 ```
 

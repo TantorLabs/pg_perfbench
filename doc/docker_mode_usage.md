@@ -31,7 +31,7 @@ python -m pg_perfbench <args>
 --docker-pg-host=127.0.0.1
 --docker-pg-port=5432
 --pg-host=127.0.0.1
---pg-port=5439
+--pg-port=5438
 ```
 > **Note**: `--pg-port, --pg-host` - Local address parameters used for forwarding to the database instance's listening address in the container `--docker-pg-port, --docker-pg-host`. The specified address `--pg-port, --pg-host` should be available for `pg_perfbench`.
 
@@ -54,15 +54,12 @@ python -m pg_perfbench <args>
 --benchmark-type=default
 --psql-path=/usr/bin/psql
 --pgbench-path=/usr/bin/pgbench
---init-command="cd ARG_WORKLOAD_PATH && psql -p ARG_PG_PORT -h ARG_PG_HOST -U postgres -d ARG_PG_DATABASE -f ARG_WORKLOAD_PATH/tpc-e_tables.sql"
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER --no-vacuum --file=ARG_WORKLOAD_PATH/Broker_Volume_SELECT.sql --file=ARG_WORKLOAD_PATH/Customer_Position_SELECT.sql ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T 10 "
+--init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE"
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 3 -T 10 --no-vacuum"
 ```
 - You can also specify arguments used as placeholders in command strings `--init-command`,  `--workload-command` (see more [workload description](workload_description.md#how-to-configure-workload)):
-```
---pgbench-clients=5
---pgbench-time=10
---pgbench-jobs=2
-```
+  - `--pg-host` will be resolved as `ARG_PG_HOST`.
+  - `--pgbench-time` will be resolved as `ARG_PGBENCH_TIME`.
 
 - Final set of arguments for database workload in the Docker container:
 ```
@@ -74,7 +71,7 @@ python -m pg_perfbench --mode=benchmark    \
 --docker-pg-host=127.0.0.1  \
 --docker-pg-port=5432   \
 --pg-host=127.0.0.1 \
---pg-port=5439  \
+--pg-port=5438  \
 --pg-user=postgres  \
 --pg-user-password=pswd \
 --pg-database=tdb   \
@@ -83,11 +80,9 @@ python -m pg_perfbench --mode=benchmark    \
 --pgbench-path=/usr/bin/pgbench \
 --psql-path=/usr/bin/psql   \
 --benchmark-type=default    \
---pgbench-clients=5 \
---pgbench-time=10   \
---pgbench-jobs=2    \
+--pgbench-clients=5,7 \
 --init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE"   \
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 3 -T 10 --no-vacuum"
 ```
 
 Initial application log output with correct configuration:
@@ -101,16 +96,14 @@ Initial application log output with correct configuration:
 #   mode = benchmark
 #   collect_pg_logs = True
 #   benchmark_type = default
-#   pgbench_clients = [5]
-#   pgbench_jobs = [2]
-#   pgbench_time = [10]
+#   pgbench_clients = [5, 7]
 #   init_command = ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE
-#   workload_command = ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum
+#   workload_command = ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 3 -T 10 --no-vacuum
 #   pgbench_path = /usr/bin/pgbench
 #   psql_path = /usr/bin/psql
 #   custom_config = 
 #   pg_host = 127.0.0.1
-#   pg_port = 5436
+#   pg_port = 5438
 #   pg_user = postgres
 #   pg_user_password = ****
 #   pg_database = tdb
@@ -125,7 +118,7 @@ Initial application log output with correct configuration:
 2024-11-27 18:51:41,621       INFO                                root :   77 - Template report_struct.json is configured correctly
 2024-11-27 18:51:41,820       INFO     pg_perfbench.connections.docker :   88 - Started Docker container: cntr_expected
 2024-11-27 18:51:41,821       INFO      pg_perfbench.benchmark_running :   64 - Start benchmarking
-2024-11-27 18:51:41,821       INFO      pg_perfbench.benchmark_running :   68 - Current benchmark iteration: /usr/bin/pgbench -p 5436 -h 127.0.0.1 -U postgres tdb -c 5 -j 2 -T 10 --no-vacuum
+2024-11-27 18:51:41,821       INFO      pg_perfbench.benchmark_running :   68 - Current benchmark iteration: /usr/bin/pgbench -p 5438 -h 127.0.0.1 -U postgres tdb -c 5 -j 3 -T 10 --no-vacuum
 2024-11-27 18:51:41,821      DEBUG      pg_perfbench.benchmark_running :   44 - Benchmark preparation
 2024-11-27 18:51:41,826       INFO     pg_perfbench.connections.docker :  182 - Docker logs: 
 
@@ -136,10 +129,10 @@ Database is available.
 2024-11-27 18:51:53,567       INFO          pg_perfbench.operations.db :   46 - Terminating other sessions to the test DB
 2024-11-27 18:51:53,575       INFO          pg_perfbench.operations.db :   48 - Dropping test DB
 2024-11-27 18:51:53,576       INFO          pg_perfbench.operations.db :   50 - Creating pristine test DB
-2024-11-27 18:51:53,643       INFO      pg_perfbench.benchmark_running :   49 - Create a database schema. Response: /usr/bin/pgbench -i --scale=100 --foreign-keys -p 5436 -h 127.0.0.1 -U postgres tdb
+2024-11-27 18:51:53,643       INFO      pg_perfbench.benchmark_running :   49 - Create a database schema. Response: /usr/bin/pgbench -i --scale=100 --foreign-keys -p 5438 -h 127.0.0.1 -U postgres tdb
 2024-11-27 18:52:02,135      DEBUG      pg_perfbench.benchmark_running :   51 - Result:
  
-2024-11-27 18:52:02,135      DEBUG      pg_perfbench.benchmark_running :   52 - Running performance test: /usr/bin/pgbench -p 5436 -h 127.0.0.1 -U postgres tdb -c 5 -j 2 -T 10 --no-vacuum
+2024-11-27 18:52:02,135      DEBUG      pg_perfbench.benchmark_running :   52 - Running performance test: /usr/bin/pgbench -p 5438 -h 127.0.0.1 -U postgres tdb -c 5 -j 3 -T 10 --no-vacuum
 
 ```
 

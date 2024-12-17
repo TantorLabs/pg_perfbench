@@ -19,7 +19,6 @@
 | `--collect-pg-logs`       | DB log collection mode. Note that the database instance log directory is queried using the command `SHOW log_directory;`. |
 | `--workload-path`         | Path to the workload directory.                                                                              |
 | `--pgbench-clients`       | `pgbench` benchmarking argument: `--clients`.                                                                |
-| `--pgbench-jobs`          | `pgbench` benchmarking argument: `--jobs`.                                                                   |
 | `--pgbench-time`          | `pgbench` benchmarking argument: `--time`.                                                                   |
 | `--init-command`          | Database initialization command in the terminal.                                                             |
 | `--workload-command`      | Database workload command in the terminal.                                                                   |
@@ -46,10 +45,13 @@
   - `--pg-host` will be resolved as `ARG_PG_HOST`.
   - `--pgbench-clients` will be resolved as `ARG_PGBENCH_CLIENTS`.
  
-- **The number of workload items** is determined by the arrays `--pgbench-clients`, `--pgbench-jobs`, and `--pgbench-time`, which form combinations of a **Cartesian product**.
-  Therefore, you should carefully populate these parameters to avoid unnecessary workload items.
-  
-![image lost](workload_items.png "workload items")
+- You can specify the number of workload elements using one of the array arguments: `--pgbench-clients` or `--pgbench-time`.
+  - The `--pgbench-clients` argument sets the number of pgbench connections to the database; the report [diagram](logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/clients.
+  ![image lost](workload_items_clients.png "workload items clients")
+  <br><br>
+  - The `--pgbench-time` argument sets the duration of the pgbench load test in seconds; the report [diagram](logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/time.
+  ![image lost](workload_items_time.png "workload items time")
+
 #### **Final Command Strings:**
 - **Initialization Command:**
   ```bash
@@ -57,7 +59,7 @@
   ```
 - **Workload Command:**
   ```bash
-  --workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
+  --workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c 6 -j 10 -T ARG_PGBENCH_TIME --no-vacuum"
   ```
 
 

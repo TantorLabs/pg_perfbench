@@ -9,7 +9,7 @@ import time
 import asyncpg
 
 from pg_perfbench.connections.common import Runnable
-from pg_perfbench.const import MAIN_REPORT_NAME
+from pg_perfbench.const import DEFAULT_REPORT_NAME
 from pg_perfbench.context.schemes.db import DBParameters
 from pg_perfbench.exceptions import exception_helper
 

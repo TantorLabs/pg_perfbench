@@ -9,8 +9,7 @@ import json
 from pydantic import BaseModel
 
 from pg_perfbench.compatibility import StrEnum
-from pg_perfbench.const import SHELL_COMMANDS_PATH
-from pg_perfbench.const import SQL_COMMANDS_PATH
+from pg_perfbench.const import SHELL_COMMANDS_PATH, SQL_COMMANDS_PATH
 
 log = logging.getLogger(__name__)
 

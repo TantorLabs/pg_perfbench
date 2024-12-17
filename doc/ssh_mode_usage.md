@@ -56,14 +56,11 @@ python -m pg_perfbench <args>
 --psql-path=/usr/bin/psql
 --pgbench-path=/usr/bin/pgbench
 --init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE" 
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 3 -T 10 --no-vacuum"
 ```
 - You can also specify arguments used as placeholders in command strings `--init-command`,  `--workload-command`(see more [workload description](workload_description.md#how-to-configure-workload)):
-```
---pgbench-clients=5,7
---pgbench-time=10
---pgbench-jobs=2
-```
+  - `--pg-host` will be resolved as `ARG_PG_HOST`.
+  - `--pgbench-clients` will be resolved as `ARG_PGBENCH_CLIENTS`.
 
 - Final set of arguments for database workload over an SSH connection on a remote host:
 ```
@@ -85,10 +82,8 @@ python -m pg_perfbench --mode=benchmark  \
 --pgbench-path=/usr/bin/pgbench \
 --psql-path=/usr/bin/psql  \
 --pgbench-clients=5,7 \
---pgbench-time=10  \
---pgbench-jobs=2 \
 --init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE"  \
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 3 -T 10 --no-vacuum"
 ```
 Initial application log output with correct configuration:
 ```
@@ -102,10 +97,8 @@ Initial application log output with correct configuration:
 #   collect_pg_logs = True
 #   benchmark_type = default
 #   pgbench_clients = [5, 7]
-#   pgbench_jobs = [2]
-#   pgbench_time = [10]
 #   init_command = ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE
-#   workload_command = ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum
+#   workload_command = ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 3 -T 10 --no-vacuum
 #   pgbench_path = /usr/bin/pgbench
 #   psql_path = /usr/bin/psql
 #   custom_config = 
@@ -127,7 +120,7 @@ Initial application log output with correct configuration:
 2024-11-27 21:28:09,434       INFO        pg_perfbench.connections.ssh :   42 - Attempting to establish an SSH connection: 
 2024-11-27 21:28:10,440       INFO        pg_perfbench.connections.ssh :   76 - SSH connection established.
 2024-11-27 21:28:10,440       INFO      pg_perfbench.benchmark_running :   64 - Start benchmarking
-2024-11-27 21:28:10,441       INFO      pg_perfbench.benchmark_running :   68 - Current benchmark iteration: /usr/bin/pgbench -p 5438 -h 127.0.0.1 -U postgres tdb -c 5 -j 2 -T 10 --no-vacuum
+2024-11-27 21:28:10,441       INFO      pg_perfbench.benchmark_running :   68 - Current benchmark iteration: /usr/bin/pgbench -p 5438 -h 127.0.0.1 -U postgres tdb -c 5 -j 3 -T 10 --no-vacuum
 2024-11-27 21:28:10,441      DEBUG      pg_perfbench.benchmark_running :   44 - Benchmark preparation
 2024-11-27 21:28:10,692       INFO        pg_perfbench.connections.ssh :   94 - 
 2024-11-27 21:28:10,750       INFO        pg_perfbench.connections.ssh :   94 - 
@@ -141,7 +134,7 @@ Database is available.
 2024-11-27 21:28:12,165       INFO      pg_perfbench.benchmark_running :   49 - Create a database schema. Response: /usr/bin/pgbench -i --scale=100 --foreign-keys -p 5438 -h 127.0.0.1 -U postgres tdb
 2024-11-27 21:28:56,973      DEBUG      pg_perfbench.benchmark_running :   51 - Result:
  
-2024-11-27 21:28:56,974      DEBUG      pg_perfbench.benchmark_running :   52 - Running performance test: /usr/bin/pgbench -p 5438 -h 127.0.0.1 -U postgres tdb -c 5 -j 2 -T 10 --no-vacuum
+2024-11-27 21:28:56,974      DEBUG      pg_perfbench.benchmark_running :   52 - Running performance test: /usr/bin/pgbench -p 5438 -h 127.0.0.1 -U postgres tdb -c 5 -j 3 -T 10 --no-vacuum
 
 ```
 ### General scheme of workload stages at SSH connection

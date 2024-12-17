@@ -34,6 +34,19 @@ def print_benchmark_welcome(raw_args: RawArgs) -> None:
     message_lines.append(f'#{"-" * 35}')
     log.info('\n'.join(message_lines))
 
+def check_benchmark_args(ctx) -> bool:
+    if len(ctx.workload.options.pgbench_clients) >= 1 and len(ctx.workload.options.pgbench_time) >= 1:
+        raise TypeError("Specify one primary parameter and include the second parameter in the workload command line --workload-command.")
+    if len(ctx.workload.options.pgbench_clients) >= 1:
+        ctx.report.chart_time_series_xaxis = 'clients'
+        ctx.report.chart_time_series_array = ctx.workload.options.pgbench_clients.copy()
+    elif len(ctx.workload.options.pgbench_time) >= 1:
+        ctx.report.chart_time_series_xaxis = 'time'
+        ctx.report.chart_time_series_array = ctx.workload.options.pgbench_time.copy()
+    else:
+        ctx.report.chart_time_series_xaxis = 'time'
+        ctx.report.chart_time_series_array = ctx.workload.options.pgbench_time.copy()
+
 
 async def perform_test(
     ctx: Context,
@@ -76,6 +89,7 @@ async def run_benchmark_tests_suit(
 async def run_benchmark(
         ctx: Context, log_level: int = logging.NOTSET
 ) -> report_schemas.Report | None:
+    check_benchmark_args(ctx)
     print_benchmark_welcome(ctx.raw_args)
     connection = get_connection(ctx.connection)
     main_report = general_reports.get_report_structure_from_json()

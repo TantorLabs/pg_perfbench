@@ -6,7 +6,7 @@ import copy
 
 from pg_perfbench.reports import schemas as report_schemas
 from pg_perfbench.context import JoinContext
-from pg_perfbench.const import PROJECT_ROOT_FOLDER
+from pg_perfbench.const import PROJECT_ROOT_FOLDER, DEFAULT_REPORT_NAME
 from pg_perfbench.const import get_datetime_report
 from pg_perfbench.logs import setup_logger
 
@@ -137,10 +137,8 @@ def join_reports(join_ctx: JoinContext, log_level: int = logging.NOTSET) -> repo
 
         report.sections['result'].reports['chart'].data['series'][0][
             'name'
-        ] = f'{rep_names.index(name) + 1}'
-        joined_report.sections['result'].reports[
-            'chart'
-        ].description += f'{name} {rep_names.index(name) + 1}\r\n'
+        ] = f'{name}'
+
 
     reference_report: report_schemas.Report = copy.deepcopy(joined_report)
 

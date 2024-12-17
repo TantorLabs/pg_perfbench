@@ -15,7 +15,7 @@ from pydantic.fields import FieldInfo
 
 from pg_perfbench.context.schemes.connections import ConnectionParameters
 from pg_perfbench.context.schemes.db import DBParameters
-from pg_perfbench.context.schemes.workload import WorkloadParams
+from pg_perfbench.context.schemes.workload import WorkloadParameters
 from pg_perfbench.exceptions import format_pydantic_error
 from pg_perfbench.const import REPORT_FOLDER
 
@@ -61,7 +61,7 @@ def restructure_args_dict(
 class Context(BaseModel):
     raw_args: RawArgs
     db: DBParameters
-    workload: WorkloadParams = Field(..., discriminator='benchmark_type')
+    workload: WorkloadParameters = Field(..., discriminator='benchmark_type')
     connection: ConnectionParameters
 
     @classmethod

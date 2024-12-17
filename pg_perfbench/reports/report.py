@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from pg_perfbench.const import REPORT_FOLDER, MAIN_REPORT_NAME
+from pg_perfbench.const import REPORT_FOLDER, DEFAULT_REPORT_NAME
 from pg_perfbench.const import REPORT_TEMPLATE_FOLDER
 from pg_perfbench.const import TEMPLATE_JSON_PATH
 from pg_perfbench.const import TEMPLATE_JSON_NAME
