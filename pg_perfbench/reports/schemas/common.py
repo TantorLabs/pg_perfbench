@@ -6,7 +6,7 @@ from pathlib import Path
 import json
 
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SerializeAsAny
 
 from pg_perfbench.compatibility import StrEnum
 from pg_perfbench.const import SHELL_COMMANDS_PATH, SQL_COMMANDS_PATH
@@ -188,7 +188,7 @@ class ItemChartPython(BaseReportPythonCommand, BaseReportChart):
 class SectionItemReports(BaseModel):
     reports: dict[
         str,
-        Union[
+        SerializeAsAny[Union[
             ItemPlainTextShell,
             ItemPlainTextSQL,
             ItemPlainTextPython,
@@ -199,5 +199,5 @@ class SectionItemReports(BaseModel):
             ItemChartSQL,
             ItemChartPython,
             ItemLink
-        ],
+        ]],
     ]

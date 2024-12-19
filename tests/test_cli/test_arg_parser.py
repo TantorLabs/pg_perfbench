@@ -20,11 +20,11 @@ class TestArgParser(unittest.TestCase):
         expected = {
             'clear_logs': False,
             'log_level': str(LogLevel.INFO),
+            'report_name': None,
             'mode': str(WorkMode.BENCHMARK),
             'benchmark_type': None,
             'workload_path': None,
             'pgbench_clients': None,
-            'pgbench_jobs': None,
             'pgbench_time': None,
             'init_command': None,
             'workload_command': None,
@@ -69,6 +69,8 @@ class TestArgParser(unittest.TestCase):
             str(WorkMode.BENCHMARK),
             '--log-level',
             'info',
+            '--report-name',
+            'report-name',
             '--clear-logs',
             '--ssh-host',
             'test_user@test_host',
@@ -114,8 +116,6 @@ class TestArgParser(unittest.TestCase):
             'ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T 10',
             '--pgbench-clients',
             '1, 12, 25',
-            '--pgbench-jobs',
-            '3, 5, 10',
             '--pgbench-time',
             '15',
         ]
@@ -125,6 +125,7 @@ class TestArgParser(unittest.TestCase):
         expected = {
             'mode': str(WorkMode.BENCHMARK),
             'log_level': 'info',
+            'report_name': 'report-name',
             'clear_logs': True,
             'ssh_host': 'test_user@test_host',
             'ssh_user': 'test_ssh_user',
@@ -150,7 +151,6 @@ class TestArgParser(unittest.TestCase):
             '--file=ARG_WORKLOAD_PATH/Customer_Position_SELECT.sql '
             'ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T 10',
             'pgbench_clients': [1, 12, 25],
-            'pgbench_jobs': [3, 5, 10],
             'pgbench_time': [15],
         }
 
