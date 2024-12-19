@@ -176,9 +176,14 @@ def join_reports(join_ctx: JoinContext, log_level: int = logging.NOTSET) -> repo
         f'Result of joined reports {get_datetime_report("%d/%m/%Y %H:%M:%S")}'
     )
     rep_names = [f'{name}' for name in rep_names]
+
+    if join_ctx.report_name is '':
+        join_ctx.report_name = f'join_{DEFAULT_REPORT_NAME}'
+    joined_report.report_name = join_ctx.report_name
     joined_report.description = '\r\n'.join(rep_names)
     joined_report.description = '\r\n'.join(
         [
+            '\r\nComparison Reports:\r\n',
             joined_report.description,
             '\r\nJoined by:\r\n',
             open(task_path).read(),

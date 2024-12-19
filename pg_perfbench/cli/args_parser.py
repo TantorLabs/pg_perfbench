@@ -32,6 +32,12 @@ def get_args_parser() -> argparse.ArgumentParser:
         choices=list(map(str, WorkMode)),
         help='pg_perfbench modes',
     )
+    general_group.add_argument(
+        '--report-name',
+        type=str,
+        default=None,
+        help='Logging level',
+    )
 
     workload_group = general_group.add_argument_group(
         title='Workload options',

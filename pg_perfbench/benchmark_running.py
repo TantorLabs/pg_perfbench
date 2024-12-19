@@ -4,7 +4,7 @@ from typing import Any
 import asyncpg
 
 from pg_perfbench.connections import common as connection_common, get_connection
-from pg_perfbench.const import VERSION, get_datetime_report
+from pg_perfbench.const import VERSION, get_datetime_report, DEFAULT_REPORT_NAME
 from pg_perfbench.context import Context, RawArgs, utils as context_utils
 from pg_perfbench.env_data import JsonMethods, collect_logs
 from pg_perfbench.exceptions import exception_helper, PerformTestError
@@ -35,6 +35,8 @@ def print_benchmark_welcome(raw_args: RawArgs) -> None:
     log.info('\n'.join(message_lines))
 
 def check_benchmark_args(ctx) -> bool:
+    if ctx.report.report_name is '':
+        ctx.report.report_name = f'benchmark_{DEFAULT_REPORT_NAME}'
     if len(ctx.workload.options.pgbench_clients) >= 1 and len(ctx.workload.options.pgbench_time) >= 1:
         raise TypeError("Specify one primary parameter and include the second parameter in the workload command line --workload-command.")
     if len(ctx.workload.options.pgbench_clients) >= 1:
@@ -105,6 +107,7 @@ async def run_benchmark(
                 password=ctx.db.pg_password,
             )
             main_report.header = 'PostgreSQL database benchmark report'
+            main_report.report_name = ctx.report.report_name
             main_report.description = get_datetime_report('%d/%m/%Y %H:%M:%S')
             for key_s, section in main_report.sections.items():
                 log.debug(f'Executing section: "{key_s}"')
@@ -125,7 +128,7 @@ async def run_benchmark(
 
             if ctx.db.collect_pg_logs:
                 dest_logs_path = await dbconn.fetchval('SHOW log_directory;')
-                if logs_item := await collect_logs(client, dest_logs_path):
+                if logs_item := await collect_logs(client, dest_logs_path, f'{ctx.report.report_name}.tar.gz'):
                     main_report.sections['result'].reports['logs'] = logs_item
 
             await dbconn.close()

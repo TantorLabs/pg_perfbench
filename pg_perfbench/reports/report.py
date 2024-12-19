@@ -37,6 +37,9 @@ def _save_json_report(report: Report, new_report_path: Path) -> None:
     if 'description' in report_json:
         report_json['description'] = report.description
 
+    if 'report_name' in report_json:
+        report_json['report_name'] = report.report_name
+
     for sect_k, sect_v in report.sections.items():
         for report_k, report_v in sect_v.reports.items():
             report_json['sections'][sect_k]['reports'].setdefault(report_k, {})
@@ -58,8 +61,8 @@ def _save_html_report(new_report_json_path: str, path: Path) -> None:
 
 def save_report(report: Report, prefix: str = 'single') -> None:
     REPORT_FOLDER.mkdir(parents=True, exist_ok=True)
-    new_report_json_path = REPORT_FOLDER / f'{prefix}_{MAIN_REPORT_NAME}.json'
-    new_report_html_path = REPORT_FOLDER / f'{prefix}_{MAIN_REPORT_NAME}.html'
+    new_report_json_path = REPORT_FOLDER / f'{report.report_name}.json'
+    new_report_html_path = REPORT_FOLDER / f'{report.report_name}.html'
 
     _save_json_report(report, new_report_json_path)
     _save_html_report(new_report_json_path, new_report_html_path)

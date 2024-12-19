@@ -135,6 +135,10 @@ def get_pgbench_results(pgbench_output: str) -> dict[str, Any]:
             re.finditer(r'number\sof\sclients\:\s(\d+)', pgbench_output),
             'int',
         ),
+        'duration': get_val(
+            re.finditer(r'duration\:\s(\d+)', pgbench_output),
+            'int',
+        ),
         'number of transactions actually processed': get_val(
             re.finditer(
                 r'number\sof\stransactions\sactually\sprocessed\:\s((\d+)/\d+|\d+)',

@@ -9,7 +9,7 @@ from asyncssh import SSHClientConnection
 from sshtunnel import SSHTunnelForwarder
 
 from pg_perfbench.connections.common import Connectable
-from pg_perfbench.const import LOG_ARCHIVE_NAME, LOG_ARCHIVE_DIR
+from pg_perfbench.const import DEFAULT_LOG_ARCHIVE_NAME, LOG_ARCHIVE_DIR
 from pg_perfbench.context.schemes.connections import SSHConnectionParams
 from pg_perfbench.exceptions import BashCommandException
 from pg_perfbench.operations.common import config_format_check
@@ -123,10 +123,10 @@ class SSHConnection(Connectable):
             return remote_config_path
 
     async def copy_db_log_files(
-        self, log_source_path, local_path
+        self, log_source_path, local_path, report_name
     ) -> str | None:
-        log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
-        log_archive_source_path = f'{LOG_ARCHIVE_DIR}/{LOG_ARCHIVE_NAME}'
+        log_archive_local_path = os.path.join(local_path, report_name)
+        log_archive_source_path = f'{LOG_ARCHIVE_DIR}/{report_name}'
         try:
 
             if not os.path.exists(local_path):

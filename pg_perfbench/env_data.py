@@ -5,7 +5,7 @@ import re
 
 from pg_perfbench.pgbench_utils import get_pgbench_options
 from pg_perfbench.context import Context
-from pg_perfbench.const import WorkloadTypes, LOCAL_DB_LOGS_PATH
+from pg_perfbench.const import WorkloadTypes, LOCAL_DB_LOGS_PATH, DEFAULT_LOG_ARCHIVE_NAME
 from pg_perfbench.reports.schemas.common import ItemLink, StateTypes, ReportTypes
 
 log = logging.getLogger(__name__)
@@ -83,6 +83,7 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
     def benchmark_result(self) -> TableData:
         theader = [
             'clients',
+            'duration',
             'number of transactions actually processed',
             'latency average',
             'initial connection time',
@@ -93,13 +94,28 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
 
     def chart_tps_clients(self) -> dict[Any]:
         return {
-            'name': 'Transactions per Second(tps)',
-            'data': [[val[0], round(val[4], 1)] for val in self.benchmark_result_data],
+            'title': {
+                'text': f'tps({self.ctx.report.chart_time_series_xaxis})'
+            },
+            'xaxis': {
+                'title': {
+                    'text': self.ctx.report.chart_time_series_xaxis
+                }
+            },
+            'series': [
+                {
+                    'name': f'{self.ctx.report.chart_time_series_name},tps',
+                    'data': [
+                        [x, round(val[5], 1)]
+                        for x, val in zip(self.ctx.report.chart_time_series_array, self.benchmark_result_data)
+                    ],
+                }
+            ]
         }  # FIXME: create a model class for pgbench result
 
 
-async def collect_logs(connect, remote_logs_path) -> ItemLink | None:
-    if data := await connect.copy_db_log_files(remote_logs_path, LOCAL_DB_LOGS_PATH):
+async def collect_logs(connect, remote_logs_path, report_name: str = DEFAULT_LOG_ARCHIVE_NAME) -> ItemLink | None:
+    if data := await connect.copy_db_log_files(remote_logs_path, LOCAL_DB_LOGS_PATH, report_name):
         report_item = ItemLink(
             header='database logs',
             description='Local path to the database log archive',

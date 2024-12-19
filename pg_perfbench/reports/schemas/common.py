@@ -60,7 +60,9 @@ class BaseReportChart(BaseReportItem):
     description: str
 
     def set_data(self, data: dict[Any]) -> None:
-        self.data['series'].append(data)
+        self.data['title']['text']=data['title']['text']
+        self.data['xaxis']['title']['text'] = data['xaxis']['title']['text']
+        self.data['series'].append(data['series'][0])
 
 
 def read_file(file: str, file_path: Path) -> str:

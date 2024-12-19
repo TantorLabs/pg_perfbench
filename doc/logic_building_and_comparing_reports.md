@@ -63,6 +63,7 @@ In this mode, single workload reports can be compared based on selected categori
 #### Join mode options
 | Option                     | Description                                               |
 |----------------------------|-----------------------------------------------------------|
+| `--report-name`   | Report name                                                                                                                                |
 | `--join-task`              | Criteria for comparing reports                            |
 | `--reference-report`       | Criteria for comparing reports                            |
 | `--input-dir`              | Reports directory                                         |

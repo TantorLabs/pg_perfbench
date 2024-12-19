@@ -48,6 +48,10 @@
 			margin: 20px 0 20px 0;
 		}
 
+		.bold_font_txt {
+			margin: 15px 0 15px 0;
+            font-weight: bold;
+		}
 
 		p.consolas-font {
 			color: #333;
@@ -104,6 +108,11 @@
 
 				if (report_item == 'header') {
 					$("#main_content").append("<h2 style='text-align: center'>" + report_data[report_item] + "</h2>");
+				}
+				if (report_item == 'report_name') {
+					var d = $("<div class='bold_font_txt' style='white-space: pre-wrap;'></div>");
+					d.html('Report name: ' + report_data[report_item]);
+					$("#main_content").append(d);
 				}
 				if (report_item == 'description') {
 					var d = $("<div class='common_div' style='white-space: pre-wrap;'></div>");

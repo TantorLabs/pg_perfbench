@@ -9,7 +9,7 @@ import docker
 from docker.errors import DockerException
 
 from pg_perfbench.connections import Connectable
-from pg_perfbench.const import LOG_ARCHIVE_NAME, get_datetime_report
+from pg_perfbench.const import DEFAULT_LOG_ARCHIVE_NAME, get_datetime_report
 from pg_perfbench.context.schemes.connections import DockerParams
 from pg_perfbench.exceptions import BashCommandException
 from pg_perfbench.operations.common import config_format_check
@@ -146,9 +146,9 @@ class DockerConnection(Connectable):
         return result.output.decode('utf-8')
 
     async def copy_db_log_files(
-        self, log_source_path, local_path
+        self, log_source_path, local_path, report_name
     ) -> str | None:
-        log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
+        log_archive_local_path = os.path.join(local_path, report_name)
         try:
             if not os.path.exists(local_path):
                 os.makedirs(local_path)

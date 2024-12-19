@@ -175,7 +175,7 @@ echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/
 ```
 
 
-## Database and workload options
+## Database, workload, report options
 ### PostgreSQL database options:
 The flags `pg_host` and `pg_port` are optional parameters for forwarding the address and port 
 from the current host to the database host, `used directly by the tool`.
@@ -204,6 +204,13 @@ from the current host to the database host, `used directly by the tool`.
 | `--init-command`     | Terminal command to create a table schema (relative to the current host)   |
 | `--workload-command` | Terminal command for loading the database (relative to the current host)   |
 
+### Configuring report options:
+| Parameter            | Description                                                                |
+|----------------------|----------------------------------------------------------------------------|
+| `--report-name`   | Report name and chart time series                                  |
+| `--pgbench-time`     |`pgbench` benchmarking arguments; The report [diagram](doc/logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/clients    |
+| `--pgbench-clients`     |`pgbench` benchmarking arguments; The report [diagram](doc/logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/time                    | 
+
 - Use placeholders to set values in the table schema and load testing commands:
 configure placeholders like `'ARG_'+ <DB/Workload options>`.<br><br>  
 For example, you can configure pgbench by specifying the path of the load files 
@@ -211,6 +218,7 @@ For example, you can configure pgbench by specifying the path of the load files
 ```
 python3.11 -m pg_perfbench --mode=benchmark \
 --collect-pg-logs \
+--report-name=ssh-pg-custom-benchmark   \
 --custom-config=/tmp/user_postgresql.conf \
 --log-level=debug \
 --ssh-port=22 \
@@ -240,6 +248,7 @@ or standard pgbench load
 ```
 python3.11 -m pg_perfbench --mode=benchmark \
 --log-level=debug \
+--report-name=docker-pg-default-benchmark \
 --collect-pg-logs \
 --custom-config=/tmp/user_postgresql.conf \
 --image-name=postgres:15 \
@@ -293,6 +302,7 @@ Add or remove reports of the following types:
 
 | Parameter           | Description                                                                                                                                                    |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--report-name`   | Report name                                                                                                                                 |
 | `--join-task`       | A JSON file containing a set of merge criteria,which are items of sections,<br/> should be located in join_tasks at the root of the project                    |
 | `--input-dir`       | Directory with reports on the load of a single database instance, files with <br/>a 'join' prefix are ignored. The default directory set is 'report'           |
 | `--reference-report`| The report specified as a benchmark for comparison with other reports. By default, the first report listed alphabetically in the --input-dir path is selected  |
