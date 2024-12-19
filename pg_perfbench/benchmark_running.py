@@ -35,7 +35,7 @@ def print_benchmark_welcome(raw_args: RawArgs) -> None:
     log.info('\n'.join(message_lines))
 
 def check_benchmark_args(ctx) -> bool:
-    if ctx.report.report_name is '':
+    if ctx.report.report_name == '':
         ctx.report.report_name = f'benchmark_{DEFAULT_REPORT_NAME}'
     if len(ctx.workload.options.pgbench_clients) >= 1 and len(ctx.workload.options.pgbench_time) >= 1:
         raise TypeError("Specify one primary parameter and include the second parameter in the workload command line --workload-command.")
