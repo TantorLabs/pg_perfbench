@@ -57,15 +57,15 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
             matches = pattern.findall(init_command)
             matches = [match for match in matches if match]
             for item in matches:
-                data = data + (subprocess.check_output(
-                    ['cat', str(item)], shell=False
-                ).decode('utf-8'))
+                data = data + f'{str(item)} :\n' + (subprocess.check_output(
+                    ['cat', f'{str(item)}'], shell=False
+                ).decode('utf-8')) + '\n\n'
         elif self.ctx.workload.benchmark_type is WorkloadTypes.DEFAULT:
             data = str(self.ctx.workload.init_command)
         return data
 
     def workload(self) -> str:
-        data = '\n\n'
+        data = ''
         if self.ctx.workload.benchmark_type is WorkloadTypes.CUSTOM:
             pgbench_command = str(self.ctx.workload.workload_command).replace(
                 'ARG_WORKLOAD_PATH', str(self.ctx.workload.workload_path))
@@ -73,9 +73,9 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
             matches = pattern.findall(pgbench_command)
             matches = [match for match in matches if match]
             for item in matches:
-                data = data + (subprocess.check_output(
-                    ['cat', str(item)], shell=False
-                ).decode('utf-8'))
+                data = data + f'{str(item)} :\n' + (subprocess.check_output(
+                    ['cat', f'{str(item)}'], shell=False
+                ).decode('utf-8')) + '\n\n'
         elif self.ctx.workload.benchmark_type is WorkloadTypes.DEFAULT:
             data = str(self.ctx.workload.workload_command)
         return data

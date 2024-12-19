@@ -36,7 +36,7 @@ def get_args_parser() -> argparse.ArgumentParser:
         '--report-name',
         type=str,
         default=None,
-        help='Logging level',
+        help='Custom report name',
     )
 
     workload_group = general_group.add_argument_group(
@@ -190,7 +190,7 @@ def get_args_parser() -> argparse.ArgumentParser:
     docker_connection_group.add_argument(
         '--container-name',
         type=str,
-        help='Which name of your image do you prefer?',
+        help='Name of the container to be created',
     )
     # Join mode args
     join_group = general_group.add_argument_group(
