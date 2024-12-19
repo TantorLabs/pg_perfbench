@@ -29,7 +29,7 @@ class Runnable(Protocol):
         ...
 
     @abstractmethod
-    async def copy_db_log_files(self, remote_logs_path: str, local_report_file: str) -> None:
+    async def copy_db_log_files(self, remote_logs_path: str, local_report_file: str, report_name: str) -> None:
         ...
 
 

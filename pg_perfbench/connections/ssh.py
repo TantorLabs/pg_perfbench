@@ -9,7 +9,7 @@ from asyncssh import SSHClientConnection
 from sshtunnel import SSHTunnelForwarder
 
 from pg_perfbench.connections.common import Connectable
-from pg_perfbench.const import LOG_ARCHIVE_NAME
+from pg_perfbench.const import DEFAULT_LOG_ARCHIVE_NAME, LOG_ARCHIVE_DIR
 from pg_perfbench.context.schemes.connections import SSHConnectionParams
 from pg_perfbench.exceptions import BashCommandException
 from pg_perfbench.operations.common import config_format_check
@@ -119,20 +119,23 @@ class SSHConnection(Connectable):
         remote_config_path = os.path.join(data_dir, 'postgresql.conf')
         async with self.client.start_sftp_client() as sftp_client:
             await sftp_client.put(localpaths=local_path, remotepath=remote_config_path)
-            log.info(f'Custom config moved to the data directory:{remote_config_path}')
+            log.info(f'Custom config "{local_path}" \n moved to the data directory "{remote_config_path}"')
             return remote_config_path
 
     async def copy_db_log_files(
-        self, log_source_path, local_path
+        self, log_source_path, local_path, report_name
     ) -> str | None:
-        log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
-        log_archive_source_path = f'{os.path.dirname(log_source_path)}/{LOG_ARCHIVE_NAME}'
+        log_archive_local_path = os.path.join(local_path, report_name)
+        log_archive_source_path = f'{LOG_ARCHIVE_DIR}/{report_name}'
         try:
+
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
 
+            await self.run(f'rm -rf {LOG_ARCHIVE_DIR}')
+            await self.run(f'mkdir -p {LOG_ARCHIVE_DIR}')
             await self.run(
-                f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)}'
+                f'tar -czvf {log_archive_source_path} --directory={os.path.dirname(log_source_path)}'
                 f' {os.path.basename(log_source_path)}'
             )
 
@@ -141,7 +144,7 @@ class SSHConnection(Connectable):
                     log_archive_source_path, log_archive_local_path
                 )
 
-            await self.run(f'rm {log_archive_source_path}')
+            await self.run(f'rm -rf {LOG_ARCHIVE_DIR}')
             log.info(f'The log archive has been sent to :{log_archive_local_path}')
             return str(log_archive_local_path)
         except Exception as e:

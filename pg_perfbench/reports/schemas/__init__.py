@@ -12,6 +12,7 @@ def _get_now_timestamp() -> str:
 
 class Report(BaseModel):
     header: str
+    report_name: str = Field(default='')
     description: str = Field(default_factory=_get_now_timestamp)
     sections: dict[str, SectionItemReports]
 
