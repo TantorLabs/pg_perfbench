@@ -4,7 +4,7 @@
             "system.sysctl_vm.data",
             "system.sysctl_net_ipv4_tcp.data",
             "system.sysctl_net_ipv4_udp.data",
-            "system.sys_memory_total.data",
+            "system.total_ram.data",
             "system.cpu_info.data",
             "system.etc_fstab.data",
             "db.version_major.data",

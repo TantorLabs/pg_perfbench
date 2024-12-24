@@ -3,12 +3,13 @@ from typing import Any
 from typing import Union
 from typing import Literal
 from pathlib import Path
+import json
 
-from pydantic import BaseModel
+
+from pydantic import BaseModel, SerializeAsAny
 
 from pg_perfbench.compatibility import StrEnum
-from pg_perfbench.const import SHELL_COMMANDS_PATH
-from pg_perfbench.const import SQL_COMMANDS_PATH
+from pg_perfbench.const import SHELL_COMMANDS_PATH, SQL_COMMANDS_PATH
 
 log = logging.getLogger(__name__)
 
@@ -59,7 +60,9 @@ class BaseReportChart(BaseReportItem):
     description: str
 
     def set_data(self, data: dict[Any]) -> None:
-        self.data['series'].append(data)
+        self.data['title']['text']=data['title']['text']
+        self.data['xaxis']['title']['text'] = data['xaxis']['title']['text']
+        self.data['series'].append(data['series'][0])
 
 
 def read_file(file: str, file_path: Path) -> str:
@@ -120,7 +123,28 @@ class ItemPlainTextPython(BaseReportPythonCommand, BaseReportPlainText):
 
 
 class ItemTableShell(BaseReportShellCommand, BaseReportTable):
-    ...
+    async def set_data(self, connection):
+        try:
+            data = await connection.bash_command(self.get_shell_raw_script()) # json format
+            data = json.loads(data)
+
+            for obj in data:
+                for key in obj.keys():
+                    if key not in self.theader:
+                        self.theader.append(key)
+
+            for obj in data:
+                row = []
+                for key in self.theader:
+                    value = obj.get(key, None)
+                    row.append(value)
+                self.data.append(row)
+
+        except Exception as e:
+            text_error = f'{self.shell_command_file} execution error: {str(e)}'
+            log.error(text_error)
+            self.data = text_error
+            self.item_type = ReportTypes.PLAIN_TEXT
 
 
 class ItemTableSQL(BaseReportSQLCommand, BaseReportTable):
@@ -164,7 +188,7 @@ class ItemChartPython(BaseReportPythonCommand, BaseReportChart):
 class SectionItemReports(BaseModel):
     reports: dict[
         str,
-        Union[
+        SerializeAsAny[Union[
             ItemPlainTextShell,
             ItemPlainTextSQL,
             ItemPlainTextPython,
@@ -175,5 +199,5 @@ class SectionItemReports(BaseModel):
             ItemChartSQL,
             ItemChartPython,
             ItemLink
-        ],
+        ]],
     ]

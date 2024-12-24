@@ -32,6 +32,12 @@ def get_args_parser() -> argparse.ArgumentParser:
         choices=list(map(str, WorkMode)),
         help='pg_perfbench modes',
     )
+    general_group.add_argument(
+        '--report-name',
+        type=str,
+        default=None,
+        help='Custom report name',
+    )
 
     workload_group = general_group.add_argument_group(
         title='Workload options',
@@ -41,7 +47,7 @@ def get_args_parser() -> argparse.ArgumentParser:
     workload_group.add_argument(
         '--collect-pg-logs',
         action='store_true',
-        help='DB log collection mode',
+        help='DB log collection mode. Note that the database instance log directory is queried from the database using the command "SHOW log_directory;".',
     )
     workload_group.add_argument(
         '--benchmark-type',
@@ -59,12 +65,6 @@ def get_args_parser() -> argparse.ArgumentParser:
         type=parse_pgbench_options,
         default=None,
         help='pgbench benchmarking arguments: --clients',
-    )
-    workload_group.add_argument(
-        '--pgbench-jobs',
-        type=parse_pgbench_options,
-        default=None,
-        help='pgbench benchmarking arguments: --jobs',
     )
     workload_group.add_argument(
         '--pgbench-time',
@@ -190,7 +190,7 @@ def get_args_parser() -> argparse.ArgumentParser:
     docker_connection_group.add_argument(
         '--container-name',
         type=str,
-        help='Which name of your image do you prefer?',
+        help='Name of the container to be created',
     )
     # Join mode args
     join_group = general_group.add_argument_group(

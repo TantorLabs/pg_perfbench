@@ -2,12 +2,14 @@ import logging
 import os
 from types import TracebackType
 from typing import Self
+import subprocess
+from pathlib import Path
 
 import docker
 from docker.errors import DockerException
 
 from pg_perfbench.connections import Connectable
-from pg_perfbench.const import LOG_ARCHIVE_NAME, get_datetime_report
+from pg_perfbench.const import DEFAULT_LOG_ARCHIVE_NAME, get_datetime_report
 from pg_perfbench.context.schemes.connections import DockerParams
 from pg_perfbench.exceptions import BashCommandException
 from pg_perfbench.operations.common import config_format_check
@@ -144,27 +146,20 @@ class DockerConnection(Connectable):
         return result.output.decode('utf-8')
 
     async def copy_db_log_files(
-        self, log_source_path, local_path
+        self, log_source_path, local_path, report_name
     ) -> str | None:
-        log_archive_local_path = os.path.join(local_path, LOG_ARCHIVE_NAME)
-        log_archive_source_path = f'/{LOG_ARCHIVE_NAME}'
+        log_archive_local_path = os.path.join(local_path, report_name)
         try:
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
 
-            if await self.run(
-                f'tar -czvf {LOG_ARCHIVE_NAME} --directory={os.path.dirname(log_source_path)} '
-                f'{os.path.basename(log_source_path)}',
-                True
-            ) is None:
-                raise Exception
+            archive_cmd = [
+                "docker", "exec", self.params.container_name,
+                "tar", "-cz", "-C", os.path.dirname(log_source_path), os.path.basename(log_source_path)
+            ]
+            with Path(str(log_archive_local_path)).open("wb") as archive_file:
+                subprocess.run(archive_cmd, stdout=archive_file, check=True)
 
-            await run_command(
-                command=f'docker cp {self.params.container_name}:{log_archive_source_path} '
-                f'{log_archive_local_path}',
-                check=True
-            )
-            await self.run(f'rm {log_archive_source_path}')
             log.info(
                 f'The log archive has been sent to :{log_archive_local_path}'
             )
