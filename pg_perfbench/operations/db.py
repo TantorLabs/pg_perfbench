@@ -9,7 +9,7 @@ import time
 import asyncpg
 
 from pg_perfbench.connections.common import Runnable
-from pg_perfbench.const import MAIN_REPORT_NAME
+from pg_perfbench.const import DEFAULT_REPORT_NAME
 from pg_perfbench.context.schemes.db import DBParameters
 from pg_perfbench.exceptions import exception_helper
 
@@ -133,6 +133,10 @@ def get_pgbench_results(pgbench_output: str) -> dict[str, Any]:
     return {
         'clients': get_val(
             re.finditer(r'number\sof\sclients\:\s(\d+)', pgbench_output),
+            'int',
+        ),
+        'duration': get_val(
+            re.finditer(r'duration\:\s(\d+)', pgbench_output),
             'int',
         ),
         'number of transactions actually processed': get_val(

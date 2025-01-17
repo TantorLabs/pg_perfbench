@@ -66,4 +66,4 @@ class WorkloadDefault(WorkloadCommon):
     benchmark_type: Literal[WorkloadTypes.DEFAULT]
 
 
-WorkloadParams = WorkloadCustom | WorkloadDefault
+WorkloadParameters = WorkloadCustom | WorkloadDefault

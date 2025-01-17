@@ -52,12 +52,12 @@ test_params = TestParams()
 raw_context_default_wrkld = {
     'mode': 'benchmark',
     'benchmark_type': 'default',
+    'report_name': 'benchmark_report_default',
     'pgbench_clients': [5, 10, 15],
-    'pgbench_time': [5],
     'init_command': 'ARG_PGBENCH_PATH -i --scale=10 --foreign-keys -p ARG_PG_PORT -h '
     'ARG_PG_HOST -U postgres ARG_PG_DATABASE',
     'workload_command': 'ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE'
-    ' -c ARG_PGBENCH_CLIENTS -j 4 -T ARG_PGBENCH_TIME --no-vacuum',
+    ' -c ARG_PGBENCH_CLIENTS -j 4 -T 5 --no-vacuum',
     'pgbench_path': test_params.pgbench_path,
     'psql_path': test_params.psql_path,
     'pg_host': '127.0.0.1',
@@ -82,17 +82,17 @@ raw_context_default_wrkld = {
 
 raw_context_custom_wrkld = {
     'mode': 'benchmark',
+    'report_name': 'benchmark_report_custom',
     'benchmark_type': 'custom',
     'workload_path': f'{test_params.root_path}/pg_perfbench/workload/tpc-e',
     'pgbench_clients': [5, 10, 15],
-    'pgbench_time': [5],
     'init_command': f'cd ARG_WORKLOAD_PATH && ARG_PSQL_PATH -p ARG_PG_PORT '
     '-h ARG_PG_HOST -U postgres ARG_PG_DATABASE '
     '-f ARG_WORKLOAD_PATH/tpc-e_tables.sql',
     'workload_command': 'ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres --no-vacuum '
     '--file=ARG_WORKLOAD_PATH/Broker_Volume_SELECT.sql '
     '--file=ARG_WORKLOAD_PATH/Customer_Position_SELECT.sql ARG_PG_DATABASE '
-    '-c ARG_PGBENCH_CLIENTS -j 20 -T 10',
+    '-c ARG_PGBENCH_CLIENTS -j 20 -T 5',
     'pgbench_path': test_params.pgbench_path,
     'psql_path': test_params.psql_path,
     'pg_host': '127.0.0.1',

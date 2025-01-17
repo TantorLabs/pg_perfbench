@@ -5,12 +5,12 @@ database with detailed `report` generation. A key feature of the tool is its cap
 * Adding the result of executing a bash script on the database host;
 * Adding the result of executing an SQL script on the database;
   
-The application offers support for two configurations of database connections:
+The application supports two configurations for database connections, depending on its location:
 
 * `SSH` - database located on a remote host;
 * `Container` - database located in a Docker container;
 
-## Prerequisites
+## Dependencies and installation
 - Pre-installed PostgreSQL client applications: `psql`, `pgbench`. For example, using:
 ```
 sudo apt install postgresql-client
@@ -18,19 +18,9 @@ sudo apt install postgresql-contrib
  ```
 - Python 3.11 and pip3:
 ```
-cd /usr/src
-sudo wget https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tar.xz
-sudo tar -xvf Python-3.11.7.tar.xz
-sudo cd Python-3.11.7
+sudo apt install python3.11
 
-sudo apt-get install libssl-dev libffi-dev gcc
-
-./configure --prefix=/opt/python3.11
-make altinstall
-
-sudo ln -sf /opt/python3.11/bin/python3.11 /usr/bin/python3.11
-sudo ln -sf /opt/python3.11/bin/pip3.11 /usr/bin/pip3.11
-
+sudo apt install python3.11-venv
 
 python3.11 --version
 ```
@@ -55,21 +45,37 @@ chmod 666 /var/run/docker.sock
 - To ensure successful use, first thoroughly explore the capabilities of the tool and run the tests.
 
 # Configuring options
-pg_perfbench supports two modes: 'join' and 'benchmark'.
-<br> In 'benchmark' mode, the application loads the
-configured database instance and generates a report based on the report_struct.json template.<br>
-In 'join' mode, the application compares reports with each other, the path to which can be specified
-via the --input-dir flag (by default set to 'report' in the project root), according to criteria
-described in join_tasks JSON files in the project root.
+**pg_perfbench** supports two modes: `benchmark` and `join`.
+- In `benchmark` mode, the application loads the
+configured database instance and generates a report based on the `report_struct.json` template.<br>
+- In `join` mode, the application compares reports with each other, the path to which can be specified
+via the `--input-dir` flag (by default set to `report`), according to criteria
+described in `join_tasks` JSON files in the project root.
+# Configuring pg_perfbench in `benchmark` mode
+![image lost](doc/user_workload_scenarios.png "user workload scenarios")
+<br>
 ## Service options
 | Parameter      | Description                                                                                                                                             |
 |----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `--help`, `-h` | Lists all the available options or flags that can be used with the command, <br> along with a short description of what each option does and after which exit occurs.|
 | `--log-level`  | Application logging level: `info`, `debug`, `error`.<br/>Default - `info`                                                                               |
 | `--clear-logs` | Clearing logs from the tool's previous session. <br>Logs are located in the 'logs' folder of the root directory.                                        |
-
-# Configuring pg_perfbench in `benchmark` mode
 ## Connection options 
+> **Note**: During testing, port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
+During the operation of pg_perfbench, it is necessary to set local environment variables within the session connecting to the database host.
+
+When establishing an SSH connection, you must first update the AcceptEnv parameter in the SSH configuration file (/etc/ssh/sshd_config) on the database server.
+Specify the argument pattern as 'ARG_*' to allow multiple variables to be passed in:
+<br>`/etc/ssh/sshd_config:` <br>
+```
+...
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_* ARG_*
+...
+```
+
+In the **Docker** container, variables are passed through when launching the pg_perfbench container.
+
 ### SSH connection
 
 | Parameter           | Description                                                      |
@@ -80,6 +86,12 @@ described in join_tasks JSON files in the project root.
 | `--remote-pg-host`  | Host of the remote server's database (default: 127.0.0.1)        |
 | `--remote-pg-port`  | Port of the remote server's database (default: 5432)             |
 
+
+* To archive the instance logs, install tar(Ubuntu example) on the data base server:
+```
+sudo apt update
+sudo apt install tar
+```
 * `The SSH connection user is postgres`. Configure SSH access keys on the database server to establish a connection to the postgres user:
 
 ```
@@ -123,8 +135,14 @@ Example of specified ssh connection arguments:
 --remote-pg-host=127.0.0.1
 --remote-pg-port=5432
 ```
+* To allow the `postgres` user to execute `lshw` without a password, add the following privileges:
 
-
+```bash
+sudo visudo
+>>>
+postgres ALL=(root) NOPASSWD: /usr/bin/lshw
+```
+see more details on benchmark configuration over an SSH connection [here](doc/ssh_mode_usage.md).
 ### Docker connection
 Preconfigure access to Docker for the user who is running the tool.
 
@@ -143,7 +161,7 @@ Preconfigure access to Docker for the user who is running the tool.
 --docker-pg-port=5432
 ```
 
-
+see more details on benchmark configuration for a database in a Docker container [here](doc/docker_mode_usage.md).
 ### Common instruction
 When utilizing an SSH connection, ensure that the postgres user has the privilege to clear the file 
 system cache on the database server. For a Docker connection, identify the user operating the tool 
@@ -157,7 +175,7 @@ echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/
 ```
 
 
-## Database and workload options
+## Database, workload, report options
 ### PostgreSQL database options:
 The flags `pg_host` and `pg_port` are optional parameters for forwarding the address and port 
 from the current host to the database host, `used directly by the tool`.
@@ -177,22 +195,30 @@ from the current host to the database host, `used directly by the tool`.
 ### Workload options:
 | Parameter            | Description                                                                |
 |----------------------|----------------------------------------------------------------------------|
-| `--benchmark-type`        | The benchmark to use: `default`, `custom`                                  | 
+| `--benchmark-type`   | The benchmark to use: `default`, `custom`                                  | 
+| `--workload-path`    | Path to the load scripts directory                                         |
 | `--pgbench-clients`  | pgbench benchmarking arguments: --clients, is set as an array (e.g. 1,2,3) |
-| `--pgbench-jobs`     | pgbench benchmarking arguments: --jobs, is set as an array (e.g. 1,2,3)    |
 | `--pgbench-time`     | pgbench benchmarking arguments: --time, is set as an array (e.g. 1,2,3)    |
 | `--pgbench-path`     | Specify the pgbench path (relative to the current host)                    |
 | `--psql-path`        | Specify the psql path (relative to the current host)                       |
 | `--init-command`     | Terminal command to create a table schema (relative to the current host)   |
 | `--workload-command` | Terminal command for loading the database (relative to the current host)   |
 
+### Configuring report options:
+| Parameter            | Description                                                                |
+|----------------------|----------------------------------------------------------------------------|
+| `--report-name`   | Report name and chart time series                                  |
+| `--pgbench-time`     |`pgbench` benchmarking arguments; The report [diagram](doc/logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/clients    |
+| `--pgbench-clients`     |`pgbench` benchmarking arguments; The report [diagram](doc/logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/time                    | 
+
 - Use placeholders to set values in the table schema and load testing commands:
-configure placeholders like `'ARG_'+ <DB|Workload options>`.<br><br>  
+configure placeholders like `'ARG_'+ <DB/Workload options>`.<br><br>  
 For example, you can configure pgbench by specifying the path of the load files 
 (this example describes the full set of arguments for ssh connection):
 ```
 python3.11 -m pg_perfbench --mode=benchmark \
 --collect-pg-logs \
+--report-name=ssh-pg-custom-benchmark   \
 --custom-config=/tmp/user_postgresql.conf \
 --log-level=debug \
 --ssh-port=22 \
@@ -209,12 +235,11 @@ python3.11 -m pg_perfbench --mode=benchmark \
 --pg-bin-path=/usr/lib/postgresql/15/bin \
 --benchmark-type=custom \
 --pgbench-clients=5,10,50 \
---pgbench-time=600 \
 --workload-path=/path/to/workload \
 --pgbench-path=/usr/bin/pgbench \
 --psql-path=/usr/bin/psql \
 --init-command="cd ARG_WORKLOAD_PATH && ARG_PSQL_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE -f ARG_WORKLOAD_PATH/table-schema.sql" \
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER --no-vacuum --file=ARG_WORKLOAD_PATH/perf_1.sql --file=ARG_WORKLOAD_PATH/perf_2.sql ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T ARG_PGBENCH_TIME"
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER --no-vacuum --file=ARG_WORKLOAD_PATH/custom_script_1.sql --file=ARG_WORKLOAD_PATH/custom_script_2.sql ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 20 -T 10"
 ```
 
 
@@ -223,6 +248,7 @@ or standard pgbench load
 ```
 python3.11 -m pg_perfbench --mode=benchmark \
 --log-level=debug \
+--report-name=docker-pg-default-benchmark \
 --collect-pg-logs \
 --custom-config=/tmp/user_postgresql.conf \
 --image-name=postgres:15 \
@@ -237,13 +263,13 @@ python3.11 -m pg_perfbench --mode=benchmark \
 --pg-data-path=/var/lib/postgresql/tantor-se-1c-15/data \
 --pg-bin-path=/opt/tantor/db/15/bin \
 --benchmark-type=default \
---pgbench-clients=5,10,50 \
---pgbench-time=600 \
---pgbench-jobs=19 \
+--pgbench-time=600,1200 \
 --init-command="ARG_PGBENCH_PATH -i --scale=100 --foreign-keys -p ARG_PG_PORT ARG_PG_HOST -U postgres ARG_PG_DATABASE" \
---workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j ARG_PGBENCH_JOBS -T ARG_PGBENCH_TIME --no-vacuum"
+--workload-command="ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c 5 -j 5 -T ARG_PGBENCH_TIME --no-vacuum"
 
 ```
+
+See more details about workload configuration [here](doc/workload_description.md).
 
 # Configuring report
 
@@ -276,6 +302,7 @@ Add or remove reports of the following types:
 
 | Parameter           | Description                                                                                                                                                    |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--report-name`   | Report name                                                                                                                                 |
 | `--join-task`       | A JSON file containing a set of merge criteria,which are items of sections,<br/> should be located in join_tasks at the root of the project                    |
 | `--input-dir`       | Directory with reports on the load of a single database instance, files with <br/>a 'join' prefix are ignored. The default directory set is 'report'           |
 | `--reference-report`| The report specified as a benchmark for comparison with other reports. By default, the first report listed alphabetically in the --input-dir path is selected  |
@@ -298,6 +325,7 @@ python3.11 -m pg_perfbench --mode=join \
 --reference-report=benchmark_report.json \
 --input-dir=/path/to/some/reports
 ```
+See more details about report configuration [here](doc/logic_building_and_comparing_reports.md).
 # Running tests
 When testing the tool, a Docker connection is used. Preconfigure access to Docker for the user who is running the tool.
 - specify the `user` from which the tool is run:

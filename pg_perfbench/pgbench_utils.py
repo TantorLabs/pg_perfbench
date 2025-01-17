@@ -3,11 +3,11 @@ from pathlib import Path
 import warnings
 
 from pg_perfbench.context.schemes.db import DBParameters
-from pg_perfbench.context.schemes.workload import WorkloadParams
+from pg_perfbench.context.schemes.workload import WorkloadParameters
 
 warnings.filterwarnings('ignore', category=UserWarning, module='pydantic.main')
 
-def get_init_execution_command(db: DBParameters, workload: WorkloadParams) -> str:
+def get_init_execution_command(db: DBParameters, workload: WorkloadParameters) -> str:
     # FIXME: this one looks a bit off this place. Maybe rename this module?
     init_command = str(workload.init_command)
     arg_values = {}
@@ -31,7 +31,7 @@ def _format_command(cmd: str, keys: tuple[str, ...], arguments: tuple[int, ...])
     return cmd
 
 
-def get_pgbench_commands(db: DBParameters, workload: WorkloadParams) -> list[str]:
+def get_pgbench_commands(db: DBParameters, workload: WorkloadParameters) -> list[str]:
     # fmt: off
     pgbench_command = str(workload.workload_command)
     arg_values = {}
@@ -55,7 +55,7 @@ def get_pgbench_commands(db: DBParameters, workload: WorkloadParams) -> list[str
     return [pgbench_command]
 
 
-def get_pgbench_options(workload: WorkloadParams) -> list[str]:
+def get_pgbench_options(workload: WorkloadParameters) -> list[str]:
     # fmt: off
     pgbench_command = str(workload.workload_command)
     arg_values = {}
