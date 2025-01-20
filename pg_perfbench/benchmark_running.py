@@ -2,9 +2,12 @@ import logging
 from typing import Any
 
 import asyncpg
+from pycparser.c_ast import Union
 
 from pg_perfbench.connections import common as connection_common, get_connection
-from pg_perfbench.const import VERSION, get_datetime_report, DEFAULT_REPORT_NAME
+from pg_perfbench.const import (VERSION, get_datetime_report, DEFAULT_REPORT_NAME, WorkMode,
+                                BENCHMARK_TEMPLATE_JSON_PATH, DB_INFO_TEMPLATE_JSON_PATH, SYS_INFO_TEMPLATE_JSON_PATH,
+                                ALL_INFO_TEMPLATE_JSON_PATH)
 from pg_perfbench.context import Context, RawArgs, utils as context_utils
 from pg_perfbench.env_data import JsonMethods, collect_logs
 from pg_perfbench.exceptions import exception_helper, PerformTestError
@@ -90,7 +93,7 @@ async def run_benchmark_tests_suit(
 
 async def run_benchmark(
         ctx: Context, log_level: int = logging.NOTSET
-) -> report_schemas.Report | None:
+) -> report_schemas.BenchmarkReport | None:
     check_benchmark_args(ctx)
     print_benchmark_welcome(ctx.raw_args)
     connection = get_connection(ctx.connection)
@@ -99,6 +102,7 @@ async def run_benchmark(
         async with connection as client:
             perf_result: list[Any] = await run_benchmark_tests_suit(client, ctx)
             jsonmethods = JsonMethods(perf_result, ctx)
+            await db_operations.wait_for_database_availability(ctx.db)
             dbconn = await asyncpg.connect(
                 host=ctx.db.pg_host,
                 port=ctx.db.pg_port,
@@ -138,3 +142,62 @@ async def run_benchmark(
         log.error(exception_helper(show_traceback=(log_level == logging.DEBUG)))
         log.error('Emergency program termination. No report has been generated.')
     return None
+
+
+async def collect_info(
+        ctx: Context, mode: WorkMode , log_level: int = logging.NOTSET
+) -> report_schemas.BenchmarkReport | None:
+
+    mode_struct_ref = {
+        WorkMode.COLLECT_DB_INFO: DB_INFO_TEMPLATE_JSON_PATH,
+        WorkMode.COLLECT_SYS_INFO: SYS_INFO_TEMPLATE_JSON_PATH,
+        WorkMode.COLLECT_ALL_INFO: ALL_INFO_TEMPLATE_JSON_PATH
+    }
+    try:
+        if ctx.report.report_name == '':
+            ctx.report.report_name = generate_report_name(mode)
+
+        connection = get_connection(ctx.connection)
+        main_report = general_reports.get_report_structure(mode_struct_ref[mode])
+        async with connection as client:
+            jsonmethods = JsonMethods({}, ctx)
+            if mode in {WorkMode.COLLECT_DB_INFO, WorkMode.COLLECT_ALL_INFO}:
+                await client.restart_db()
+                await db_operations.wait_for_database_availability(ctx.db)
+                dbconn = await asyncpg.connect(
+                    host=ctx.db.pg_host,
+                    port=ctx.db.pg_port,
+                    user=ctx.db.pg_user,
+                    database='postgres',
+                    password=ctx.db.pg_password,
+                )
+            main_report.report_name = ctx.report.report_name
+            main_report.description = get_datetime_report('%d/%m/%Y %H:%M:%S')
+            for key_s, section in main_report.sections.items():
+                log.debug(f'Executing section: "{key_s}"')
+                for key_r, report in section.reports.items():
+                    log.debug(f'Item processing: "{key_r}"')
+                    if isinstance(report, report_schemas.common.BaseReportShellCommand):
+                        await report.set_data(client)
+                    elif isinstance(report, report_schemas.common.BaseReportSQLCommand):
+                        await report.set_data(dbconn)
+                    elif isinstance(
+                            report, report_schemas.common.BaseReportPythonCommand
+                    ):
+                        report.set_data(
+                            getattr(jsonmethods, report.get_python_func_name())()
+                        )
+                    log.debug('Item completed')
+                log.info(f'Execution of the section completed - "{key_s}"')
+
+        return main_report
+    except Exception as e:
+        log.error(str(e))
+        log.error(exception_helper(show_traceback=(log_level == logging.DEBUG)))
+        log.error('Emergency program termination. No report has been generated.')
+    return None
+
+
+def generate_report_name(mode: WorkMode):
+    name = f'{str(mode)}_{DEFAULT_REPORT_NAME}'
+    return name

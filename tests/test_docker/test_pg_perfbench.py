@@ -8,7 +8,7 @@ from pathlib import Path
 
 from pg_perfbench.__main__ import run_benchmark
 from pg_perfbench.context import Context
-from pg_perfbench.reports.schemas import Report
+from pg_perfbench.reports.schemas import BenchmarkReport
 from pg_perfbench.reports.report import save_report
 from pg_perfbench.exceptions import exception_helper
 
@@ -150,8 +150,8 @@ class Operations:
     def compare_expected(expected_result, test_result) -> bool:
         exceptions_compare_fields = ['args', 'result']
         try:
-            report_expected = Report(**expected_result)
-            report_test = Report(**test_result)
+            report_expected = BenchmarkReport(**expected_result)
+            report_test = BenchmarkReport(**test_result)
             for section in compare_sections_fields:
                 for report_key, report_value in report_expected.sections[section].reports.items():
                     if report_key in exceptions_compare_fields:
@@ -170,7 +170,7 @@ class Operations:
 class BasicUnitTest:
     async def pg_perfbench_running(self, ctx, expected_result_path) -> bool:
         test_result = await run_benchmark(ctx)
-        if not isinstance(test_result, Report):
+        if not isinstance(test_result, BenchmarkReport):
             return False
 
         save_report(test_result)

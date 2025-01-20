@@ -3,10 +3,10 @@ import logging
 from argparse import Namespace
 from typing import Optional
 
-from pg_perfbench.benchmark_running import run_benchmark
+from pg_perfbench.benchmark_running import run_benchmark, collect_info
 from pg_perfbench.cli.args_parser import get_args_parser
 from pg_perfbench.const import WorkMode
-from pg_perfbench.context import Context, JoinContext
+from pg_perfbench.context import Context, JoinContext, CollectSysInfoContext, CollectDBInfoContext
 from pg_perfbench.logs import clear_logs, setup_logger
 from pg_perfbench.reports import report as general_reports
 from pg_perfbench.join_reports import join_reports
@@ -30,6 +30,14 @@ async def run(args: Optional[Namespace] = None):
     if args.mode == WorkMode.BENCHMARK:
         context = Context.from_args_map(vars(args))
         report = await run_benchmark(context, log_level)
+    if args.mode in {WorkMode.COLLECT_SYS_INFO, WorkMode.COLLECT_DB_INFO, WorkMode.COLLECT_ALL_INFO}:
+        mode_ctx = {
+            WorkMode.COLLECT_SYS_INFO: CollectSysInfoContext,
+            WorkMode.COLLECT_DB_INFO: CollectDBInfoContext,
+            WorkMode.COLLECT_ALL_INFO: CollectDBInfoContext
+        }
+        context = mode_ctx[args.mode].from_args_map(vars(args))
+        report = await collect_info(context, args.mode, log_level)
     elif args.mode == WorkMode.JOIN:
         context = JoinContext.from_args_map(vars(args))
         report = join_reports(context, log_level)

@@ -9,15 +9,25 @@ if sys.version_info >= (3, 11):
 else:
     from compatibility import StrEnum
 
-VERSION = '0.0.1'  # FIXME: print real app version here
+VERSION = '0.0.2'  # FIXME: print real app version here
 SOURCE_ROOT_FOLDER = Path(__file__).parent
 PROJECT_ROOT_FOLDER = SOURCE_ROOT_FOLDER.parent
 LOGS_FOLDER = PROJECT_ROOT_FOLDER / 'log'
 
 REPORT_FOLDER = PROJECT_ROOT_FOLDER / 'report'
 REPORT_TEMPLATE_FOLDER = SOURCE_ROOT_FOLDER / 'reports' / 'templates'
-TEMPLATE_JSON_NAME = 'report_struct.json'
-TEMPLATE_JSON_PATH = REPORT_TEMPLATE_FOLDER / TEMPLATE_JSON_NAME
+
+BENCHMARK_TEMPLATE_JSON_NAME = 'benchmark_report_struct.json'
+BENCHMARK_TEMPLATE_JSON_PATH = REPORT_TEMPLATE_FOLDER / BENCHMARK_TEMPLATE_JSON_NAME
+
+DB_INFO_TEMPLATE_JSON_NAME = 'db_info_report_struct.json'
+DB_INFO_TEMPLATE_JSON_PATH = REPORT_TEMPLATE_FOLDER / DB_INFO_TEMPLATE_JSON_NAME
+
+SYS_INFO_TEMPLATE_JSON_NAME = 'sys_info_report_struct.json'
+SYS_INFO_TEMPLATE_JSON_PATH = REPORT_TEMPLATE_FOLDER / SYS_INFO_TEMPLATE_JSON_NAME
+
+ALL_INFO_TEMPLATE_JSON_NAME = 'all_info_report_struct.json'
+ALL_INFO_TEMPLATE_JSON_PATH = REPORT_TEMPLATE_FOLDER / ALL_INFO_TEMPLATE_JSON_NAME
 
 SHELL_COMMANDS_PATH = SOURCE_ROOT_FOLDER / 'commands' / 'bash_commands'
 SQL_COMMANDS_PATH = SOURCE_ROOT_FOLDER / 'commands' / 'sql_commands'
@@ -39,6 +49,9 @@ LOG_ARCHIVE_DIR = '/tmp/log_archive'
 class WorkMode(StrEnum):
     BENCHMARK = 'benchmark'
     JOIN = 'join'
+    COLLECT_SYS_INFO = 'collect-sys-info'
+    COLLECT_DB_INFO = 'collect-db-info'
+    COLLECT_ALL_INFO = 'collect-all-info'
 
 
 @enum.unique

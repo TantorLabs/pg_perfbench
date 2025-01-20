@@ -115,6 +115,16 @@ class SSHConnection(Connectable):
             f'{self.params.work_paths.pg_data_path}'
         )
 
+    async def restart_db(self) -> None:
+        await self.run(
+            f'{self.params.work_paths.pg_bin_path}/pg_ctl '
+            f'stop -D {self.params.work_paths.pg_data_path}',
+        )
+        await self.run(
+            f'{self.params.work_paths.pg_bin_path}/pg_ctl start -D '
+            f'{self.params.work_paths.pg_data_path}'
+        )
+
     async def send_config(self, local_path, data_dir) -> str | None:
         remote_config_path = os.path.join(data_dir, 'postgresql.conf')
         async with self.client.start_sftp_client() as sftp_client:
