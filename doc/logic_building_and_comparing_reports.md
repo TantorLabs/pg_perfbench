@@ -1,4 +1,131 @@
+# Generating report in `collect-sys-info` mode
+> **Note**: In this mode, only the 'system' section is populated, and there is no access to collect database information.
+
+You can configure the JSON report template file `pg_perfbench/reports/templates/sys_info_report_struct.json`.
+Add or remove reports of the following types:
+
+- "shell_command_file" - a report with the result of executing the specified bash script relative to the database host in the `pg_perfbench/commands/bash_commands` directory:
+
+&emsp; &emsp;- output type `plain_text`:
+
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "plain_text",
+  "shell_command_file": "bash_example.sh",
+  "data": ""
+}
+```
+
+&emsp; &emsp;- output type `table`:
+
+> **Note**: this bash script should return data in the form of an array of objects on the basis of which the table is built, as an example you can see the output of lshw in the report pg_perfbench/reports/templates/report_struct.json
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "table",
+  "shell_command_file": "bash_example.sh", <----- 
+  "theader": [],
+  "data": []
+}
+```
+
+# Generating report in `collect-db-info` mode
+
+> **Note**: In this mode, only the 'db' section is populated.
+
+You can configure the JSON report template file `pg_perfbench/reports/templates/db_info_report_struct.json`.
+Add or remove reports of the following types:
+- "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
+
+&emsp; &emsp;- output type `plain_text`:
+```
+"example_sql_report": {
+    "header": "example_sql_header",
+    "state": "collapsed",
+    "item_type": "plain_text",
+    "sql_command_file": "sql_example.sql",
+    "data": ""
+}
+```
+&emsp; &emsp;- output type `table`:
+> **Note**: This sql script should return a tabular form of the data. Examples can be found in pg_perfbench/reports/templates/report_struct.json
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "table",
+  "shell_command_file": "sql_example.sql", <----- 
+  "theader": [],
+  "data": []
+}
+```
+
+# Generating report in `collect-all-info` mode
+> **Note**: In this mode, the 'system' and 'db' sections are filled.
+
+You can configure the JSON report template file `pg_perfbench/reports/templates/all_info_report_struct.json`.
+Add or remove reports of the following types:
+
+- "shell_command_file" - a report with the result of executing the specified bash script relative to the database host in the `pg_perfbench/commands/bash_commands` directory:
+
+&emsp; &emsp;- output type `plain_text`:
+
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "plain_text",
+  "shell_command_file": "bash_example.sh",
+  "data": ""
+}
+```
+
+&emsp; &emsp;- output type `table`:
+
+> **Note**: this bash script should return data in the form of an array of objects on the basis of which the table is built, as an example you can see the output of lshw in the report pg_perfbench/reports/templates/report_struct.json
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "table",
+  "shell_command_file": "bash_example.sh", <----- 
+  "theader": [],
+  "data": []
+}
+```
+- "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
+
+&emsp; &emsp;- output type `plain_text`:
+```
+"example_sql_report": {
+    "header": "example_sql_header",
+    "state": "collapsed",
+    "item_type": "plain_text",
+    "sql_command_file": "sql_example.sql",
+    "data": ""
+}
+```
+&emsp; &emsp;- output type `table`:
+> **Note**: This sql script should return a tabular form of the data. Examples can be found in pg_perfbench/reports/templates/report_struct.json
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "table",
+  "shell_command_file": "sql_example.sql", <----- 
+  "theader": [],
+  "data": []
+}
+```
 # Generating report in `benchmark` mode
+> **Note**: In this template, the following sections are also included:<br>
+`benchmark`: This section displays the user application configuration, detailed benchmark configuration, a detailed description of the database schema for load, and load scripts.<br>
+`result`: This section shows the detailed output of the pgbench benchmark results and the load iteration chart.<br>
+These sections cannot be modified.
+
 You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
 Add or remove reports of the following types:
 
