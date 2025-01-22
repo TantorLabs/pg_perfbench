@@ -2,12 +2,11 @@ import logging
 from typing import Any
 
 import asyncpg
-from pycparser.c_ast import Union
 
 from pg_perfbench.connections import common as connection_common, get_connection
 from pg_perfbench.const import (VERSION, get_datetime_report, DEFAULT_REPORT_NAME, WorkMode,
-                                BENCHMARK_TEMPLATE_JSON_PATH, DB_INFO_TEMPLATE_JSON_PATH, SYS_INFO_TEMPLATE_JSON_PATH,
-                                ALL_INFO_TEMPLATE_JSON_PATH)
+                                DB_INFO_TEMPLATE_JSON_PATH, SYS_INFO_TEMPLATE_JSON_PATH,
+                                ALL_INFO_TEMPLATE_JSON_PATH, LogLevel)
 from pg_perfbench.context import Context, RawArgs, utils as context_utils
 from pg_perfbench.env_data import JsonMethods, collect_logs
 from pg_perfbench.exceptions import exception_helper, PerformTestError
@@ -92,7 +91,7 @@ async def run_benchmark_tests_suit(
 
 
 async def run_benchmark(
-        ctx: Context, log_level: int = logging.NOTSET
+        ctx: Context, log_level: LogLevel = LogLevel.INFO
 ) -> report_schemas.BenchmarkReport | None:
     check_benchmark_args(ctx)
     print_benchmark_welcome(ctx.raw_args)
@@ -145,7 +144,7 @@ async def run_benchmark(
 
 
 async def collect_info(
-        ctx: Context, mode: WorkMode , log_level: int = logging.NOTSET
+        ctx, mode: WorkMode , log_level: LogLevel = LogLevel.INFO
 ) -> report_schemas.BenchmarkReport | None:
 
     mode_struct_ref = {
