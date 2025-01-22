@@ -71,7 +71,7 @@ def _save_html_report(new_report_json_path: str, path: Path) -> None:
         file.write(content)
 
 
-def save_report(report: BenchmarkReport, mode: WorkMode) -> None:
+def save_report(report, mode: WorkMode) -> None:
     REPORT_FOLDER.mkdir(parents=True, exist_ok=True)
     new_report_json_path = REPORT_FOLDER / f'{report.report_name}.json'
     new_report_html_path = REPORT_FOLDER / f'{report.report_name}.html'

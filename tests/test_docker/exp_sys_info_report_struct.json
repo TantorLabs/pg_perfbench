@@ -1,0 +1,42 @@
+{
+    "header": "Server System Information Report",
+    "report_name": "collect-sys-info-report",
+    "description": "",
+    "sections": {
+        "system": {
+            "header": "System properties <hn>",
+            "description": "Common info about current host",
+            "state": "expanded",
+            "reports": {
+                "uname_a": {
+                    "header": "Linux kernel version and machine architecture | uname -r -m",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "uname_a.sh",
+                    "data": "6.8.0-51-generic x86_64\r\n"
+                },
+                "etc_os_release": {
+                    "header": "OS distribution information | /etc/os-release",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_os_release.sh",
+                    "data": "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\r\nNAME=\"Debian GNU/Linux\"\r\nVERSION_ID=\"12\"\r\nVERSION=\"12 (bookworm)\"\r\nVERSION_CODENAME=bookworm\r\nID=debian\r\nHOME_URL=\"https://www.debian.org/\"\r\nSUPPORT_URL=\"https://www.debian.org/support\"\r\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\r\n"
+                },
+                "cpu_info": {
+                    "header": "CPU architecture and specification display tool | lscpu",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "cpu_info.sh",
+                    "data": "Architecture:                         x86_64\r\nCPU op-mode(s):                       32-bit, 64-bit\r\nAddress sizes:                        39 bits physical, 48 bits virtual\r\nByte Order:                           Little Endian\r\nCPU(s):                               16\r\nOn-line CPU(s) list:                  0-15\r\nVendor ID:                            GenuineIntel\r\nBIOS Vendor ID:                       Intel(R) Corporation\r\nModel name:                           12th Gen Intel(R) Core(TM) i7-1260P\r\nBIOS Model name:                      12th Gen Intel(R) Core(TM) i7-1260P None CPU @ 2.1GHz\r\nBIOS CPU family:                      198\r\nCPU family:                           6\r\nModel:                                154\r\nThread(s) per core:                   2\r\nCore(s) per socket:                   12\r\nSocket(s):                            1\r\nStepping:                             3\r\nCPU max MHz:                          4700.0000\r\nCPU min MHz:                          400.0000\r\nBogoMIPS:                             4992.00\r\nFlags:                                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid movdiri movdir64b fsrm md_clear serialize arch_lbr ibt flush_l1d arch_capabilities\r\nVirtualization:                       VT-x\r\nL1d cache:                            448 KiB (12 instances)\r\nL1i cache:                            640 KiB (12 instances)\r\nL2 cache:                             9 MiB (6 instances)\r\nL3 cache:                             18 MiB (1 instance)\r\nNUMA node(s):                         1\r\nNUMA node0 CPU(s):                    0-15\r\nVulnerability Gather data sampling:   Not affected\r\nVulnerability Itlb multihit:          Not affected\r\nVulnerability L1tf:                   Not affected\r\nVulnerability Mds:                    Not affected\r\nVulnerability Meltdown:               Not affected\r\nVulnerability Mmio stale data:        Not affected\r\nVulnerability Reg file data sampling: Mitigation; Clear Register File\r\nVulnerability Retbleed:               Not affected\r\nVulnerability Spec rstack overflow:   Not affected\r\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\r\nVulnerability Spectre v1:             Mitigation; usercopy/swapgs barriers and __user pointer sanitization\r\nVulnerability Spectre v2:             Mitigation; Enhanced / Automatic IBRS; IBPB conditional; RSB filling; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\r\nVulnerability Srbds:                  Not affected\r\nVulnerability Tsx async abort:        Not affected\r\n"
+                },
+                "etc_fstab": {
+                    "header": "File system mount configuration | fstab",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_fstab.sh",
+                    "data": "# UNCONFIGURED FSTAB FOR BASE SYSTEM\r\n"
+                }
+            }
+        }
+    }
+}
