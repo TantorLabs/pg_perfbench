@@ -1,6 +1,47 @@
 # Generating report in `collect-sys-info` mode
 > **Note**: In this mode, only the 'system' section is populated, and there is no access to collect database information.
 
+### Common parameters
+| Parameter       | Description                                                               |
+|-----------------|---------------------------------------------------------------------------|
+| `--mode='collect-sys-info'`       | The execution mode of pg_perfbench should be set to `'collect-sys-info'`    |
+| `--log-level`   | Application logging level: `info`, `debug`, `error` (default - `info`) |
+| `--report-name` | Report name(optional)                                                  |
+
+### Docker container parameters 
+| Parameter           | Description                                                            |
+|---------------------|------------------------------------------------------------------------|
+| `--image-name`     | Docker image name (must be pre-installed)                              |
+| `--container-name` | Name of creating container                                             |
+| `--docker-pg-host` | Container PostgreSQL database host (optional, default: 127.0.0.1)      |
+| `--docker-pg-port` | Container PostgreSQL database port (optional, default: 5432)           |
+
+<br>For example, the following parameter group can be configured:
+```
+python -m pg_perfbench --mode=collect-sys-info \
+--log-level=debug \
+--image-name=postgres:16 \
+--container-name=cntr_test \
+--docker-pg-host=127.0.0.1 \
+--docker-pg-port=5432
+```
+
+### Remote host parameters via SSH
+| Parameter           | Description                                                               |
+|---------------------|---------------------------------------------------------------------------|
+| `--ssh-port`        | Port for ssh connection (default: 22)                            |
+| `--ssh-host`        | IP address of the remote server                                  |
+| `--ssh-key`         | Path to the ssh connection private key file (must be configured) |
+
+<br>For example, the following parameter group can be configured:
+```
+python -m pg_perfbench --mode=collect-sys-info  \
+--log-level=debug   \
+--ssh-port=22   \
+--ssh-key=/path_to/private_key \
+--ssh-host=10.177.199.199
+```
+### Template configuration
 You can configure the JSON report template file `pg_perfbench/reports/templates/sys_info_report_struct.json`.
 Add or remove reports of the following types:
 
@@ -36,6 +77,71 @@ Add or remove reports of the following types:
 
 > **Note**: In this mode, only the 'db' section is populated.
 
+### Common parameters
+| Parameter      | Description                                                               |
+|----------------|---------------------------------------------------------------------------|
+| `--mode='collect-db-info'`    | The execution mode of pg_perfbench should be set to `'collect-db-info'`    |
+| `--log-level`  | Application logging level: `info`, `debug`, `error` (default - `info`) |
+| `--report-name` | Report name(optional)                                                  |
+| `--pg-port`       | Forwarded port (default `5432`, relative to the current host)        |
+| `--pg-host`       | Forwarded address (default `127.0.0.1`, relative to the current host) |
+| `--pg-user`       | User of database (must be configured or set "postgres")              |
+| `--pg-database`   | Database used for testing                                            |
+| `--pg-user-password` | Password for database connection (optional)                          |
+| `--pg-data-path`  | Path to the PostgreSQL data directory (relative to the database host) |
+| `--pg-bin-path`   | Path to the PostgreSQL bin directory (relative to the database host) |
+| `--collect-pg-logs` | Enable database logging (logging must be configured by the user)     |
+| `--custom-config`  | Use custom PostgreSQL config                                         |
+
+### Docker container parameters 
+| Parameter           | Description                                                            |
+|---------------------|------------------------------------------------------------------------|
+| `--image-name`     | Docker image name (must be pre-installed)                              |
+| `--container-name` | Name of creating container                                             |
+| `--docker-pg-host` | Container PostgreSQL database host (optional, default: 127.0.0.1)      |
+| `--docker-pg-port` | Container PostgreSQL database port (optional, default: 5432)           | 
+
+<br>For example, the following parameter group can be configured:
+```
+python -m pg_perfbench --mode=collect-db-info   \
+--log-level=debug   \
+--image-name=postgres:15.5  \
+--container-name=cntr_test    \
+--docker-pg-host=127.0.0.1  \
+--docker-pg-port=5432   \
+--pg-host=127.0.0.1 \
+--pg-port=5435  \
+--pg-user=postgres  \
+--pg-user-password=test \
+--pg-database=tdb   \
+--pg-data-path=/var/lib/postgresql/data \
+--pg-bin-path=/usr/lib/postgresql/15/bin
+```
+### Remote host parameters via SSH
+| Parameter           | Description                                                               |
+|---------------------|---------------------------------------------------------------------------|
+| `--ssh-port`        | Port for ssh connection (default: 22)                            |
+| `--ssh-host`        | IP address of the remote server                                  |
+| `--ssh-key`         | Path to the ssh connection private key file (must be configured) |
+
+<br>For example, the following parameter group can be configured:
+```
+python -m pg_perfbench --mode=collect-db-info \
+--log-level=debug \
+--ssh-port=22 \
+--ssh-key=/path_to/private_key \
+--ssh-host=10.199.199.199 \
+--remote-pg-host=127.0.0.1  \
+--remote-pg-port=5432  \
+--pg-host=127.0.0.1  \
+--pg-port=5435  \
+--pg-user=postgres  \
+--pg-user-password=pswd  \
+--pg-database=tdb  \
+--pg-data-path=/var/lib/postgresql/16/data  \
+--pg-bin-path=/opt/postgresql/db/16/bin
+```
+### Template configuration
 You can configure the JSON report template file `pg_perfbench/reports/templates/db_info_report_struct.json`.
 Add or remove reports of the following types:
 - "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
@@ -65,7 +171,72 @@ Add or remove reports of the following types:
 
 # Generating report in `collect-all-info` mode
 > **Note**: In this mode, the 'system' and 'db' sections are filled.
+### Common parameters
+| Parameter      | Description                                                               |
+|----------------|---------------------------------------------------------------------------|
+| `--mode='collect-all-info'`    | The execution mode of pg_perfbench should be set to `'collect-all-info'`    |
+| `--log-level`  | Application logging level: `info`, `debug`, `error` (default - `info`) |
+| `--report-name` | Report name(optional)                                                  |
+| `--pg-port`       | Forwarded port (default `5432`, relative to the current host)        |
+| `--pg-host`       | Forwarded address (default `127.0.0.1`, relative to the current host) |
+| `--pg-user`       | User of database (must be configured or set "postgres")              |
+| `--pg-database`   | Database used for testing                                            |
+| `--pg-user-password` | Password for database connection (optional)                          |
+| `--pg-data-path`  | Path to the PostgreSQL data directory (relative to the database host) |
+| `--pg-bin-path`   | Path to the PostgreSQL bin directory (relative to the database host) |
+| `--collect-pg-logs` | Enable database logging (logging must be configured by the user)     |
+| `--custom-config`  | Use custom PostgreSQL config                                         |
 
+### Docker container parameters 
+| Parameter           | Description                                                            |
+|---------------------|------------------------------------------------------------------------|
+| `--image-name`     | Docker image name (must be pre-installed)                              |
+| `--container-name` | Name of creating container                                             |
+| `--docker-pg-host` | Container PostgreSQL database host (optional, default: 127.0.0.1)      |
+| `--docker-pg-port` | Container PostgreSQL database port (optional, default: 5432)           | 
+
+<br>For example, the following parameter group can be configured:
+```
+python -m pg_perfbench --mode=collect-db-info   \
+--log-level=debug   \
+--image-name=postgres:15.5  \
+--container-name=cntr_test    \
+--docker-pg-host=127.0.0.1  \
+--docker-pg-port=5432   \
+--pg-host=127.0.0.1 \
+--pg-port=5435  \
+--pg-user=postgres  \
+--pg-user-password=test \
+--pg-database=tdb   \
+--pg-data-path=/var/lib/postgresql/data \
+--pg-bin-path=/usr/lib/postgresql/15/bin
+```
+
+### Remote host parameters via SSH
+| Parameter           | Description                                                               |
+|---------------------|---------------------------------------------------------------------------|
+| `--ssh-port`        | Port for ssh connection (default: 22)                            |
+| `--ssh-host`        | IP address of the remote server                                  |
+| `--ssh-key`         | Path to the ssh connection private key file (must be configured) |
+
+<br>For example, the following parameter group can be configured:
+```
+python -m pg_perfbench --mode=collect-db-info \
+--log-level=debug \
+--ssh-port=22 \
+--ssh-key=/path_to/private_key \
+--ssh-host=10.199.199.199 \
+--remote-pg-host=127.0.0.1  \
+--remote-pg-port=5432  \
+--pg-host=127.0.0.1  \
+--pg-port=5435  \
+--pg-user=postgres  \
+--pg-user-password=pswd  \
+--pg-database=tdb  \
+--pg-data-path=/var/lib/postgresql/16/data  \
+--pg-bin-path=/opt/postgresql/db/16/bin
+```
+### Template configuration
 You can configure the JSON report template file `pg_perfbench/reports/templates/all_info_report_struct.json`.
 Add or remove reports of the following types:
 
@@ -126,6 +297,8 @@ Add or remove reports of the following types:
 `result`: This section shows the detailed output of the pgbench benchmark results and the load iteration chart.<br>
 These sections cannot be modified.
 
+The description of the parameters is located on the main [page](../README.md#configuring-pg_perfbench-in-benchmark-mode).
+### Template configuration
 You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
 Add or remove reports of the following types:
 

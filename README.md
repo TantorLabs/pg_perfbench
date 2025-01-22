@@ -328,7 +328,8 @@ python3.11 -m pg_perfbench --mode=join \
 --reference-report=benchmark_report.json \
 --input-dir=/path/to/some/reports
 ```
-
+# Data collection mode 
+The mode of information collection is described [here](doc/logic_building_and_comparing_reports.md).
 # Running tests
 When testing the tool, a Docker connection is used. Preconfigure access to Docker for the user who is running the tool.
 - specify the `user` from which the tool is run:
