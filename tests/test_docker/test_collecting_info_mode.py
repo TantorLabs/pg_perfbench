@@ -136,12 +136,26 @@ class Operations:
         try:
             report_expected = ReportClass(**expected_result)
             report_test = ReportClass(**test_result)
+
             for section in compare_sections_fields:
                 for report_key, report_value in report_expected.sections[section].reports.items():
                     report_test_value = report_test.sections[section].reports.get(report_key)
-                    if not compare_reports(report_value.data, report_test_value.data):
-                        print(f'----------Error: sect: {section} report: {report_key}')
+
+                    if not report_test_value:
+                        print(f'----------Error: sect: {section} report: {report_key} missing in test result')
                         return False
+
+                    for field in report_value.__dict__:
+                        if field == "data":
+                            continue
+
+                        expected_field_value = getattr(report_value, field, None)
+                        test_field_value = getattr(report_test_value, field, None)
+
+                        if expected_field_value != test_field_value:
+                            print(f'----------Error: sect: {section} report: {report_key} field: {field}')
+                            return False
+
             return True
         except Exception as e:
             print(exception_helper())
