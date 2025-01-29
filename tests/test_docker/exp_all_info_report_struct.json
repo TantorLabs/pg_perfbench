@@ -1,0 +1,103 @@
+{
+    "header": "Server and Database Information Report",
+    "report_name": "collect-all-info_report_2025-01-22_15:50:15",
+    "description": "22/01/2025 15:50:15",
+    "sections": {
+        "system": {
+            "header": "System properties <hn>",
+            "description": "Common info about current host",
+            "state": "expanded",
+            "reports": {
+                "uname_a": {
+                    "header": "Linux kernel version and machine architecture | uname -r -m",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "uname_a.sh",
+                    "data": " "
+                },
+                "etc_os_release": {
+                    "header": "OS distribution information | /etc/os-release",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_os_release.sh",
+                    "data": " "
+                },
+                "cpu_info": {
+                    "header": "CPU architecture and specification display tool | lscpu",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "cpu_info.sh",
+                    "data": " "
+                },
+                "etc_fstab": {
+                    "header": "File system mount configuration | fstab",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_fstab.sh",
+                    "data": " "
+                }
+            }
+        },
+        "db": {
+            "header": "Common database info",
+            "description": "Common info about current database",
+            "state": "expanded",
+            "reports": {
+                "full_version": {
+                    "header": "PostgreSQL full version",
+                    "description": "Information about the installed PostgreSQL version, including the version number, system architecture, utilized compiler, and operating system",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": " "
+                },
+                "version_major": {
+                    "header": "PostgreSQL major version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": " "
+                },
+                "version_minor": {
+                    "header": "PostgreSQL minor version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "server_version.sql",
+                    "data": " "
+                },
+                "pg_config": {
+                    "header": "PostgreSQL pg_config",
+                    "description": "Configuration parameters of the currently installed PostgreSQL version",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "pg_config.sh",
+                    "data": " "
+                },
+                "pg_settings": {
+                    "header": "PostgreSQL settings",
+                    "description": "Configuration settings of the PostgreSQL server",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "server_settings.sql",
+                    "theader": [
+                        "name",
+                        "setting"
+                    ],
+                    "data": " "
+                },
+                "pg_available_extensions": {
+                    "header": "PostgreSQL extensions",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "available_server_extensions.sql",
+                    "theader": [
+                        "name",
+                        "default_version",
+                        "installed_version"
+                    ],
+                    "data": " "
+                }
+            }
+        }
+    }
+}

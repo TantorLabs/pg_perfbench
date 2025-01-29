@@ -7,8 +7,8 @@ from pydantic import Field
 
 # TODO: those nodes require simplification
 class LocalNodeParams(BaseModel):
-    host: str = Field(alias='pg_host')
-    port: int = Field(alias='pg_port')
+    host: str = Field(default='127.0.0.1', alias='pg_host')
+    port: int = Field(default=8995, alias='pg_port')
 
 
 class RemoteNodeParams(BaseModel):
@@ -27,8 +27,8 @@ class TunnelParams(BaseModel):
 
 
 class WorkPaths(BaseModel):
-    pg_data_path: str = Field(alias='pg_data_path')
-    pg_bin_path: str = Field(alias='pg_bin_path')
+    pg_data_path: str = Field(alias='pg_data_path', default='/var/lib/postgresql/data')
+    pg_bin_path: str = Field(alias='pg_bin_path', default='')
     custom_config: str = Field(alias='custom_config', default='')
 
 

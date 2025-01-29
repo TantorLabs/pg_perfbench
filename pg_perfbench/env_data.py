@@ -35,7 +35,8 @@ class JsonMethods:    # FIXME: this class needs a lot of fixes.....
         self.raw_args = {name: value for name, value in ctx.raw_args.items() if value is not None}
         self.benchmark_result_data = benchmark_result_data
         self.ctx = ctx
-        self.pgbench_options = get_pgbench_options(ctx.workload)
+        if getattr(ctx, 'workload', None) is not None:
+            self.pgbench_options = get_pgbench_options(ctx.workload)
 
     def pgbench_options_table(self) -> TableData:
         theader = ['iteration number', 'pgbench_options']

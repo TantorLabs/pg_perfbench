@@ -22,7 +22,7 @@ REPORT = 1
 
 def _read_report_files(
     input_dir: str = '', ref_report: str = ''
-) -> tuple[list[str], list[report_schemas.Report]] | None:
+) -> tuple[list[str], list[report_schemas.BenchmarkReport]] | None:
     rep_list = []
     rep_names_list = sorted(
         [
@@ -43,15 +43,15 @@ def _read_report_files(
         file_path = os.path.join(input_dir, file_name)
         with open(file_path, 'r') as file:
             report_data = json.load(file)
-            report = report_schemas.Report(**report_data)
+            report = report_schemas.BenchmarkReport(**report_data)
             rep_list.append(report)
 
     return rep_names_list, rep_list
 
 
 def _comparing_reports(
-    ref_rep: report_schemas.Report,
-    compr_rep: report_schemas.Report,
+    ref_rep: report_schemas.BenchmarkReport,
+    compr_rep: report_schemas.BenchmarkReport,
     compare_items: list[str],
 ) -> bool:
 
@@ -101,7 +101,7 @@ def _compare_report_data(
     return False
 
 
-def join_reports(join_ctx: JoinContext, log_level: int = logging.NOTSET) -> report_schemas.Report | None:
+def join_reports(join_ctx: JoinContext, log_level: int = logging.NOTSET) -> report_schemas.BenchmarkReport | None:
     if log_level is logging.NOTSET:     #FIXME: Set up logging in any case
         setup_logger(logging.INFO)
 
@@ -140,7 +140,7 @@ def join_reports(join_ctx: JoinContext, log_level: int = logging.NOTSET) -> repo
         ] = f'{name}'
 
 
-    reference_report: report_schemas.Report = copy.deepcopy(joined_report)
+    reference_report: report_schemas.BenchmarkReport = copy.deepcopy(joined_report)
 
     for section_key, sect_data in reference_report.sections.items():
         for report_key, report_item in sect_data.reports.items():

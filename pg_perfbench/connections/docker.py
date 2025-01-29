@@ -129,6 +129,9 @@ class DockerConnection(Connectable):
         )
         await self.start()
 
+    async def restart_db(self) -> None:
+        ...
+
     async def bash_command(self, command: str) -> str:
         result = self.container.exec_run(
             cmd=f'bash -c "{command}"',
