@@ -349,7 +349,7 @@ export PYTHONPATH=$(pwd)
 ```
 python -m unittest tests.test_cli.test_arg_parser -v --failfast
 python -m unittest tests.test_context.test_workload -v --failfast
-python -m unittest tests.test_docker.test_pg_perfbench -v --failfast
+python -m unittest tests.test_docker.test_benchmark_mode -v --failfast
 ```
 - executing all tests: 
 <br>`python -m unittest discover tests`
