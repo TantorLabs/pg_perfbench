@@ -15,7 +15,7 @@ PROJECT_ROOT_FOLDER = SOURCE_ROOT_FOLDER.parent
 LOGS_FOLDER = PROJECT_ROOT_FOLDER / 'log'
 
 REPORT_FOLDER = PROJECT_ROOT_FOLDER / 'report'
-REPORT_TEMPLATE_FOLDER = SOURCE_ROOT_FOLDER / 'reports' / 'templates'
+REPORT_TEMPLATE_FOLDER = SOURCE_ROOT_FOLDER / 'templates'
 
 BENCHMARK_TEMPLATE_JSON_NAME = 'benchmark_report_struct.json'
 BENCHMARK_TEMPLATE_JSON_PATH = REPORT_TEMPLATE_FOLDER / BENCHMARK_TEMPLATE_JSON_NAME
@@ -39,7 +39,7 @@ def get_datetime_report(format: str = '%d/%m/%Y %H:%M:%S'):
     return REPORT_TIMESTAMP.strftime(format)
 
 
-DEFAULT_REPORT_NAME  = f'report_{get_datetime_report("%Y-%m-%d_%H:%M:%S")}'
+DEFAULT_REPORT_NAME  = f'report_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}'
 
 LOCAL_DB_LOGS_PATH = PROJECT_ROOT_FOLDER / 'db_logs'
 DEFAULT_LOG_ARCHIVE_NAME = f'logs_archive_report_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}.tar.gz'
@@ -58,13 +58,6 @@ class WorkMode(StrEnum):
 class WorkloadTypes(StrEnum):
     CUSTOM = 'custom'
     DEFAULT = 'default'
-
-
-@enum.unique
-class BenchmarkProfile(StrEnum):
-    TPC_C = 'tpc-c'
-    TPC_DS = 'tpc-ds'
-    TPC_E = 'tpc-e'
 
 
 @enum.unique
