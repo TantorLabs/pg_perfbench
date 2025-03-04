@@ -121,3 +121,56 @@ class JoinContext(BaseModel):
             )  # noqa: G201
 
         return None
+
+class CollectSysInfoContext(BaseModel):
+    raw_args: RawArgs
+    connection: ConnectionParameters
+    report: ReportParameters
+
+    @classmethod
+    def from_args_map(
+            cls: type['CollectSysInfoContext'],
+            args_map: dict[str, str | None],
+    ) -> Optional['CollectSysInfoContext']:
+        # FIXME: Might be a better solution using validators to ensure 'benchmark' field
+        meaningful_args = {k: v for k, v in args_map.items() if v is not None or k == 'benchmark'}
+
+        restructured_args = restructure_args_dict(Context.model_fields, meaningful_args)
+        restructured_args['raw_args'] = args_map
+
+        try:
+            return CollectSysInfoContext.model_validate(restructured_args)
+        except pydantic.ValidationError as error:
+            # TODO: add traceback print control
+            log.error(
+                format_pydantic_error(error), exc_info=True
+            )  # noqa: G201
+
+        return None
+
+class CollectDBInfoContext(BaseModel):
+    raw_args: RawArgs
+    db: DBParameters
+    connection: ConnectionParameters
+    report: ReportParameters
+
+    @classmethod
+    def from_args_map(
+            cls: type['CollectDBInfoContext'],
+            args_map: dict[str, str | None],
+    ) -> Optional['CollectDBInfoContext']:
+        # FIXME: Might be a better solution using validators to ensure 'benchmark' field
+        meaningful_args = {k: v for k, v in args_map.items() if v is not None or k == 'benchmark'}
+
+        restructured_args = restructure_args_dict(Context.model_fields, meaningful_args)
+        restructured_args['raw_args'] = args_map
+
+        try:
+            return CollectDBInfoContext.model_validate(restructured_args)
+        except pydantic.ValidationError as error:
+            # TODO: add traceback print control
+            log.error(
+                format_pydantic_error(error), exc_info=True
+            )  # noqa: G201
+
+        return None

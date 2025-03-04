@@ -1,0 +1,61 @@
+{
+    "header": "Database Information Report",
+    "report_name": "",
+    "description": "",
+    "sections": {
+        "db": {
+            "header": "Common database info",
+            "description": "Common info about current database",
+            "state": "expanded",
+            "reports": {
+                "full_version": {
+                    "header": "PostgreSQL full version",
+                    "description": "Information about the installed PostgreSQL version, including the version number, system architecture, utilized compiler, and operating system",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": ""
+                },
+                "version_major": {
+                    "header": "PostgreSQL major version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": ""
+                },
+                "version_minor": {
+                    "header": "PostgreSQL minor version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "server_version.sql",
+                    "data": ""
+                },
+                "pg_config": {
+                    "header": "PostgreSQL pg_config",
+                    "description": "Configuration parameters of the currently installed PostgreSQL version",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "pg_config.sh",
+                    "data": ""
+                },
+                "pg_settings": {
+                    "header": "PostgreSQL settings",
+                    "description": "Configuration settings of the PostgreSQL server",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "server_settings.sql",
+                    "theader": [],
+                    "data": []
+                },
+                "pg_available_extensions": {
+                    "header": "PostgreSQL extensions",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "available_server_extensions.sql",
+                    "theader": [],
+                    "data": []
+                }
+            }
+        }
+    }
+}

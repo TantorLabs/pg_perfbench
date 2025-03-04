@@ -5,10 +5,10 @@ import logging
 import os
 from pathlib import Path
 
-
-from pg_perfbench.__main__ import run_benchmark
-from pg_perfbench.context import Context
-from pg_perfbench.reports.schemas import Report
+from pg_perfbench.__main__ import collect_info
+from pg_perfbench.context import CollectSysInfoContext, CollectDBInfoContext
+from pg_perfbench.const import WorkMode, LogLevel
+from pg_perfbench.reports.schemas import SysInfoReport, DBInfoReport, AllInfoReport
 from pg_perfbench.reports.report import save_report
 from pg_perfbench.exceptions import exception_helper
 
@@ -18,7 +18,7 @@ logging.getLogger('asyncio').setLevel(logging.CRITICAL)
 logging.getLogger('asyncpg').setLevel(logging.CRITICAL)
 logging.getLogger('pydantic').setLevel(logging.CRITICAL)
 
-compare_sections_fields = ['db', 'benchmark']
+
 
 
 class TestParams:
@@ -43,21 +43,14 @@ class TestParams:
     pgbench_path = 'pgbench'
     psql_path = 'psql'
 
-    workload_path = str(root_path / 'pg_perfbench/workload/tpc-e')
-
 
 test_params = TestParams()
 
 
-raw_context_default_wrkld = {
-    'mode': 'benchmark',
+raw_context_collect_sys_info = {
+    'mode': 'collect-sys-info',
     'benchmark_type': 'default',
-    'report_name': 'benchmark_report_default',
-    'pgbench_clients': [5, 10, 15],
-    'init_command': 'ARG_PGBENCH_PATH -i --scale=10 --foreign-keys -p ARG_PG_PORT -h '
-    'ARG_PG_HOST -U postgres ARG_PG_DATABASE',
-    'workload_command': 'ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE'
-    ' -c ARG_PGBENCH_CLIENTS -j 4 -T 5 --no-vacuum',
+    'report_name': 'collect-sys-info-report',
     'pgbench_path': test_params.pgbench_path,
     'psql_path': test_params.psql_path,
     'pg_host': '127.0.0.1',
@@ -80,19 +73,10 @@ raw_context_default_wrkld = {
 }
 
 
-raw_context_custom_wrkld = {
-    'mode': 'benchmark',
-    'report_name': 'benchmark_report_custom',
-    'benchmark_type': 'custom',
-    'workload_path': f'{test_params.root_path}/pg_perfbench/workload/tpc-e',
-    'pgbench_clients': [5, 10, 15],
-    'init_command': f'cd ARG_WORKLOAD_PATH && ARG_PSQL_PATH -p ARG_PG_PORT '
-    '-h ARG_PG_HOST -U postgres ARG_PG_DATABASE '
-    '-f ARG_WORKLOAD_PATH/tpc-e_tables.sql',
-    'workload_command': 'ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U postgres --no-vacuum '
-    '--file=ARG_WORKLOAD_PATH/Broker_Volume_SELECT.sql '
-    '--file=ARG_WORKLOAD_PATH/Customer_Position_SELECT.sql ARG_PG_DATABASE '
-    '-c ARG_PGBENCH_CLIENTS -j 20 -T 5',
+raw_context_collect_db_info = {
+    'mode': 'collect-db-info',
+    'benchmark_type': 'default',
+    'report_name': 'collect-db-info-report',
     'pgbench_path': test_params.pgbench_path,
     'psql_path': test_params.psql_path,
     'pg_host': '127.0.0.1',
@@ -114,8 +98,9 @@ raw_context_custom_wrkld = {
     'container_name': test_params.cntr_name,
 }
 
-ctx_custom = Context.from_args_map(raw_context_custom_wrkld)
-ctx_default = Context.from_args_map(raw_context_default_wrkld)
+ctx_collect_sys_info = CollectSysInfoContext.from_args_map(raw_context_collect_sys_info)
+ctx_collect_db_info = CollectDBInfoContext.from_args_map(raw_context_collect_db_info)
+ctx_collect_all_info = CollectDBInfoContext.from_args_map(raw_context_collect_db_info)
 
 
 def compare_reports(report1, report2):
@@ -132,7 +117,6 @@ def compare_reports(report1, report2):
         return True
     return report1 == report2
 
-
 class Operations:
     @staticmethod
     def run_command(cmd, print_output=True):
@@ -147,38 +131,53 @@ class Operations:
         return out.decode('utf-8'), err.decode('utf-8')
 
     @staticmethod
-    def compare_expected(expected_result, test_result) -> bool:
-        exceptions_compare_fields = ['args', 'result']
+    def compare_expected(expected_result, ReportClass, test_result) -> bool:
+        compare_sections_fields = list(expected_result['sections'].keys())
         try:
-            report_expected = Report(**expected_result)
-            report_test = Report(**test_result)
+            report_expected = ReportClass(**expected_result)
+            report_test = ReportClass(**test_result)
+
             for section in compare_sections_fields:
                 for report_key, report_value in report_expected.sections[section].reports.items():
-                    if report_key in exceptions_compare_fields:
-                        continue
                     report_test_value = report_test.sections[section].reports.get(report_key)
-                    if not compare_reports(report_value.data, report_test_value.data):
-                        print(f'----------Error: sect: {section} report: {report_key}')
+
+                    if not report_test_value:
+                        print(f'----------Error: sect: {section} report: {report_key} missing in test result')
                         return False
+
+                    for field in report_value.__dict__:
+                        if field == "data":
+                            continue
+
+                        expected_field_value = getattr(report_value, field, None)
+                        test_field_value = getattr(report_test_value, field, None)
+
+                        if expected_field_value != test_field_value:
+                            print(f'----------Error: sect: {section} report: {report_key} field: {field}')
+                            return False
+
             return True
         except Exception as e:
             print(exception_helper())
             print(str(e))
             return False
 
-
 class BasicUnitTest:
-    async def pg_perfbench_running(self, ctx, expected_result_path) -> bool:
-        test_result = await run_benchmark(ctx)
-        if not isinstance(test_result, Report):
+    async def collect_info_checking(self, ctx, mode: WorkMode, expected_result_path) -> bool:
+        mode_rprtcls = {
+            WorkMode.COLLECT_SYS_INFO: SysInfoReport,
+            WorkMode.COLLECT_DB_INFO: DBInfoReport,
+            WorkMode.COLLECT_ALL_INFO: AllInfoReport
+        }
+        test_result = await collect_info(ctx, mode, LogLevel.DEBUG)
+        if not isinstance(test_result, mode_rprtcls[mode]):
             return False
 
-        save_report(test_result)
+        save_report(test_result, mode)
         with open(expected_result_path) as json_struct:
             exp_result = json.load(json_struct)
         test_result = test_result.model_dump()
-        return Operations.compare_expected(exp_result, test_result)
-
+        return Operations.compare_expected(exp_result, mode_rprtcls[mode], test_result)
 
 class IntegralTest(unittest.IsolatedAsyncioTestCase, BasicUnitTest):
     @classmethod
@@ -187,19 +186,32 @@ class IntegralTest(unittest.IsolatedAsyncioTestCase, BasicUnitTest):
         Operations.run_command(['docker', 'stop', test_params.cntr_name], False)
         Operations.run_command(['docker', 'rm', '-f', test_params.cntr_name], False)
 
-    async def test_01_running_benchmark_default(self):
+
+    async def test_01_collect_sys_info(self):
         self.assertTrue(
-            await self.pg_perfbench_running(
-                ctx_default,
-                str(test_params.root_path / 'tests' / 'test_docker' / 'exp_result_default.json'),
+            await self.collect_info_checking(
+                ctx_collect_sys_info,
+                WorkMode.COLLECT_SYS_INFO,
+                str(test_params.root_path / 'tests' / 'test_docker' / 'exp_sys_info_report_struct.json'),
             )
         )
 
-    async def test_02_running_benchmark_custom(self):
+    async def test_02_collect_db_info(self):
         self.assertTrue(
-            await self.pg_perfbench_running(
-                ctx_custom,
-                str(test_params.root_path / 'tests' / 'test_docker' / 'exp_result_custom.json'),
+            await self.collect_info_checking(
+                ctx_collect_db_info,
+                WorkMode.COLLECT_DB_INFO,
+                str(test_params.root_path / 'tests' / 'test_docker' / 'exp_db_info_report_struct.json'),
+            )
+        )
+
+    async def test_03_collect_all_info(self):
+        ctx_collect_db_info.report.report_name = 'collect-all-info-report'
+        self.assertTrue(
+            await self.collect_info_checking(
+                ctx_collect_db_info,
+                WorkMode.COLLECT_ALL_INFO,
+                str(test_params.root_path / 'tests' / 'test_docker' / 'exp_all_info_report_struct.json'),
             )
         )
 
