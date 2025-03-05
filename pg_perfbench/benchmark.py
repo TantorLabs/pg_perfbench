@@ -78,6 +78,10 @@ def get_filled_load_commands(db_conf, workload_conf, pgbench_param, iter_amount)
 
 
 def load_iterations_config(db_conf, workload_conf):
+    db_conf_pg = {}
+    for key, value in db_conf.items():
+        new_key = f"pg_{key}"
+        db_conf_pg[new_key] = value
     # prepare a list of [init_command, workload_command] sets for each iteration
     if not workload_conf or not isinstance(workload_conf, dict):
         return []
@@ -93,7 +97,7 @@ def load_iterations_config(db_conf, workload_conf):
 
     load_iterations = []
     for iteration in iter_list:
-        commands = get_filled_load_commands(db_conf, workload_conf, pgbench_param_name, iteration)
+        commands = get_filled_load_commands(db_conf_pg, workload_conf, pgbench_param_name, iteration)
         load_iterations.append(commands)
 
     return load_iterations

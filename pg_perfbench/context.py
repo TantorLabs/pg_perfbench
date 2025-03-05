@@ -40,6 +40,13 @@ class Context:
             }
         )
 
+        if args.connection_type == ConnectionType.DOCKER:
+            self.structured_params.update({
+                'conn_conf': {
+                    'conn_params': {'container_name': args.container_name}
+                }
+            })
+
         self.structured_params.update({
             'db_conf' : {
                 'host': args.pg_host,

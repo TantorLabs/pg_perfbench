@@ -100,21 +100,29 @@ class SSHTasks:
         return res
 
 class DockerTasks:
-    def __init__(self, container_name, image_name):
-        self.container_name = container_name
-        self.image_name = image_name
+    def __init__(self, db_conf, conn):
+        self.conn = conn
+        self.pg_bin_path = db_conf['pg_bin_path']
+        self.pg_data_path = db_conf['pg_data_path']
 
-    def stop_db(self, conn):
+    async def stop_db(self):
+        # res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}'")
+        res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}")
+        self.conn.close()
+        return res
+
+    async def start_db(self):
+        await self.conn.start()
+        # res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}'")
+        res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}")
+        return res
+
+    async def sync(self):
         ...
 
-    def sync(self, conn):
+    async def drop_caches(self):
         ...
 
-    def drop_caches(self, conn):
-        ...
-
-    def start_db(self, conn):
-        ...
 
 
 TASK_FACTORIES = {
@@ -122,8 +130,8 @@ TASK_FACTORIES = {
         db_conf=kwargs["db_conf"],
         conn=kwargs["conn"]
     ),
-    ConnectionType.DOCKER: lambda **kwargs: DockerTasks(
-        container_name=kwargs["container_name"],
-        image_name=kwargs["image_name"],
+     ConnectionType.DOCKER: lambda **kwargs: DockerTasks(
+        conn=kwargs["conn"],
+        db_conf=kwargs["db_conf"],
     ),
 }
