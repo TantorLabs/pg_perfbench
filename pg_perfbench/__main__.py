@@ -219,12 +219,6 @@ def get_args_parser() -> argparse.ArgumentParser:
     # Docker-related options
     docker_group = parser.add_argument_group('Docker connection options')
     docker_group.add_argument(
-        '--image-name',
-        type=str,
-        default=None,
-        help='Docker image name',
-    )
-    docker_group.add_argument(
         '--docker-pg-host',
         type=str,
         default=None,
