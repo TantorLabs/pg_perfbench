@@ -8,7 +8,7 @@ from pg_perfbench.const import (
     get_datetime_report
 )
 from pg_perfbench.connections import get_connection
-from pg_perfbench.db_operations import TASK_FACTORIES, DBTasks
+from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks
 from pg_perfbench.report_processing import fill_info_report, get_report_structure
 from pg_perfbench.report_commands import collect_logs
 from pg_perfbench.log import display_user_configuration
@@ -139,14 +139,13 @@ async def reset_db_environment(logger, conn_type, conn, db_conf, workload_conf):
     # stop DB, drop DB, sync and drop caches, then start DB and init DB
     try:
         db_tasks = DBTasks(db_conf, logger)
-        tasks = TASK_FACTORIES[conn_type](db_conf=workload_conf, conn=conn)
-
-        await tasks.start_db()
+        conn_tasks = get_conn_type_tasks(conn_type)(db_conf=workload_conf, conn=conn)
+        await conn_tasks.start_db()
         await db_tasks.drop_db()
-        await tasks.stop_db()
-        await tasks.sync()
-        await tasks.drop_caches()
-        await tasks.start_db()
+        await conn_tasks.stop_db()
+        await conn_tasks.sync()
+        await conn_tasks.drop_caches()
+        await conn_tasks.start_db()
         await db_tasks.init_db()
         await db_tasks.check_db_access()
     except Exception as e:

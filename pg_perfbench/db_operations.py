@@ -1,4 +1,4 @@
-from const import ConnectionType
+from pg_perfbench.const import ConnectionType
 import asyncpg
 import time
 
@@ -106,14 +106,12 @@ class DockerTasks:
         self.pg_data_path = db_conf['pg_data_path']
 
     async def stop_db(self):
-        # res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}'")
         res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}")
         self.conn.close()
         return res
 
     async def start_db(self):
         await self.conn.start()
-        # res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}'")
         res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}")
         return res
 
@@ -135,3 +133,9 @@ TASK_FACTORIES = {
         db_conf=kwargs["db_conf"],
     ),
 }
+
+def get_conn_type_tasks(type):
+    if type == ConnectionType.SSH:
+        return SSHTasks
+    if type == ConnectionType.DOCKER:
+        return DockerTasks

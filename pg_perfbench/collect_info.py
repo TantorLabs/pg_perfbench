@@ -6,7 +6,7 @@ from pg_perfbench.const import (
     get_datetime_report
 )
 from pg_perfbench.connections import get_connection
-from pg_perfbench.db_operations import TASK_FACTORIES, DBTasks
+from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks
 from pg_perfbench.report_processing import fill_info_report, get_report_structure
 from pg_perfbench.report_commands import collect_logs
 from pg_perfbench.log import display_user_configuration
@@ -79,7 +79,7 @@ async def collect_info(
                             logger.warning(f"pg_custom_config file does not exist: {custom_config_path}")
 
                     # start DB if tasks factory is available
-                    tasks = TASK_FACTORIES.get(conn_type)
+                    tasks = get_conn_type_tasks(conn_type)
                     if tasks:
                         task_object = tasks(db_conf=db_env, conn=client)
                         await task_object.start_db()
