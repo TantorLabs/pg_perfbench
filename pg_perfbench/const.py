@@ -38,12 +38,12 @@ REPORT_TIMESTAMP = datetime.now()
 def get_datetime_report(format: str = '%d/%m/%Y %H:%M:%S'):
     return REPORT_TIMESTAMP.strftime(format)
 
-
-DEFAULT_REPORT_NAME  = f'report_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}'
+CURRENT_TIME = get_datetime_report("%Y-%m-%d_%H-%M-%S")
+DEFAULT_REPORT_NAME  = f'report_{CURRENT_TIME}'
 
 LOCAL_DB_LOGS_PATH = PROJECT_ROOT_FOLDER / 'db_logs'
-DEFAULT_LOG_ARCHIVE_NAME = f'logs_archive_report_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}.tar.gz'
-LOG_ARCHIVE_DIR = '/tmp/log_archive'
+DEFAULT_LOG_ARCHIVE_NAME = f'logs_archive_report_{CURRENT_TIME}.tar.gz'
+SRC_LOG_ARCHIVE_DIR = '/tmp/log_archive'
 
 @enum.unique
 class WorkMode(StrEnum):

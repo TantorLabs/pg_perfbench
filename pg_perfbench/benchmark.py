@@ -5,12 +5,12 @@ import re
 
 from pg_perfbench.const import (
     WorkMode, DEFAULT_REPORT_NAME, BENCHMARK_TEMPLATE_JSON_PATH,
-    get_datetime_report
+    get_datetime_report, CURRENT_TIME
 )
 from pg_perfbench.connections import get_connection
 from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks
-from pg_perfbench.report_processing import fill_info_report, get_report_structure
-from pg_perfbench.report_commands import collect_logs
+from pg_perfbench.report.processing import fill_info_report, get_report_structure
+from pg_perfbench.report.commands import collect_logs
 from pg_perfbench.log import display_user_configuration
 
 
@@ -187,13 +187,11 @@ async def run_benchmark_and_collect_metrics(
         'workload_conf': workload_conf,
         'report_conf': report_conf
     }
-
     display_user_configuration(args, logger)
-
     try:
         # load base report template
         report = get_report_structure(BENCHMARK_TEMPLATE_JSON_PATH)
-        report['description'] = get_datetime_report('%d/%m/%Y %H:%M:%S')
+        report['description'] = CURRENT_TIME
         if report_conf['report_name'] is None:
             report['report_name'] = f'{WorkMode.BENCHMARK}-{DEFAULT_REPORT_NAME}'
         else:
@@ -220,11 +218,12 @@ async def run_benchmark_and_collect_metrics(
                 custom_config_path = workload_conf['pg_custom_config']
                 db_data_path = workload_conf.get('pg_data_path', '')
                 try:
-                    await client.send_file(custom_config_path, db_data_path)
+                    await client.send_pg_config_file(custom_config_path, db_data_path)
                     logger.info(f'Custom config \"{custom_config_path}\" '
                                 f'moved to \"{db_data_path}\"')
                 except Exception as e:
-                    logger.warning(f"Failed to send custom config: {str(e)}")
+                    logger.error(f"Failed to send custom config: {str(e)}")
+                    raise
 
             # run each iteration of the benchmark
             for load_iteration in load_iterations:
@@ -243,7 +242,6 @@ async def run_benchmark_and_collect_metrics(
             if log_conf.get('collect_pg_logs'):
                 log_dir = await db_conn.fetchval('show log_directory')
                 await collect_logs(client, log_dir, report['report_name'])
-
             await db_conn.close()
 
         if not perf_results:

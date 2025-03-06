@@ -10,7 +10,7 @@ from pg_perfbench.const import (
     get_datetime_report
 )
 from pg_perfbench.log import setup_logger
-from pg_perfbench.report_processing import parse_json_in_order
+from pg_perfbench.report.processing import parse_json_in_order
 
 logger = logging.getLogger(__name__)
 JOIN_TASKS_PATH = os.path.join(str(PROJECT_ROOT_FOLDER), 'join_tasks')
@@ -73,6 +73,7 @@ def _compare_data(ref_data, cmp_data) -> bool:
     return False
 
 def _compare_reports(ref_rep: dict, cmp_rep: dict, compare_items: list[str]) -> bool:
+    result = True
     ref_steps, _ = parse_json_in_order(ref_rep)
     cmp_steps, _ = parse_json_in_order(cmp_rep)
     if len(ref_steps) != len(cmp_steps):
@@ -85,8 +86,13 @@ def _compare_reports(ref_rep: dict, cmp_rep: dict, compare_items: list[str]) -> 
         left = s1['report_obj'].get('data')
         right = s2['report_obj'].get('data')
         if not _compare_data(left, right):
+            result = False
             ck = f'sections.{s1["section"]}.reports.{s1["report"]}.data'
             if ck in compare_items:
+                raise ValueError(f" Unlisted mismatch in \'{s1['report']}\'\n"
+                                 f" reference report - {ref_rep['report_name']}\n"
+                                 f" сomparable report - {cmp_rep['report_name']}")
+            else:
                 if 'Diff' in s1['report_obj'].get('header', ''):
                     s1['report_obj']['data'].append([cmp_rep.get('report_name', 'Unnamed'), right])
                 else:
@@ -96,8 +102,6 @@ def _compare_reports(ref_rep: dict, cmp_rep: dict, compare_items: list[str]) -> 
                     ]
                     old_hdr = s1['report_obj'].get('header', '')
                     s1['report_obj']['header'] = f'{old_hdr} | Diff'
-            else:
-                raise ValueError(f'Unlisted mismatch in {s1["report"]}')
     return True
 
 def _add_result(base: dict, inc: dict) -> None:

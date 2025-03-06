@@ -2,6 +2,7 @@ from pg_perfbench.const import ConnectionType
 import asyncpg
 import time
 
+
 class DBTasks:
     def __init__(self, db_conf, logger):
         self.db_conf = db_conf
@@ -99,6 +100,7 @@ class SSHTasks:
         res = await self.conn.run_command("sudo /bin/sh -c 'echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches'")
         return res
 
+
 class DockerTasks:
     def __init__(self, db_conf, conn):
         self.conn = conn
@@ -122,20 +124,31 @@ class DockerTasks:
         ...
 
 
+class LocalConnTasks:
+    def __init__(self, db_conf, conn):
+        self.conn = conn
+        self.pg_bin_path = db_conf['pg_bin_path']
+        self.pg_data_path = db_conf['pg_data_path']
 
-TASK_FACTORIES = {
-    ConnectionType.SSH: lambda **kwargs: SSHTasks(
-        db_conf=kwargs["db_conf"],
-        conn=kwargs["conn"]
-    ),
-     ConnectionType.DOCKER: lambda **kwargs: DockerTasks(
-        conn=kwargs["conn"],
-        db_conf=kwargs["db_conf"],
-    ),
-}
+    async def stop_db(self):
+        res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}'")
+        return res
+
+    async def start_db(self):
+        res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}'")
+        return res
+
+    async def sync(self):
+        ...
+
+    async def drop_caches(self):
+        ...
+
 
 def get_conn_type_tasks(type):
     if type == ConnectionType.SSH:
         return SSHTasks
     if type == ConnectionType.DOCKER:
         return DockerTasks
+    if type == ConnectionType.LOCAL:
+        return LocalConnTasks

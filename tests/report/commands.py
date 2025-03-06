@@ -4,7 +4,7 @@ import shutil
 import os
 from unittest.mock import patch, MagicMock
 from unittest import IsolatedAsyncioTestCase
-from pg_perfbench.report_commands import (
+from pg_perfbench.report.commands import (
     get_script_text,
     run_shell_command,
     run_sql_command

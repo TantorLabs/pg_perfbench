@@ -1,16 +1,41 @@
 # PostgreSQL Performance Bench
-This tool provides methods to run standard(TPC-B) and custom pgbench benchmarks on a PostgreSQL 
-database with detailed `report` generation. A key feature of the tool is its capability to configure reports according to the type of information gathered:
+This application serves as a wrapper around pgbench and performs the following tasks:
 
-* Adding the result of executing a bash script on the database host;
-* Adding the result of executing an SQL script on the database;
-  
-The application supports two configurations for database connections, depending on its location:
+- Launches the pgbench workload;
+- Collects system information:
+     - CPU;
+     - RAM; 
+     - The rest of the information is specified in the application configuration.
+    
+  and database information:
+    - version;
+    - DB settings;
+    - The rest of the information is specified in the application configuration.
+- Generates a report summarizing database performance, configuration, and the server environment.
 
-* `SSH` - database located on a remote host;
-* `Container` - database located in a Docker container;
+# Table of Contents
+1. [Report Examples](#report-examples)
+2. [Dependencies and installation](#dependencies-and-installation)
+3. [Configuring options](#configuring-options)
+   - [Configuring pg_perfbench in `benchmark` and `collect info` mode](#configuring-pg_perfbench-in-benchmark-and-collect-info-mode)
+     - [Service options](#service-options)
+     - [Connection options](#connection-options)
+       - [SSH connection](#ssh-connection)
+       - [Docker connection](#docker-connection)
+       - [Common instruction](#common-instruction)
+     - [PostgreSQL database options](#postgresql-database-options)
+     - [`benchmark` mode](#benchmark-mode)
+         - [Workload options](#workload-options)
+         - [Configuring report options](#configuring-report-options)
+     - [`collect info` mode](#collect-info-mode)
+   - [Configuring pg_perfbench in `join` mode](#configuring-pg_perfbench-in-join-mode)
+4. [Configuring report](#configuring-report)
+5. [Running tests](#running-tests)
 
+## Report Examples
+Benchmark report example - [benchmark-report.html](https://splendorous-syrniki-53cc77.netlify.app/)
 ## Dependencies and installation
+- OS: Ubuntu 22.04
 - Pre-installed PostgreSQL client applications: `psql`, `pgbench`. For example, using:
 ```
 sudo apt install postgresql-client
@@ -45,23 +70,23 @@ chmod 666 /var/run/docker.sock
 - To ensure successful use, first thoroughly explore the capabilities of the tool and run the tests.
 
 # Configuring options
-**pg_perfbench** supports two modes: `benchmark` and `join`.
+**pg_perfbench** supports three modes: `benchmark`, `collect info` and `join`.
+A report is generated for all modes.
 - In `benchmark` mode, the application loads the
-configured database instance and generates a report based on the `report_struct.json` template.<br>
-- In `join` mode, the application compares reports with each other, the path to which can be specified
-via the `--input-dir` flag (by default set to `report`), according to criteria
-described in `join_tasks` JSON files in the project root.
-# Configuring pg_perfbench in `benchmark` mode
-![image lost](doc/user_workload_scenarios.png "user workload scenarios")
-<br>
+configured database instance and сollects information about the server environment and database configuration .<br>
+- In `collect info` mode, the application сollects information about the server environment and database configuration.<br>
+- In `join` mode, the application compares reports with each other.
+# Configuring pg_perfbench in `benchmark` and `collect info` mode
+
 ## Service options
 | Parameter      | Description                                                                                                                                             |
 |----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `--help`, `-h` | Lists all the available options or flags that can be used with the command, <br> along with a short description of what each option does and after which exit occurs.|
 | `--log-level`  | Application logging level: `info`, `debug`, `error`.<br/>Default - `info`                                                                               |
 | `--clear-logs` | Clearing logs from the tool's previous session. <br>Logs are located in the 'logs' folder of the root directory.                                        |
-## Connection options 
-> **Note**: During testing, port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
+## Connection options
+![image lost](doc/db_connections_type.png "db conn types") 
+> **Note**: Port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
 During the operation of pg_perfbench, it is necessary to set local environment variables within the session connecting to the database host.
 
 When establishing an SSH connection, you must first update the AcceptEnv parameter in the SSH configuration file (/etc/ssh/sshd_config) on the database server.
@@ -76,6 +101,11 @@ AcceptEnv LANG LC_* ARG_*
 
 In the **Docker** container, variables are passed through when launching the pg_perfbench container.
 
+### Common parameters
+
+| Parameter           | Description                                                      |
+|---------------------|------------------------------------------------------------------|
+| `--connection-type`        | Connection types: `ssh`, `docker`, `local`.                            |
 ### SSH connection
 
 | Parameter           | Description                                                      |
@@ -127,14 +157,7 @@ chmod 700 /var/lib/postgresql/.ssh
 chown -R postgres:postgres /var/lib/postgresql/.ssh
 
 ```
-Example of specified ssh connection arguments:
-```
---ssh-port=22
---ssh-key=path/to/private_key
---ssh-host=10.111.1.111
---remote-pg-host=127.0.0.1
---remote-pg-port=5432
-```
+
 * To allow the `postgres` user to execute `lshw` without a password, add the following privileges:
 
 ```bash
@@ -148,18 +171,10 @@ Preconfigure access to Docker for the user who is running the tool.
 
 | Parameter          | Description                                             |
 |--------------------|---------------------------------------------------------|
-| `--image-name`     | Docker image name (must be pre-installed)               |
 | `--container-name` | Name of creating container                              |
 | `--docker-pg-host` | Container PostgreSQL database host (default: 127.0.0.1) |
 | `--docker-pg-port` | Container PostgreSQL database port (default: 5432)      |      
 
-<br>Example of specified docker connection arguments:<br>
-```
---image-name=postgres:15
---container-name=cntr_expected
---docker-pg-host=127.0.0.1
---docker-pg-port=5432
-```
 
 see more details on benchmark configuration for a database in a Docker container [here](doc/docker_mode_usage.md).
 ### Common instruction
@@ -174,8 +189,6 @@ and execute the following command on the tool host.:
 echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches' | sudo EDITOR='tee -a' visudo -f /etc/sudoers
 ```
 
-
-## Database, workload, report options
 ### PostgreSQL database options:
 The flags `pg_host` and `pg_port` are optional parameters for forwarding the address and port 
 from the current host to the database host, `used directly by the tool`.
@@ -192,7 +205,15 @@ from the current host to the database host, `used directly by the tool`.
 | `--collect-pg-logs` | Enable database logging (logging must be configured by the user)     |
 | `--custom-config`  | Use custom PostgreSQL config                                         |
 
-### Workload options:
+### Configuring report options:
+| Parameter            | Description                                                                |
+|----------------------|----------------------------------------------------------------------------|
+| `--report-name`   | Report name and chart time series                                  |
+
+## `benchmark` mode
+### Workload, report options
+
+#### Workload options:
 | Parameter            | Description                                                                |
 |----------------------|----------------------------------------------------------------------------|
 | `--benchmark-type`   | The benchmark to use: `default`, `custom`                                  | 
@@ -204,12 +225,11 @@ from the current host to the database host, `used directly by the tool`.
 | `--init-command`     | Terminal command to create a table schema (relative to the current host)   |
 | `--workload-command` | Terminal command for loading the database (relative to the current host)   |
 
-### Configuring report options:
-| Parameter            | Description                                                                |
-|----------------------|----------------------------------------------------------------------------|
-| `--report-name`   | Report name and chart time series                                  |
-| `--pgbench-time`     |`pgbench` benchmarking arguments; The report [diagram](doc/logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/clients    |
-| `--pgbench-clients`     |`pgbench` benchmarking arguments; The report [diagram](doc/logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/time                    | 
+#### Configuring report options:
+`--pgbench-time` - `pgbench` benchmarking arguments; The report [diagram](doc/logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/clients;
+<br> `--pgbench-clients` - `pgbench` benchmarking arguments; The report [diagram](doc/logic_building_and_comparing_reports.md#Generating-report-in-`benchmark`-mode) will display tps/time                    
+
+<br> 
 
 - Use placeholders to set values in the table schema and load testing commands:
 configure placeholders like `'ARG_'+ <DB/Workload options>`.<br><br>  
@@ -271,34 +291,51 @@ python3.11 -m pg_perfbench --mode=benchmark \
 
 See more details about workload configuration [here](doc/workload_description.md).
 
-# Configuring report
-There are several operation modes for the application: `collect-sys-info`, `collect-db-info`, `collect-all-info`, `benchmark`, `join`.
-See more details about report configuration [here](doc/logic_building_and_comparing_reports.md).
+## `collect info` mode
+The mode of information collection is described [here](doc/logic_building_and_comparing_reports.md).
 
-### Generating report in `benchmark` mode
-You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
-Add or remove reports of the following types:
-
-- "shell_command_file" - a report with the result of executing the specified bash script relative to the database host in the `pg_perfbench/commands/bash_commands` directory, for example:
+Collection of remote server system information via an SSH connection:
 ```
-"example_bash_report": {
-  "header": "example_bash_header",
-  "state": "collapsed",
-  "item_type": "plain_text",
-  "shell_command_file": "bash_example.sh",
-  "data": ""
-}
+python3.11 -m pg_perfbench --mode=collect-sys-info \
+--report-name=benchmark-ssh-default-2 \
+--log-level=debug \
+--connection-type=ssh \
+--ssh-port=22 \
+--ssh-key=/tmp/private_key \
+--ssh-host=10.177.143.88
 ```
-
-- "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
+Collection of all database information in a Docker container:
 ```
-"example_sql_report": {
-    "header": "example_sql_header",
-    "state": "collapsed",
-    "item_type": <"plain_text", "table">,
-    "sql_command_file": "sql_example.sql",
-    "data": ""
-}
+python3.11 -m pg_perfbench --mode=collect-db-info   \
+--report-name=test-collect-db-info-docker-container \
+--log-level=debug   \
+--container-name=cntr_result    \
+--docker-pg-host=127.0.0.1  \
+--docker-pg-port=5432   \
+--pg-host=127.0.0.1 \
+--pg-port=5435  \
+--pg-user=postgres  \
+--pg-database=tdb   \
+--pg-data-path=/var/lib/postgresql/data \
+--pg-bin-path=/usr/lib/postgresql/15/bin
+```
+Collection of all information from the remote database server via an SSH connection:
+```
+python3.11 -m pg_perfbench --mode=collect-all-info  \
+--report-name=all-info-report   \
+--log-level=debug   \
+--connection-type=ssh   \
+--ssh-port=22   \
+--ssh-key=/tmp/private_key  \
+--ssh-host=10.177.143.88    \
+--remote-pg-host=127.0.0.1  \
+--remote-pg-port=5432   \
+--pg-host=127.0.0.1 \
+--pg-port=5435  \
+--pg-user=postgres  \
+--pg-database=tdb   \
+--pg-data-path=/var/lib/postgresql/16/main  \
+--pg-bin-path=/usr/lib/postgresql/16/bin
 ```
 
 # Configuring pg_perfbench in `join` mode
@@ -328,8 +365,35 @@ python3.11 -m pg_perfbench --mode=join \
 --reference-report=benchmark_report.json \
 --input-dir=/path/to/some/reports
 ```
-# Data collection mode 
-The mode of information collection is described [here](doc/logic_building_and_comparing_reports.md).
+# Configuring report
+There are several operation modes for the application: `collect-sys-info`, `collect-db-info`, `collect-all-info`, `benchmark`, `join`.
+See more details about report configuration [here](doc/logic_building_and_comparing_reports.md).
+
+### Generating report in `benchmark` mode
+You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
+Add or remove reports of the following types:
+
+- "shell_command_file" - a report with the result of executing the specified bash script relative to the database host in the `pg_perfbench/commands/bash_commands` directory, for example:
+```
+"example_bash_report": {
+  "header": "example_bash_header",
+  "state": "collapsed",
+  "item_type": "plain_text",
+  "shell_command_file": "bash_example.sh",
+  "data": ""
+}
+```
+
+- "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
+```
+"example_sql_report": {
+    "header": "example_sql_header",
+    "state": "collapsed",
+    "item_type": <"plain_text", "table">,
+    "sql_command_file": "sql_example.sql",
+    "data": ""
+}
+```
 # Running tests
 When testing the tool, a Docker connection is used. Preconfigure access to Docker for the user who is running the tool.
 - specify the `user` from which the tool is run:
@@ -347,9 +411,7 @@ export PYTHONPATH=$(pwd)
 ```
 - single test running. Example of executing unit tests:
 ```
-python -m unittest tests.test_cli.test_arg_parser -v --failfast
-python -m unittest tests.test_context.test_workload -v --failfast
-python -m unittest tests.test_docker.test_benchmark_mode -v --failfast
+python -m unittest tests.connections.test_docker_connection -v --failfast
 ```
 - executing all tests: 
 <br>`python -m unittest discover tests`

@@ -6,7 +6,7 @@ import json
 import pathlib
 from unittest.mock import MagicMock, patch
 
-from pg_perfbench.report_processing import (
+from pg_perfbench.report.processing import (
     get_report_structure,
     parse_json_in_order,
     save_report,

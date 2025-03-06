@@ -5,7 +5,7 @@ from pg_perfbench.const import (
     BENCHMARK_TEMPLATE_JSON_NAME, REPORT_FOLDER,
     REPORT_TEMPLATE_FOLDER
 )
-from pg_perfbench.report_commands import execute_steps_in_order
+from pg_perfbench.report.commands import execute_steps_in_order
 import os
 
 

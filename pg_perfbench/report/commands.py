@@ -150,7 +150,7 @@ def workload_tables(report_data, item):
         return
 
     btype = workload_conf.get('benchmark_type')
-    if btype is WorkloadTypes.CUSTOM:
+    if btype == WorkloadTypes.CUSTOM:
         init_command = str(workload_conf.get('init_command', ''))
         init_command = init_command.replace(
             'ARG_WORKLOAD_PATH', str(workload_conf.get('workload_path', ''))
@@ -173,7 +173,7 @@ def workload_tables(report_data, item):
 
         item['data'] = data
 
-    elif btype is WorkloadTypes.DEFAULT:
+    elif btype == WorkloadTypes.DEFAULT:
         item['data'] = str(workload_conf.get('init_command', ''))
 
     else:
@@ -187,7 +187,7 @@ def workload(report_data, item):
         return
 
     btype = workload_conf.get('benchmark_type')
-    if btype is WorkloadTypes.CUSTOM:
+    if btype == WorkloadTypes.CUSTOM:
         pgbench_command = str(workload_conf.get('workload_command', ''))
         pgbench_command = pgbench_command.replace(
             'ARG_WORKLOAD_PATH', str(workload_conf.get('workload_path', ''))
@@ -210,7 +210,7 @@ def workload(report_data, item):
 
         item['data'] = data
 
-    elif btype is WorkloadTypes.DEFAULT:
+    elif btype == WorkloadTypes.DEFAULT:
         item['data'] = str(workload_conf.get('workload_command', ''))
 
     else:

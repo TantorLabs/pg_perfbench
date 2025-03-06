@@ -3,41 +3,48 @@ import asyncssh
 import docker
 import io
 import os
-from sshtunnel import SSHTunnelForwarder
 import tarfile
+from typing import Optional, Self
 from types import TracebackType
-from typing import Self
 
-from pg_perfbench.const import ConnectionType, LOG_ARCHIVE_DIR
+from pg_perfbench.const import ConnectionType, SRC_LOG_ARCHIVE_DIR
+
 
 class SSHConnection:
-    def __init__(self, conn_params, tunnel_params = None):
+    def __init__(self, conn_params, tunnel_params=None):
         self.conn_params = conn_params
         self.tunnel_params = tunnel_params
         self.client = None
         self.tunnel = None
         self.logger = None
 
-    def set_params(self, conn_params, tunnel_params):
-        self.conn_params = conn_params
-        self.tunnel_params = tunnel_params
-
     async def start(self):
-
         try:
             self.client = await asyncssh.connect(**self.conn_params)
             if self.tunnel_params is not None:
+                from sshtunnel import SSHTunnelForwarder
                 self.tunnel = SSHTunnelForwarder(**self.tunnel_params)
                 self.tunnel.start()
+
+        except asyncssh.misc.PermissionDenied:
+            raise PermissionError("Permission denied (key issue or insufficient permissions).")
+
+        except asyncssh.misc.ConnectionLost:
+            raise TimeoutError("SSH connection lost or timed out.")
+
         except Exception as e:
-            raise
+            raise ConnectionError(f"SSH connection failed: {e}")
 
     def close(self):
-        if self.tunnel_params is not None:
+        if self.tunnel_params is not None and self.tunnel:
             self.tunnel.stop()
-        self.client.close()
+        if self.client:
+            self.client.close()
 
-    async def run_command(self, cmd: str)->str:
+    async def run_command(self, cmd: str) -> str:
+        if not self.client:
+            raise ConnectionError("SSH client not initialized.")
+
         if 'start' in cmd:
             process = await self.client.create_process(cmd)
             process.close()
@@ -49,37 +56,47 @@ class SSHConnection:
         process.close()
         return stdout
 
-    async def send_file(self, local_config_path, remote_data_dir):
+    async def send_pg_config_file(self, local_config_path, remote_data_dir):
+        if not self.client:
+            raise ConnectionError("SSH client not initialized.")
+
+        if not os.path.exists(local_config_path):
+            raise FileNotFoundError(f"Local config does not exist: {local_config_path}")
+
         remote_config_path = os.path.join(remote_data_dir, 'postgresql.conf')
         async with self.client.start_sftp_client() as sftp_client:
             await sftp_client.put(localpaths=local_config_path, remotepath=remote_config_path)
         return remote_config_path
 
     async def copy_db_log_files(self, log_source_path, local_path, report_name):
-        log_archive_local_path = os.path.join(local_path, report_name)
-        log_archive_source_path = f'{LOG_ARCHIVE_DIR}/{report_name}'
-        try:
+        if not self.client:
+            raise ConnectionError("SSH client not initialized.")
 
+        log_archive_local_path = os.path.join(local_path, report_name + '.tar')
+        log_archive_source_path = f'{SRC_LOG_ARCHIVE_DIR}/{report_name}'
+        try:
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
 
-            await self.run_command(f'rm -rf {LOG_ARCHIVE_DIR}')
-            await self.run_command(f'mkdir -p {LOG_ARCHIVE_DIR}')
+            await self.run_command(f'rm -rf {SRC_LOG_ARCHIVE_DIR}')
+            await self.run_command(f'mkdir -p {SRC_LOG_ARCHIVE_DIR}')
             await self.run_command(
-                f'tar -czvf {log_archive_source_path} --directory={os.path.dirname(log_source_path)}'
-                f' {os.path.basename(log_source_path)}'
+                f'tar -czvf {log_archive_source_path} '
+                f'--directory={os.path.dirname(log_source_path)} '
+                f'{os.path.basename(log_source_path)}'
             )
 
             async with self.client.start_sftp_client() as sftp_client:
-                await sftp_client.get(
-                    log_archive_source_path, log_archive_local_path
-                )
+                await sftp_client.get(log_archive_source_path, log_archive_local_path)
 
-            await self.run_command(f'rm -rf {LOG_ARCHIVE_DIR}')
-            self.logger.info(f'The log archive has been sent to :{log_archive_local_path}')
+            await self.run_command(f'rm -rf {SRC_LOG_ARCHIVE_DIR}')
+            if self.logger:
+                self.logger.info(f'The log archive has been sent to: {log_archive_local_path}')
             return str(log_archive_local_path)
+
         except Exception as e:
-            self.logger.error(f'Attempt to transfer database logs failed :{str(e)}')
+            if self.logger:
+                self.logger.error(f'Failed to transfer logs: {str(e)}')
             return None
 
     async def __aenter__(self):
@@ -91,23 +108,38 @@ class SSHConnection:
 
 
 class DockerConnection:
-    def __init__(self, conn_params) -> None:
+    def __init__(self, conn_params, env) -> None:
         self.conn_params = conn_params
         self.docker_client = None
         self.container = None
         self.logger = None
-
-    def set_params(self, conn_params):
-        self.conn_params = conn_params
+        self.env: dict[str, str] = {}
+        for key, value in env.items():
+            self.env[key] = value
 
     async def start(self):
         if not self.docker_client:
-            self.docker_client = docker.from_env()
+            try:
+                self.docker_client = docker.from_env()
+            except docker.errors.DockerException as e:
+                raise OSError(f"Cannot access Docker daemon: {e}")
+
         name = self.conn_params.get("container_name")
         if not name:
-            raise ValueError("Missing 'container_name'")
-        self.container = self.docker_client.containers.get(name)
-        self.container.reload()
+            raise FileNotFoundError("Missing 'container_name' in docker connection params")
+
+        try:
+            self.container = self.docker_client.containers.get(name)
+        except docker.errors.NotFound:
+            raise FileNotFoundError(f"Container '{name}' not found.")
+        except Exception as e:
+            raise OSError(f"Failed to retrieve container: {e}")
+
+        try:
+            self.container.reload()
+        except Exception:
+            raise OSError("Cannot reload container or port is unavailable.")
+
         if self.container.status == "running":
             if self.logger:
                 self.logger.info(f"Container '{name}' is already running.")
@@ -121,15 +153,21 @@ class DockerConnection:
             if self.logger:
                 self.logger.warning("No container to stop.")
             return
+
         name = self.container.name
-        self.container.reload()
-        if self.container.status == "running":
-            self.container.stop()
+        try:
+            self.container.reload()
+            if self.container.status == "running":
+                self.container.stop()
+                if self.logger:
+                    self.logger.info(f"Container '{name}' has been stopped.")
+            else:
+                if self.logger:
+                    self.logger.info(f"Container '{name}' is already stopped.")
+        except Exception as e:
             if self.logger:
-                self.logger.info(f"Container '{name}' has been stopped.")
-        else:
-            if self.logger:
-                self.logger.info(f"Container '{name}' is already stopped.")
+                self.logger.error(f"Error stopping container: {str(e)}")
+
         if self.docker_client:
             self.docker_client.close()
         self.container = None
@@ -137,43 +175,76 @@ class DockerConnection:
 
     async def run_command(self, cmd: str) -> str:
         if not self.container:
-            raise RuntimeError("Container not available")
+            raise PermissionError("Container not available or no access to 'postgres' user.")
+
         result = self.container.exec_run(
             ["/bin/bash", "-c", cmd],
             user="postgres",
-            demux=True
+            demux=True,
+            environment=self.env
         )
         out, err = result.output
         out_str = out.decode("utf-8", "replace") if out else ""
         err_str = err.decode("utf-8", "replace") if err else ""
         return out_str if out_str else err_str
 
-    async def send_file(self, local_config_path, remote_data_dir):
+    async def run_command_as_root(self, cmd: str) -> str:
         if not self.container:
-            raise RuntimeError("Container not available")
+            raise PermissionError("No container available.")
+
+        result = self.container.exec_run(
+            ["/bin/bash", "-c", cmd],
+            user="root",
+            demux=True,
+            environment=self.env
+        )
+        out, err = result.output
+        out_str = out.decode("utf-8", "replace") if out else ""
+        err_str = err.decode("utf-8", "replace") if err else ""
+        return out_str if out_str else err_str
+
+    async def send_pg_config_file(self, local_config_path, remote_data_dir):
+        if not self.container:
+            raise PermissionError("Container not available.")
         if not os.path.exists(local_config_path):
-            raise FileNotFoundError(local_config_path)
+            raise FileNotFoundError(f"File not found: {local_config_path}")
+
         file_name = os.path.basename(local_config_path)
         tar_buffer = io.BytesIO()
         with tarfile.TarFile(fileobj=tar_buffer, mode='w') as tar:
             tar.add(local_config_path, arcname=file_name)
         tar_buffer.seek(0)
+
         success = self.container.put_archive(remote_data_dir, tar_buffer.getvalue())
         if not success:
-            raise RuntimeError("Failed to put_archive")
-        return os.path.join(remote_data_dir, file_name)
+            raise OSError("Failed to put_archive into Docker container.")
+
+        remote_file_path = os.path.join(remote_data_dir, file_name)
+
+        chown_cmd = f"chown postgres:postgres '{remote_file_path}'"
+        chown_result = await self.run_command_as_root(chown_cmd)
+        if "Operation not permitted" in chown_result:
+            raise PermissionError(f"Failed to chown {remote_file_path}: {chown_result}")
+
+        chmod_cmd = f"chmod 750 '{remote_data_dir}'"
+        await self.run_command_as_root(chmod_cmd)
+
+        return remote_file_path
 
     async def copy_db_log_files(self, log_source_path, local_path, report_name):
         if not self.container:
-            raise RuntimeError("Container not available")
+            raise PermissionError("Container not available.")
         os.makedirs(local_path, exist_ok=True)
+
         local_archive_dir = os.path.join(local_path, report_name)
         try:
             stream, _ = self.container.get_archive(log_source_path)
             tar_bytes = b"".join(stream)
+
             archive_path = os.path.join(local_path, f"{report_name}.tar")
             with open(archive_path, "wb") as f:
                 f.write(tar_bytes)
+
             with tarfile.open(archive_path, "r") as tar:
                 tar.extractall(local_archive_dir)
             return local_archive_dir
@@ -194,10 +265,120 @@ class DockerConnection:
         # self.close()
         ...
 
+
+class LocalConnection:
+    def __init__(self, env) -> None:
+        self.conn_params: Optional[dict] = None
+        self.process: Optional[asyncio.subprocess.Process] = None
+        self.logger = None
+
+        self.env = os.environ.copy()
+        for key, value in env.items():
+            self.env[key] = value
+
+    async def start(self) -> None:
+        if self.logger:
+            self.logger.info("LocalConnection started (no persistent process).")
+
+    async def close(self) -> None:
+        if self.logger:
+            self.logger.info("LocalConnection closed.")
+
+    async def run_command(self, cmd: str, check: bool = False) -> str:
+        if not cmd.strip():
+            if self.logger:
+                self.logger.warning("Attempting to run an empty command string.")
+            return ''
+
+        try:
+            if 'start' in cmd:
+                process = await asyncio.create_subprocess_shell(
+                    cmd,
+                    stdout=asyncio.subprocess.DEVNULL,
+                    stderr=asyncio.subprocess.DEVNULL,
+                    shell=True,
+                    limit=262144,
+                    env=self.env
+                )
+                await asyncio.sleep(1)
+                return ''
+            else:
+                process = await asyncio.create_subprocess_shell(
+                    cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    shell=True,
+                    limit=262144,
+                    env=self.env
+                )
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"Failed to start subprocess for command: {cmd}\nError: {str(e)}")
+            return ''
+
+        stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            if self.logger:
+                self.logger.error(f"Command '{cmd}' failed with exit code {process.returncode}.")
+                self.logger.error(f"STDERR: {stderr.decode('utf-8', errors='replace')}")
+            if check:
+                raise RuntimeError(f"Command '{cmd}' returned non-zero exit code.")
+
+        return stdout.decode('utf-8', errors='replace')
+
+
+    async def send_pg_config_file(self, local_config_path: str, remote_data_dir: str) -> str:
+        # Check if the local file exists
+        if not os.path.exists(local_config_path):
+            raise FileNotFoundError(f"Local file not found: {local_config_path}")
+
+        # Check if the destination directory exists
+        if not os.path.isdir(remote_data_dir):
+            raise FileNotFoundError(f"Destination directory not found: {remote_data_dir}")
+
+        if self.logger:
+            self.logger.info(f"Copying file {local_config_path} -> {remote_data_dir}")
+
+        dest_path = os.path.join(remote_data_dir, "postgresql.conf")
+
+        shutil.copy2(local_config_path, dest_path)
+
+        return dest_path
+
+    async def copy_db_log_files(self, log_source_path: str, local_path: str, report_name: str) -> str:
+        if self.logger:
+            self.logger.info(f"Copying logs from {log_source_path} -> {local_path}/{report_name}")
+
+        if not os.path.isdir(log_source_path):
+            raise FileNotFoundError(f"Log source path does not exist or is not a directory: {log_source_path}")
+
+        if not os.listdir(log_source_path):
+            raise ValueError(f"Log source directory is empty: {log_source_path}")
+
+        os.makedirs(local_path, exist_ok=True)
+        dest_path = os.path.join(local_path, f"{report_name}.tar")
+
+        with tarfile.open(dest_path, "w") as tar:
+            tar.add(log_source_path, arcname=os.path.basename(log_source_path))
+        return dest_path
+
+    async def __aenter__(self) -> Self:
+        await self.start()
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        await self.close()
+
+
 def get_connection(type):
     if type == ConnectionType.SSH:
         return SSHConnection
     if type == ConnectionType.DOCKER:
         return DockerConnection
-
-
+    if type == ConnectionType.LOCAL:
+        return LocalConnection

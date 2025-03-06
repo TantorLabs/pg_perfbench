@@ -25,11 +25,7 @@
                 },
                 "version_minor": {
                     "header": "PostgreSQL minor version",
-<<<<<<< HEAD
-                    "state": "hidden",
-=======
                     "state": "collapsed",
->>>>>>> c0342c4 (tmp)
                     "item_type": "plain_text",
                     "sql_command_file": "server_version.sql",
                     "data": ""

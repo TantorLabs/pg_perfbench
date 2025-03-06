@@ -8,7 +8,6 @@ from logging.handlers import RotatingFileHandler
 from pg_perfbench.const import LogLevel, LOGS_FOLDER
 
 def display_user_configuration(raw_args, logger):
-    logger.info('Started run_benchmark_and_collect_metrics module')
     message_lines: list[str] = ['Incoming parameters:']
     message_lines.extend(
         f'#   {name} = {value}'
@@ -18,7 +17,10 @@ def display_user_configuration(raw_args, logger):
     message_lines.append(f'#{"-" * 35}')
     logger.info('\n'.join(message_lines))
 
-def setup_logger(raw_log_level):
+def setup_logger(raw_log_level, arg_clear_logs):
+    # optional clearing of old logs
+    if arg_clear_logs:
+        clear_logs()
     """Configure logger"""
     log_level = 0
     file_name = f'{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}.log'
@@ -40,11 +42,17 @@ def setup_logger(raw_log_level):
     log = logging.getLogger()
     logging.getLogger("paramiko").setLevel(logging.CRITICAL)
     logging.getLogger("asyncssh").setLevel(logging.CRITICAL)
+    logging.getLogger("docker").setLevel(logging.CRITICAL)
+    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
+    logging.getLogger("asyncio").setLevel(logging.CRITICAL)
+
     if (log_level_int := log_level.as_level_int_value()) is None:
         log.setLevel(logging.INFO)
         log.error('Incorrectly specified --log-level, automatically set to "info" level.')
     log.setLevel(log_level_int)
     log.info('Logging level: %s', log_level)
+    if arg_clear_logs:
+        log.info("Clearing logs folder.")
     return log
 
 
