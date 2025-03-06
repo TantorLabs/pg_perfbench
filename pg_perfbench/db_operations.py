@@ -121,19 +121,6 @@ class DockerTasks:
     async def drop_caches(self):
         ...
 
-
-
-TASK_FACTORIES = {
-    ConnectionType.SSH: lambda **kwargs: SSHTasks(
-        db_conf=kwargs["db_conf"],
-        conn=kwargs["conn"]
-    ),
-     ConnectionType.DOCKER: lambda **kwargs: DockerTasks(
-        conn=kwargs["conn"],
-        db_conf=kwargs["db_conf"],
-    ),
-}
-
 def get_conn_type_tasks(type):
     if type == ConnectionType.SSH:
         return SSHTasks
