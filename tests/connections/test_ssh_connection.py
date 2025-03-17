@@ -88,5 +88,6 @@ class TestSSHConnectionFunctions(unittest.IsolatedAsyncioTestCase):
                 await self.ssh_conn.start()
             self.assertIn("SSH connection failed", str(cm.exception))
 
+
 if __name__ == "__main__":
     unittest.main()

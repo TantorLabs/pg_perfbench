@@ -64,5 +64,6 @@ class TestDockerConnectionFunctions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(docker_conn.env, expected_env,
                          "DockerConnection.env do not match expected dictionary.")
 
+
 if __name__ == "__main__":
     unittest.main()
