@@ -26,7 +26,7 @@ class DBTasks:
             database='postgres',
             password=self.db_conf['password'],
         )
-        self.logger.info('Creating pristine test DB')
+        self.logger.debug('Creating pristine test DB.')
         await db.execute(create_test_db_sql)
         await db.close()
 
@@ -47,12 +47,11 @@ class DBTasks:
             database='postgres',
             password=self.db_conf['password'],
         )
-        self.logger.info('Terminating other sessions to the test DB')
+        self.logger.debug('Terminating other sessions to the test DB.')
         await db.execute(terminate_db_pid_sql)
-        self.logger.info('Dropping test DB')
+        self.logger.debug('Dropping test DB.')
         await db.execute(drop_database_db_sql)
         await db.close()
-
 
     async def check_db_access(self):
         for attempt in range(1, 11):  # Adjust the number of attempts as needed
@@ -66,11 +65,11 @@ class DBTasks:
                 )
                 await db_connection.fetchval('SELECT 1')
                 await db_connection.close()
-                self.logger.info('Database is available.')
+                self.logger.debug('Database is available.')
                 return True
             except (asyncpg.PostgresError, ConnectionError) as e:
                 self.logger.warning(
-                    f'Database not yet available. Attempt {attempt}/10. Error: {e}'
+                    f'Database not yet available. Attempt {attempt}/10. Error: {e}.'
                 )
                 time.sleep(1)
         else:
@@ -152,3 +151,16 @@ def get_conn_type_tasks(type):
         return DockerTasks
     if type == ConnectionType.LOCAL:
         return LocalConnTasks
+
+
+async def collect_db_logs(client, db_conn, log_conf, logger, report):
+    """
+    If DB info was collected and log collection is enabled,
+    fetch the log directory and call collect_logs.
+    """
+    if db_conn and log_conf.get("collect_pg_logs"):
+        try:
+            log_dir = await db_conn.fetchval("show log_directory")
+            await collect_logs(client, log_dir, report["report_name"])
+        except Exception as e:
+            logger.warning(f"Error collecting logs: {str(e)}")

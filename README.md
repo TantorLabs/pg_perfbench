@@ -14,26 +14,15 @@ This application serves as a wrapper around pgbench and performs the following t
 - Generates a report summarizing database performance, configuration, and the server environment.
 
 # Table of Contents
-1. [Report Examples](#report-examples)
-2. [Dependencies and installation](#dependencies-and-installation)
-3. [Configuring options](#configuring-options)
-   - [Configuring pg_perfbench in `benchmark` and `collect info` mode](#configuring-pg_perfbench-in-benchmark-and-collect-info-mode)
-     - [Service options](#service-options)
-     - [Connection options](#connection-options)
-       - [SSH connection](#ssh-connection)
-       - [Docker connection](#docker-connection)
-       - [Common instruction](#common-instruction)
-     - [PostgreSQL database options](#postgresql-database-options)
+- [Report Examples](#report-examples)
+- [Dependencies and installation](#dependencies-and-installation)
+- [Configuring options](#configuring-options)
      - [`benchmark` mode](#benchmark-mode)
-         - [Workload options](#workload-options)
-         - [Configuring report options](#configuring-report-options)
      - [`collect info` mode](#collect-info-mode)
-   - [Configuring pg_perfbench in `join` mode](#configuring-pg_perfbench-in-join-mode)
-4. [Configuring report](#configuring-report)
-5. [Running tests](#running-tests)
+     - [`join` mode](#configuring-pg_perfbench-in-join-mode)
+- [Configuring report](#configuring-report)
+- [Running tests](#running-tests)
 
-## Report Examples
-Benchmark report example - [benchmark-report.html](https://splendorous-syrniki-53cc77.netlify.app/)
 ## Dependencies and installation
 - OS: Ubuntu 22.04
 - Pre-installed PostgreSQL client applications: `psql`, `pgbench`. For example, using:
@@ -41,18 +30,12 @@ Benchmark report example - [benchmark-report.html](https://splendorous-syrniki-5
 sudo apt install postgresql-client
 sudo apt install postgresql-contrib
  ```
-- Python 3.11 and pip3:
-```
-sudo apt install python3.11
+- Python 3.10+ and pip3:
 
-sudo apt install python3.11-venv
-
-python3.11 --version
-```
-- Create a Python 3.11 virtual environment in the project's root directory for ease of use:
+- Create a Python virtual environment in the project's root directory for ease of use:
 ```
 cd pg_perfbench
-python3.11 -m venv venv
+python3.10 -m venv venv
 source venv/bin/activate
 ```
 - Install additional packages for Python 3.11, for example, using:
@@ -105,7 +88,7 @@ In the **Docker** container, variables are passed through when launching the pg_
 
 | Parameter           | Description                                                      |
 |---------------------|------------------------------------------------------------------|
-| `--connection-type`        | Connection types: `ssh`, `docker`, `local`.                            |
+| `--connection-type`        | Connection types: `ssh`, `docker`, `local`                            |
 ### SSH connection
 
 | Parameter           | Description                                                      |
@@ -236,7 +219,7 @@ configure placeholders like `'ARG_'+ <DB/Workload options>`.<br><br>
 For example, you can configure pgbench by specifying the path of the load files 
 (this example describes the full set of arguments for ssh connection):
 ```
-python3.11 -m pg_perfbench --mode=benchmark \
+python -m pg_perfbench --mode=benchmark \
 --collect-pg-logs \
 --report-name=ssh-pg-custom-benchmark   \
 --custom-config=/tmp/user_postgresql.conf \
@@ -266,7 +249,7 @@ python3.11 -m pg_perfbench --mode=benchmark \
 or standard pgbench load
 (this example shows all arguments needed to load a database in a Docker container):
 ```
-python3.11 -m pg_perfbench --mode=benchmark \
+python -m pg_perfbench --mode=benchmark \
 --log-level=debug \
 --report-name=docker-pg-default-benchmark \
 --collect-pg-logs \
@@ -291,12 +274,14 @@ python3.11 -m pg_perfbench --mode=benchmark \
 
 See more details about workload configuration [here](doc/workload_description.md).
 
+**Example benchmark report** - [benchmark-report.html](examples/benchmark/benchmark-ssh-default-workload.html)
+
 ## `collect info` mode
 The mode of information collection is described [here](doc/logic_building_and_comparing_reports.md).
 
 Collection of remote server system information via an SSH connection:
 ```
-python3.11 -m pg_perfbench --mode=collect-sys-info \
+python -m pg_perfbench --mode=collect-sys-info \
 --report-name=benchmark-ssh-default-2 \
 --log-level=debug \
 --connection-type=ssh \
@@ -306,7 +291,7 @@ python3.11 -m pg_perfbench --mode=collect-sys-info \
 ```
 Collection of all database information in a Docker container:
 ```
-python3.11 -m pg_perfbench --mode=collect-db-info   \
+python -m pg_perfbench --mode=collect-db-info   \
 --report-name=test-collect-db-info-docker-container \
 --log-level=debug   \
 --container-name=cntr_result    \
@@ -321,7 +306,7 @@ python3.11 -m pg_perfbench --mode=collect-db-info   \
 ```
 Collection of all information from the remote database server via an SSH connection:
 ```
-python3.11 -m pg_perfbench --mode=collect-all-info  \
+python -m pg_perfbench --mode=collect-all-info  \
 --report-name=all-info-report   \
 --log-level=debug   \
 --connection-type=ssh   \
@@ -338,6 +323,7 @@ python3.11 -m pg_perfbench --mode=collect-all-info  \
 --pg-bin-path=/usr/lib/postgresql/16/bin
 ```
 
+Examples of information collection reports - [examples collect info.](examples/collect_info) 
 # Configuring pg_perfbench in `join` mode
 
 | Parameter           | Description                                                                                                                                                    |
@@ -360,17 +346,15 @@ Template for the comparison criteria file:
 ```
 Example of argument configuration in join mode:
 ```
-python3.11 -m pg_perfbench --mode=join \
+python -m pg_perfbench --mode=join \
 --join-task=task_compare_dbs_on_single_host.json \
 --reference-report=benchmark_report.json \
 --input-dir=/path/to/some/reports
 ```
 # Configuring report
-There are several operation modes for the application: `collect-sys-info`, `collect-db-info`, `collect-all-info`, `benchmark`, `join`.
 See more details about report configuration [here](doc/logic_building_and_comparing_reports.md).
 
-### Generating report in `benchmark` mode
-You can configure the JSON report template file `pg_perfbench/reports/templates/report_struct.json`.
+You can configure the JSON report template file from `pg_perfbench/reports/templates`.
 Add or remove reports of the following types:
 
 - "shell_command_file" - a report with the result of executing the specified bash script relative to the database host in the `pg_perfbench/commands/bash_commands` directory, for example:
@@ -383,6 +367,8 @@ Add or remove reports of the following types:
   "data": ""
 }
 ```
+It is necessary to first ensure that the script executes correctly  for the utility's user.
+
 
 - "sql_command_file" - a report with the result of executing the specified SQL script in the database located in the `pg_perfbench/commands/sql_commands` directory, for example:
 ```

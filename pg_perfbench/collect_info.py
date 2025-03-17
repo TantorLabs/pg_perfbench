@@ -26,7 +26,7 @@ async def _prepare_report(report_conf, logger):
     return report
 
 
-async def _handle_db_info(client, db_conf, logger):
+async def _handle_db_info(client, conn_type, db_conf, logger):
     """
     Handles sending custom configuration, starting the database,
     and establishing a connection to the database.
@@ -66,61 +66,62 @@ async def _handle_db_info(client, db_conf, logger):
     return db_conn
 
 
-async def _collect_logs_if_needed(client, db_conn, log_conf, logger, report):
-    """
-    If DB info was collected and log collection is enabled,
-    fetch the log directory and call collect_logs.
-    """
-    if db_conn and log_conf.get("collect_pg_logs"):
-        try:
-            log_dir = await db_conn.fetchval("show log_directory")
-            await collect_logs(client, log_dir, report["report_name"])
-        except Exception as e:
-            logger.warning(f"Error collecting logs: {str(e)}")
-
-
 async def collect_info(
-    args,
-    conn_type,
-    conn_conf,
-    db_conf,
-    report_conf,
-    log_conf,
-    logger
+        args,
+        conn_type,
+        conn_conf,
+        db_conf,
+        report_conf,
+        log_conf,
+        logger
 ) -> dict | None:
     if "report_template" not in report_conf:
-        logger.error("Missing 'report_template' in report_conf.")
+        logger.error("Missing \"report_template\" in report_conf.")
         return None
 
     # Display run parameters.
     display_user_configuration(args, logger)
 
     try:
+        # Prepare report template.
         report = await _prepare_report(report_conf, logger)
+        logger.info("Report template loaded successfully.")
 
         report_data = {
             "args": args,
             "report_conf": report_conf
         }
 
+        # Choose connection type.
         connection_class = get_connection(conn_type)
         if not connection_class:
             logger.error(f"Unknown connection type: {conn_type}. Cannot proceed.")
             return None
+        logger.info(f"Connection type selected: {conn_type}")
 
         connection = connection_class(**conn_conf)
         connection.logger = logger
 
         async with connection as client:
+            logger.info("Connection established successfully.")
             db_conn = None
-            if args["mode"] in [WorkMode.COLLECT_DB_INFO, WorkMode.COLLECT_ALL_INFO]:
-                db_conn = await _handle_db_info(client, db_conf, logger)
 
+            # If DB info is to be collected, establish DB connection.
+            if args["mode"] in [WorkMode.COLLECT_DB_INFO, WorkMode.COLLECT_ALL_INFO]:
+                db_conn = await _handle_db_info(client, conn_type, db_conf, logger)
+                logger.info("Database connection established successfully for collecting DB info.")
+
+            # Collect monitoring information.
             await fill_info_report(client, db_conn, report_data, report)
-            if args["mode"] in [WorkMode.COLLECT_DB_INFO, WorkMode.COLLECT_ALL_INFO]:
-                await _collect_logs_if_needed(client, db_conn, log_conf, logger, report)
-                await db_conn.close()
+            logger.info("Monitoring info collected successfully.")
 
+            # Optionally collect DB logs.
+            if args["mode"] in [WorkMode.COLLECT_DB_INFO, WorkMode.COLLECT_ALL_INFO]:
+                logger.info("DB logs collected successfully.")
+                await db_conn.close()
+                logger.info("Database connection closed.")
+
+        logger.info("Collect info process completed successfully.")
         return report
 
     except FileNotFoundError as fe:

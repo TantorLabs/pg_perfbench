@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 
 from pg_perfbench.const import LogLevel, LOGS_FOLDER
 
+
 def display_user_configuration(raw_args, logger):
     message_lines: list[str] = ['Incoming parameters:']
     message_lines.extend(
@@ -16,6 +17,7 @@ def display_user_configuration(raw_args, logger):
     )
     message_lines.append(f'#{"-" * 35}')
     logger.info('\n'.join(message_lines))
+
 
 def setup_logger(raw_log_level, arg_clear_logs):
     # optional clearing of old logs

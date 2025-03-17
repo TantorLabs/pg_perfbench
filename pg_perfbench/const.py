@@ -7,7 +7,7 @@ from pathlib import Path
 if sys.version_info >= (3, 11):
     from enum import StrEnum
 else:
-    from compatibility import StrEnum
+    from aenum import StrEnum
 
 VERSION = '0.0.2'  # FIXME: print real app version here
 SOURCE_ROOT_FOLDER = Path(__file__).parent
@@ -38,12 +38,14 @@ REPORT_TIMESTAMP = datetime.now()
 def get_datetime_report(format: str = '%d/%m/%Y %H:%M:%S'):
     return REPORT_TIMESTAMP.strftime(format)
 
+
 CURRENT_TIME = get_datetime_report("%Y-%m-%d_%H-%M-%S")
-DEFAULT_REPORT_NAME  = f'report_{CURRENT_TIME}'
+DEFAULT_REPORT_NAME = f'report_{CURRENT_TIME}'
 
 LOCAL_DB_LOGS_PATH = PROJECT_ROOT_FOLDER / 'db_logs'
 DEFAULT_LOG_ARCHIVE_NAME = f'logs_archive_report_{CURRENT_TIME}.tar.gz'
 SRC_LOG_ARCHIVE_DIR = '/tmp/log_archive'
+
 
 @enum.unique
 class WorkMode(StrEnum):

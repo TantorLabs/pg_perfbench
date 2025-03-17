@@ -5,3 +5,4 @@ asyncssh>=2.13.2
 docker>=7.1.0
 pytest>=7.4.2
 sshtunnel>=0.4.0
+aenum>=3.1.15;python_version <= '3.10'

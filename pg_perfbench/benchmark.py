@@ -9,8 +9,8 @@ from pg_perfbench.const import (
 )
 from pg_perfbench.connections import get_connection
 from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks
-from pg_perfbench.report.processing import fill_info_report, get_report_structure
-from pg_perfbench.report.commands import collect_logs
+from pg_perfbench.report.processing import get_report_structure
+from pg_perfbench.report.commands import collect_logs, fill_info_report
 from pg_perfbench.log import display_user_configuration
 
 
@@ -160,12 +160,12 @@ async def run_benchmark(logger, load_iteration: [Any]):
     init_cmd = load_iteration[0]
     workload_cmd = load_iteration[1]
 
-    logger.info(f'Initial command executing:\n {init_cmd}')
+    logger.info(f"Initial command executing:\n {init_cmd}")
     init_result = await run_command(logger, init_cmd, check=True)
-    logger.info(f'Initial command result: \n {init_result}')
+    logger.info(f"Initial command result: \n {init_result}")
 
     perf_result = await run_command(logger, workload_cmd, check=True)
-    logger.info(f'Performance command result: \n {perf_result}')
+    logger.info(f"Performance command result: \n {perf_result}")
 
     if not perf_result.strip():
         logger.warning("Workload command returned an empty or whitespace-only result.")
@@ -182,76 +182,80 @@ async def run_benchmark_and_collect_metrics(
         report_conf,
         log_conf,
         logger
-) -> dict[str:Any] | None:
+) -> dict[str, any] | None:
     perf_results = []
     report_data = {
-        'args': args,
-        'workload_conf': workload_conf,
-        'report_conf': report_conf
+        "args": args,
+        "workload_conf": workload_conf,
+        "report_conf": report_conf
     }
     display_user_configuration(args, logger)
     try:
-        # load base report template
+        # Load base report template
         report = get_report_structure(BENCHMARK_TEMPLATE_JSON_PATH)
-        report['description'] = CURRENT_TIME
-        if report_conf['report_name'] is None:
-            report['report_name'] = f'{WorkMode.BENCHMARK}-{DEFAULT_REPORT_NAME}'
+        report["description"] = get_datetime_report("%d/%m/%Y %H:%M:%S")
+        if report_conf["report_name"] is None:
+            report["report_name"] = f"{WorkMode.BENCHMARK}-{DEFAULT_REPORT_NAME}"
         else:
-            report['report_name'] = report_conf['report_name']
+            report["report_name"] = report_conf["report_name"]
+        logger.info("Report template loaded successfully.")
 
-        # prepare iteration commands
+        # Prepare iteration commands
         load_iterations = load_iterations_config(db_conf, workload_conf)
         if not load_iterations:
-            logger.error("No valid load iterations configured. Check pgbench_iter_list and commands.")
+            logger.error("No valid load iterations configured.")
             return None
+        logger.info(f"Load iterations configured successfully. Total iterations: {len(load_iterations)}")
 
-        # establish a connection (SSH or Docker)
+        # Choose connection type
         connection_class = get_connection(conn_type)
         if not connection_class:
             logger.error(f"No valid connection factory for type: {conn_type}")
             return None
+        logger.info(f"Connection type selected: {conn_type}")
 
         connection = connection_class(**conn_conf)
         connection.logger = logger
 
         async with connection as client:
-            # send custom config if present
-            if 'pg_custom_config' in workload_conf:
-                custom_config_path = workload_conf['pg_custom_config']
-                db_data_path = workload_conf.get('pg_data_path', '')
-                try:
-                    await client.send_pg_config_file(custom_config_path, db_data_path)
-                    logger.info(f'Custom config \"{custom_config_path}\" '
-                                f'moved to \"{db_data_path}\"')
-                except Exception as e:
-                    logger.error(f"Failed to send custom config: {str(e)}")
-                    raise
+            logger.info("Connection established successfully.")
+            # If custom config is specified, send it
+            if "pg_custom_config" in workload_conf and workload_conf["pg_custom_config"]:
+                custom_config_path = workload_conf["pg_custom_config"]
+                db_data_path = workload_conf.get("pg_data_path", "")
+                logger.info(f"Custom DB config selected: {custom_config_path}")
+                remote_config = await client.send_pg_config_file(custom_config_path, db_data_path)
+                logger.info(f"User's DB config set successfully: {remote_config}")
 
-            # run each iteration of the benchmark
-            for load_iteration in load_iterations:
+            # Run each load iteration
+            logger.info("Start load testing.")
+            for idx, load_iteration in enumerate(load_iterations, start=1):
+                logger.info("Resetting the database.")
                 await reset_db_environment(logger, conn_type, client, db_conf, workload_conf)
+                logger.info("Database reset successfully.")
+                logger.info(f"Starting load iteration {idx}...")
                 bench_result = await run_benchmark(logger, load_iteration)
                 perf_results.append(bench_result)
+                logger.info(f"Load iteration {idx} result collected successfully.")
 
-            # store pgbench results
-            report_data['pgbench_outputs'] = perf_results
-
-            # connect to PostgreSQL to fill additional info
+            # Store pgbench results
+            report_data["pgbench_outputs"] = perf_results
+            # Connect to PostgreSQL to fill additional info
             db_conn = await asyncpg.connect(**db_conf)
+            logger.info("Connected to DB successfully.")
             await fill_info_report(client, db_conn, report_data, report)
+            logger.info("Monitoring info collected successfully.")
 
-            # optionally collect DB logs
-            if log_conf.get('collect_pg_logs'):
-                log_dir = await db_conn.fetchval('show log_directory')
-                await collect_logs(client, log_dir, report['report_name'])
+            # Optionally collect DB logs
+            if log_conf.get("collect_pg_logs"):
+                log_dir = await db_conn.fetchval("show log_directory")
+                await collect_logs(client, log_dir, report["report_name"])
+                logger.info("DB logs collected successfully.")
             await db_conn.close()
 
-        if not perf_results:
-            logger.warning("No benchmark results were collected (perf_results is empty).")
-
+        logger.info("DB benchmark processed successfully.")
         return report
 
     except Exception as e:
         logger.error(str(e))
-        logger.error('Emergency program termination. No report has been generated.')
-        raise
+        return None
