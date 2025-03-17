@@ -4,7 +4,8 @@ import docker
 import io
 import os
 import tarfile
-from typing import Optional, Self
+import shutil
+from typing import Optional
 from types import TracebackType
 
 from pg_perfbench.const import ConnectionType, SRC_LOG_ARCHIVE_DIR
@@ -20,6 +21,7 @@ class SSHConnection:
 
     async def start(self):
         try:
+            self.conn_params['known_hosts'] = None
             self.client = await asyncssh.connect(**self.conn_params)
             if self.tunnel_params is not None:
                 from sshtunnel import SSHTunnelForwarder
@@ -63,10 +65,13 @@ class SSHConnection:
         if not os.path.exists(local_config_path):
             raise FileNotFoundError(f"Local config does not exist: {local_config_path}")
 
-        remote_config_path = os.path.join(remote_data_dir, 'postgresql.conf')
-        async with self.client.start_sftp_client() as sftp_client:
-            await sftp_client.put(localpaths=local_config_path, remotepath=remote_config_path)
-        return remote_config_path
+        try:
+            remote_config_path = os.path.join(remote_data_dir, 'postgresql.conf')
+            async with self.client.start_sftp_client() as sftp_client:
+                await sftp_client.put(localpaths=local_config_path, remotepath=remote_config_path)
+            return remote_config_path
+        except Exception as e:
+            raise TimeoutError(str(e))
 
     async def copy_db_log_files(self, log_source_path, local_path, report_name):
         if not self.client:
@@ -99,7 +104,7 @@ class SSHConnection:
                 self.logger.error(f'Failed to transfer logs: {str(e)}')
             return None
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "SSHConnection":
         await self.start()
         return self
 
@@ -183,10 +188,12 @@ class DockerConnection:
             demux=True,
             environment=self.env
         )
-        out, err = result.output
-        out_str = out.decode("utf-8", "replace") if out else ""
-        err_str = err.decode("utf-8", "replace") if err else ""
-        return out_str if out_str else err_str
+        if result.exit_code != 0:
+            out, err = result.output
+            error_message = err.decode("utf-8", "replace") if err else "Unknown error"
+            raise RuntimeError(f"Command \"{cmd}\" failed with exit code {result.exit_code}: {error_message} \n")
+        out, _ = result.output
+        return out.decode("utf-8", "replace") if out else ""
 
     async def run_command_as_root(self, cmd: str) -> str:
         if not self.container:
@@ -198,10 +205,14 @@ class DockerConnection:
             demux=True,
             environment=self.env
         )
-        out, err = result.output
-        out_str = out.decode("utf-8", "replace") if out else ""
-        err_str = err.decode("utf-8", "replace") if err else ""
-        return out_str if out_str else err_str
+
+        if result.exit_code != 0:
+            out, err = result.output
+            error_message = err.decode("utf-8", "replace") if err else "Unknown error"
+            raise RuntimeError(f"Command \"{cmd}\" failed with exit code {result.exit_code}: {error_message}")
+
+        out, _ = result.output
+        return out.decode("utf-8", "replace") if out else ""
 
     async def send_pg_config_file(self, local_config_path, remote_data_dir):
         if not self.container:
@@ -209,27 +220,34 @@ class DockerConnection:
         if not os.path.exists(local_config_path):
             raise FileNotFoundError(f"File not found: {local_config_path}")
 
-        file_name = os.path.basename(local_config_path)
-        tar_buffer = io.BytesIO()
-        with tarfile.TarFile(fileobj=tar_buffer, mode='w') as tar:
-            tar.add(local_config_path, arcname=file_name)
-        tar_buffer.seek(0)
+        try:
+            file_name = os.path.basename(local_config_path)
+            tmp_path = f"/tmp"
+            tar_buffer = io.BytesIO()
+            with tarfile.TarFile(fileobj=tar_buffer, mode='w') as tar:
+                tar.add(local_config_path, arcname=file_name)
+            tar_buffer.seek(0)
 
-        success = self.container.put_archive(remote_data_dir, tar_buffer.getvalue())
-        if not success:
-            raise OSError("Failed to put_archive into Docker container.")
+            success = self.container.put_archive(tmp_path, tar_buffer.getvalue())
+            if not success:
+                raise OSError("Failed to put_archive into Docker container.")
 
-        remote_file_path = os.path.join(remote_data_dir, file_name)
+            remote_file_path = os.path.join(tmp_path, file_name)
+            remote_config_path = os.path.join(remote_data_dir, 'postgresql.conf')
+            chmod_cmd = f"cp {remote_file_path} {remote_config_path}"
+            await self.run_command_as_root(chmod_cmd)
 
-        chown_cmd = f"chown postgres:postgres '{remote_file_path}'"
-        chown_result = await self.run_command_as_root(chown_cmd)
-        if "Operation not permitted" in chown_result:
-            raise PermissionError(f"Failed to chown {remote_file_path}: {chown_result}")
+            chown_cmd = f"chown postgres:postgres '{remote_file_path}'"
+            chown_result = await self.run_command_as_root(chown_cmd)
+            if "Operation not permitted" in chown_result:
+                raise PermissionError(f"Failed to chown {remote_file_path}: {chown_result}")
 
-        chmod_cmd = f"chmod 750 '{remote_data_dir}'"
-        await self.run_command_as_root(chmod_cmd)
+            chmod_cmd = f"chmod 750 '{remote_data_dir}'"
+            await self.run_command_as_root(chmod_cmd)
 
-        return remote_file_path
+            return remote_file_path
+        except Exception as e:
+            raise TimeoutError(str(e))
 
     async def copy_db_log_files(self, log_source_path, local_path, report_name):
         if not self.container:
@@ -251,16 +269,16 @@ class DockerConnection:
         except Exception:
             return None
 
-    async def __aenter__(self) -> Self:
+    async def __aenter__(self) -> "DockerConnection":
         if not hasattr(self, 'client'):
             await self.start()
         return self
 
     async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
+            self,
+            exc_type: type[BaseException] | None,
+            exc_val: BaseException | None,
+            exc_tb: TracebackType | None,
     ) -> None:
         # self.close()
         ...
@@ -326,7 +344,6 @@ class LocalConnection:
 
         return stdout.decode('utf-8', errors='replace')
 
-
     async def send_pg_config_file(self, local_config_path: str, remote_data_dir: str) -> str:
         # Check if the local file exists
         if not os.path.exists(local_config_path):
@@ -362,15 +379,15 @@ class LocalConnection:
             tar.add(log_source_path, arcname=os.path.basename(log_source_path))
         return dest_path
 
-    async def __aenter__(self) -> Self:
+    async def __aenter__(self) -> "LocalConnection":
         await self.start()
         return self
 
     async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
+            self,
+            exc_type: type[BaseException] | None,
+            exc_val: BaseException | None,
+            exc_tb: TracebackType | None,
     ) -> None:
         await self.close()
 

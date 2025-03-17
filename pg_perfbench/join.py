@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 JOIN_TASKS_PATH = os.path.join(str(PROJECT_ROOT_FOLDER), 'join_tasks')
 REF_REPORT_IDX = 0
 
+
 def _load_reports(input_dir: str, reference_report: str) -> tuple[list[str], list[dict]] | None:
     if not os.path.isdir(input_dir):
         logger.error(f'Invalid directory: {input_dir}')
@@ -40,6 +41,7 @@ def _load_reports(input_dir: str, reference_report: str) -> tuple[list[str], lis
             logger.warning(f'Cannot load {f}: {e}')
     return (files, reports) if reports else None
 
+
 def _load_compare_items(join_tasks_file: str) -> list[str] | None:
     path = os.path.join(JOIN_TASKS_PATH, join_tasks_file)
     if not os.path.isfile(path):
@@ -53,6 +55,7 @@ def _load_compare_items(join_tasks_file: str) -> list[str] | None:
     except (OSError, json.JSONDecodeError) as e:
         logger.error(f'Cannot parse join_tasks: {e}')
         return None
+
 
 def _compare_data(ref_data, cmp_data) -> bool:
     if isinstance(ref_data, str) and isinstance(cmp_data, str):
@@ -71,6 +74,7 @@ def _compare_data(ref_data, cmp_data) -> bool:
                 return False
         return True
     return False
+
 
 def _compare_reports(ref_rep: dict, cmp_rep: dict, compare_items: list[str]) -> bool:
     result = True
@@ -104,34 +108,36 @@ def _compare_reports(ref_rep: dict, cmp_rep: dict, compare_items: list[str]) -> 
                     s1['report_obj']['header'] = f'{old_hdr} | Diff'
     return True
 
+
 def _add_result(base: dict, inc: dict) -> None:
     chart_series = base.get('sections', {}) \
-                      .get('result', {}) \
-                      .get('reports', {}) \
-                      .get('chart', {}) \
-                      .get('data', {}) \
-                      .get('series', [])
+        .get('result', {}) \
+        .get('reports', {}) \
+        .get('chart', {}) \
+        .get('data', {}) \
+        .get('series', [])
     inc_series = inc.get('sections', {}) \
-                    .get('result', {}) \
-                    .get('reports', {}) \
-                    .get('chart', {}) \
-                    .get('data', {}) \
-                    .get('series', [])
+        .get('result', {}) \
+        .get('reports', {}) \
+        .get('chart', {}) \
+        .get('data', {}) \
+        .get('series', [])
     if inc_series:
         inc_series[0]['name'] = inc.get('report_name', 'Unnamed')
         chart_series.append(inc_series[0])
     base_outputs = base.get('sections', {}) \
-                       .get('result', {}) \
-                       .get('reports', {}) \
-                       .get('pgbench_outputs', {})
+        .get('result', {}) \
+        .get('reports', {}) \
+        .get('pgbench_outputs', {})
     inc_outputs = inc.get('sections', {}) \
-                     .get('result', {}) \
-                     .get('reports', {}) \
-                     .get('pgbench_outputs', {})
+        .get('result', {}) \
+        .get('reports', {}) \
+        .get('pgbench_outputs', {})
     if 'data' not in base_outputs or not isinstance(base_outputs['data'], list):
         base_outputs['data'] = []
     if 'data' in inc_outputs and isinstance(inc_outputs['data'], list):
         base_outputs['data'].append([inc.get('report_name', 'Unnamed'), inc_outputs['data']])
+
 
 def _merge_reports(names: list[str], reports: list[dict], compare_items: list[str]) -> dict | None:
     ref = reports[0]

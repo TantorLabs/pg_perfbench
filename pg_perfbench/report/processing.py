@@ -5,7 +5,6 @@ from pg_perfbench.const import (
     BENCHMARK_TEMPLATE_JSON_NAME, REPORT_FOLDER,
     REPORT_TEMPLATE_FOLDER
 )
-from pg_perfbench.report.commands import execute_steps_in_order
 import os
 
 
@@ -155,14 +154,3 @@ def parse_json_in_order(report) -> (List[dict], dict):
             command_steps.append(step_info)
 
     return command_steps, report
-
-
-async def fill_info_report(conn, db, workload_conf, report):
-    # We parse the report to get steps in order
-    command_steps, json_data = parse_json_in_order(report)
-    if not command_steps:
-        # If there's nothing to process, just return silently
-        return
-
-    # Then execute them as usual
-    await execute_steps_in_order(command_steps, workload_conf, conn, db)

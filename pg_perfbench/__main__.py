@@ -145,7 +145,7 @@ def get_args_parser() -> argparse.ArgumentParser:
     db_group.add_argument(
         "--pg-password",
         type=str,
-        default="",
+        default=None,
         help="PostgreSQL user password",
     )
     db_group.add_argument(
@@ -278,47 +278,51 @@ async def run(args: Optional[Namespace] = None):
                 print("Error parsing arguments. Exiting.")
                 return None
 
-    logger = setup_logger(args.log_level, args.clear_logs)
-    logger.info("Logger configured successfully.")
+    try:
+        logger = setup_logger(args.log_level, args.clear_logs)
+        logger.info("Logger configured successfully.")
 
-    # check if user provided any valid mode
-    if not args.mode:
-        logger.error("No mode specified. Please set --mode to a valid option.")
+        # check if user provided any valid mode
+        if not args.mode:
+            logger.error("No mode specified. Please set --mode to a valid option.")
+            return None
+
+        # run the appropriate mode
+        if args.mode == WorkMode.BENCHMARK:
+            # Creating a context for benchmark mode
+            ctx = Context(args, logger)
+            report = await run_benchmark_and_collect_metrics(**ctx.structured_params)
+
+        elif args.mode in {
+            WorkMode.COLLECT_SYS_INFO,
+            WorkMode.COLLECT_DB_INFO,
+            WorkMode.COLLECT_ALL_INFO
+        }:
+            # Creating a context for collect info mode
+            ctx = CollectInfoContext(args, logger)
+            report = await collect_info(**ctx.structured_params)
+
+        elif args.mode in WorkMode.JOIN:
+            # Creating a context for join mode
+            ctx = JoinContext(args, logger)
+            report = join_reports(**ctx.structured_params)
+
+        else:
+            logger.error(f"Unsupported mode: {args.mode}")
+            return None
+
+        # check if a report was generated
+        if report is None:
+            logger.error("Emergency program termination. No report has been generated.")
+            return None
+
+        # save the generated report (JSON/HTML)
+        save_report(report, logger)
+        logger.info("Benchmark report saved successfully.")
+
+    except Exception as e:
+        logger.error(e)
         return None
-
-
-    # run the appropriate mode
-    if args.mode == WorkMode.BENCHMARK:
-        # Creating a context for benchmark mode
-        ctx = Context(args, logger)
-        report = await run_benchmark_and_collect_metrics(**ctx.structured_params)
-
-    elif args.mode in {
-        WorkMode.COLLECT_SYS_INFO,
-        WorkMode.COLLECT_DB_INFO,
-        WorkMode.COLLECT_ALL_INFO
-    }:
-        # Creating a context for collect info mode
-        ctx = CollectInfoContext(args, logger)
-        report = await collect_info(**ctx.structured_params)
-
-    elif args.mode in WorkMode.JOIN:
-        # Creating a context for join mode
-        ctx = JoinContext(args, logger)
-        report = join_reports(**ctx.structured_params)
-
-    else:
-        logger.error(f"Unsupported mode: {args.mode}")
-        return None
-
-    # check if a report was generated
-    if report is None:
-        logger.error("Emergency program termination. No report has been generated.")
-        return None
-
-    # save the generated report (JSON/HTML)
-    save_report(report, logger)
-    logger.info("Benchmark report saved successfully.")
 
 
 if __name__ == "__main__":

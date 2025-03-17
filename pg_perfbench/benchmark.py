@@ -140,7 +140,10 @@ async def reset_db_environment(logger, conn_type, conn, db_conf, workload_conf):
     try:
         db_tasks = DBTasks(db_conf, logger)
         conn_tasks = get_conn_type_tasks(conn_type)(db_conf=workload_conf, conn=conn)
-        await conn_tasks.start_db()
+        try:
+            await conn_tasks.start_db()
+        except Exception as e:
+            logger.warning(str(e))
         await db_tasks.drop_db()
         await conn_tasks.stop_db()
         await conn_tasks.sync()
@@ -149,8 +152,7 @@ async def reset_db_environment(logger, conn_type, conn, db_conf, workload_conf):
         await db_tasks.init_db()
         await db_tasks.check_db_access()
     except Exception as e:
-        logger.error(f"Failed to reset DB environment: {str(e)}")
-        raise
+        raise RuntimeError(f"Failed to reset DB environment: {str(e)}")
 
 
 async def run_benchmark(logger, load_iteration: [Any]):

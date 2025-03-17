@@ -7,6 +7,8 @@ from pg_perfbench.const import (
     SHELL_COMMANDS_PATH, SQL_COMMANDS_PATH, DEFAULT_LOG_ARCHIVE_NAME,
     LOCAL_DB_LOGS_PATH, WorkloadTypes
 )
+from pg_perfbench.report.processing import parse_json_in_order
+
 
 def get_script_text(full_script_path) -> str:
     # check if file exists before reading
@@ -18,6 +20,7 @@ def get_script_text(full_script_path) -> str:
             return file_content.read()
     except OSError as e:
         raise OSError(f"Failed to open or read script file {full_script_path}: {e}")
+
 
 async def run_shell_command(conn, item):
     # check necessary fields in item
@@ -75,6 +78,7 @@ async def run_shell_command(conn, item):
     except Exception as e:
         print(f'Execution of command \"{shell_cmd_file}\" was failed:\n {str(e)}')
 
+
 async def run_sql_command(dbconn, item):
     sql_cmd_file = item.get('sql_command_file')
     if not sql_cmd_file:
@@ -106,6 +110,7 @@ async def run_sql_command(dbconn, item):
     except Exception as e:
         print(f'Execution of command \"{sql_cmd_file}\" was failed:\n {str(e)}')
 
+
 def args(report_data, item):
     # build a table of (arg, value) from report_data['args']
     if 'args' not in report_data or not isinstance(report_data['args'], dict):
@@ -114,6 +119,7 @@ def args(report_data, item):
 
     item['theader'] = ['arg', 'value']
     item['data'] = [[key, str(value)] for key, value in report_data['args'].items()]
+
 
 def get_workload_cmds(report_data):
     # retrieve workload commands with replaced placeholders
@@ -136,11 +142,13 @@ def get_workload_cmds(report_data):
 
     return pgbench_cmds
 
+
 def pgbench_options_table(report_data, item):
     # build a table "iteration number -> pgbench_options"
     pgbench_cmds = get_workload_cmds(report_data)
     item['theader'] = ['iteration number', 'pgbench_options']
     item['data'] = [[idx, cmd] for idx, cmd in enumerate(pgbench_cmds)]
+
 
 def workload_tables(report_data, item):
     # show .sql content or commands for init phase
@@ -179,6 +187,7 @@ def workload_tables(report_data, item):
     else:
         item['data'] = f"Unknown or missing benchmark_type: {btype}"
 
+
 def workload(report_data, item):
     # show .sql content or commands for workload phase
     workload_conf = report_data.get('workload_conf', {})
@@ -216,6 +225,7 @@ def workload(report_data, item):
     else:
         item['data'] = f"Unknown or missing benchmark_type: {btype}"
 
+
 def benchmark_result(report_data, item):
     # turn 'pgbench_outputs' into a table
     if 'pgbench_outputs' not in report_data:
@@ -237,10 +247,11 @@ def benchmark_result(report_data, item):
     ]
     item['data'] = results
 
+
 def chart_tps_clients(report_data, item):
     # fill chart data with tps vs iteration
     if ('workload_conf' not in report_data or
-        'pgbench_iter_list' not in report_data['workload_conf']):
+            'pgbench_iter_list' not in report_data['workload_conf']):
         item['data'] = "Missing 'workload_conf' or 'pgbench_iter_list'"
         return
 
@@ -286,6 +297,7 @@ def chart_tps_clients(report_data, item):
         }
     )
 
+
 async def collect_logs(connect, remote_logs_path, report_name: str = DEFAULT_LOG_ARCHIVE_NAME):
     # check if remote_logs_path is provided
     if not remote_logs_path:
@@ -308,6 +320,7 @@ async def collect_logs(connect, remote_logs_path, report_name: str = DEFAULT_LOG
     else:
         print('Error collecting log files')
         return None
+
 
 async def execute_steps_in_order(command_steps, report_data, conn, db) -> None:
     # validate command_steps is a list
@@ -342,3 +355,14 @@ async def execute_steps_in_order(command_steps, report_data, conn, db) -> None:
         else:
             output_str = f'Unknown command type {cmd_type}'
             report_obj['data'] = output_str
+
+
+async def fill_info_report(conn, db, workload_conf, report):
+    # We parse the report to get steps in order
+    command_steps, json_data = parse_json_in_order(report)
+    if not command_steps:
+        # If there's nothing to process, just return silently
+        return
+
+    # Then execute them as usual
+    await execute_steps_in_order(command_steps, workload_conf, conn, db)

@@ -7,8 +7,8 @@ from pg_perfbench.const import (
 )
 from pg_perfbench.connections import get_connection
 from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks
-from pg_perfbench.report.processing import fill_info_report, get_report_structure
-from pg_perfbench.report.commands import collect_logs
+from pg_perfbench.report.processing import get_report_structure
+from pg_perfbench.report.commands import collect_logs, fill_info_report
 from pg_perfbench.log import display_user_configuration
 
 
@@ -44,10 +44,13 @@ async def _handle_db_info(client, db_conf, logger):
             except Exception as e:
                 logger.warning(f"Failed to send custom config: {str(e)}")
 
-        tasks = get_conn_type_tasks(client.conn_params.get("connection_type"))
+        tasks = get_conn_type_tasks(conn_type)
         if tasks:
             task_object = tasks(db_conf=db_env, conn=client)
-            await task_object.start_db()
+            try:
+                await task_object.start_db()
+            except Exception as e:
+                logger.warning(str(e))
         else:
             logger.warning(f"No task factory for connection type {client.conn_params.get('connection_type')}")
 
