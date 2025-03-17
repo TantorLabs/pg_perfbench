@@ -165,32 +165,49 @@ def _merge_reports(names: list[str], reports: list[dict], compare_items: list[st
     ref['header'] = f'Result of joined reports {get_datetime_report("%d/%m/%Y %H:%M:%S")}'
     return ref
 
+
 def join_reports(join_tasks: str, reference_report: str, input_dir: str, report_name: str, logger) -> dict | None:
     if not logger:
         logger = setup_logger("info")
+    logger.info("Starting join_reports process.")
+
     if not join_tasks:
-        logger.error('No join_tasks')
+        logger.error("No join_tasks specified.")
         return None
+
     compare_items = _load_compare_items(join_tasks)
     if not compare_items:
-        logger.error('No compare_items')
+        logger.error("No compare_items found.")
         return None
+    logger.info(f"Compare items loaded successfully: {compare_items}")
+
     loaded = _load_reports(input_dir, reference_report)
     if not loaded:
-        logger.error('No reports loaded')
+        logger.error("No reports loaded from input directory.")
         return None
     names, rpts = loaded
+    logger.info(f"Loaded {len(names)} report(s): {', '.join(names)}")
+
     joined = _merge_reports(names, rpts, compare_items)
     if not joined:
-        logger.error('Merge failed')
+        logger.error("Merge of reports failed.")
         return None
-    joined['report_name'] = report_name or f'join_{DEFAULT_REPORT_NAME}'
-    all_names = '\n'.join(names)
+    logger.info("Reports merged successfully.")
+
+    joined["report_name"] = report_name or f"join_{DEFAULT_REPORT_NAME}"
+    logger.info(f"Join report name set to: {joined['report_name']}")
+
+    all_names = "\n".join(names)
     tasks_path = os.path.join(JOIN_TASKS_PATH, join_tasks)
     try:
-        with open(tasks_path, 'r', encoding='utf-8') as tf:
+        with open(tasks_path, "r", encoding="utf-8") as tf:
             tasks_content = tf.read()
+        logger.info("Join tasks file read successfully.")
     except OSError as e:
-        tasks_content = f'Cannot read tasks: {e}'
-    joined['description'] = f'\nComparison Reports:\n{all_names}\n\nJoined by:\n{tasks_content}'
+        tasks_content = f"Cannot read tasks: {e}"
+        logger.error(tasks_content)
+
+    joined["description"] = f"\nComparison Reports:\n{all_names}\n\nJoined by:\n{tasks_content}"
+    logger.info("Join report description set successfully.")
+    logger.info("Join reports process completed successfully.")
     return joined

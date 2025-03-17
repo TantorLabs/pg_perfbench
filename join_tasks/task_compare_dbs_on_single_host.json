@@ -10,7 +10,6 @@
             "sections.db.reports.version_major.data",
             "sections.db.reports.pg_available_extensions.data",
             "sections.db.reports.pg_config.data",
-            "sections.benchmark.reports.args.data",
             "sections.benchmark.reports.options.data",
             "sections.benchmark.reports.custom_tables.data",
             "sections.benchmark.reports.custom_workload.data"
