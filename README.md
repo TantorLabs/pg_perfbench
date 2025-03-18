@@ -14,7 +14,6 @@ This application serves as a wrapper around pgbench and performs the following t
 - Generates a report summarizing database performance, configuration, and the server environment.
 
 # Table of Contents
-- [Report Examples](#report-examples)
 - [Dependencies and installation](#dependencies-and-installation)
 - [Configuring options](#configuring-options)
      - [`benchmark` mode](#benchmark-mode)
@@ -38,7 +37,7 @@ cd pg_perfbench
 python3.10 -m venv venv
 source venv/bin/activate
 ```
-- Install additional packages for Python 3.11, for example, using:
+- Install additional packages for Python, for example, using:
  ```
   pip install -r requirements.txt
  ```
@@ -70,25 +69,37 @@ configured database instance and сollects information about the server environm
 ## Connection options
 ![image lost](doc/db_connections_type.png "db conn types") 
 > **Note**: Port forwarding to the target database occurs, so make sure to use an available local forwarding port for --pg-port (default value is 5432).
-During the operation of pg_perfbench, it is necessary to set local environment variables within the session connecting to the database host.
-
-When establishing an SSH connection, you must first update the AcceptEnv parameter in the SSH configuration file (/etc/ssh/sshd_config) on the database server.
-Specify the argument pattern as 'ARG_*' to allow multiple variables to be passed in:
-<br>`/etc/ssh/sshd_config:` <br>
-```
-...
-# Allow client to pass locale environment variables
-AcceptEnv LANG LC_* ARG_*
-...
-```
-
-In the **Docker** container, variables are passed through when launching the pg_perfbench container.
 
 ### Common parameters
 
 | Parameter           | Description                                                      |
 |---------------------|------------------------------------------------------------------|
 | `--connection-type`        | Connection types: `ssh`, `docker`, `local`                            |
+
+### General instructions for all connection types
+ - Bash scripts are used to collect system information, and the commands within them must be available for execution 
+by the application's user, for example:
+<br>&nbsp;&nbsp;To allow the `postgres` user to execute `lshw` without a password, add the following privileges:
+
+```bash
+# ========================================
+# Actions on the data base host
+# ========================================
+sudo visudo
+>>>
+postgres ALL=(root) NOPASSWD: /usr/bin/lshw
+```
+- Ensure that the postgres user has the privilege to clear the file 
+system cache on the database server. Execute the following command on the `database` host:
+
+```
+# ========================================
+# Actions on the data base host
+# ========================================
+echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches' | sudo EDITOR='tee -a' visudo -f /etc/sudoers
+```
+
+
 ### SSH connection
 
 | Parameter           | Description                                                      |
@@ -99,7 +110,18 @@ In the **Docker** container, variables are passed through when launching the pg_
 | `--remote-pg-host`  | Host of the remote server's database (default: 127.0.0.1)        |
 | `--remote-pg-port`  | Port of the remote server's database (default: 5432)             |
 
-
+#### Environment preparation
+* During the operation of pg_perfbench, it is necessary to set local environment variables within the session connecting
+to the database host. When establishing an SSH connection, you must first update the AcceptEnv parameter in the SSH
+configuration file (/etc/ssh/sshd_config) on the database server. Specify the argument pattern as 'ARG_*' to allow 
+multiple variables to be passed in:
+<br>`/etc/ssh/sshd_config:` <br>
+```
+...
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_* ARG_*
+...
+```
 * To archive the instance logs, install tar(Ubuntu example) on the data base server:
 ```
 sudo apt update
@@ -140,15 +162,23 @@ chmod 700 /var/lib/postgresql/.ssh
 chown -R postgres:postgres /var/lib/postgresql/.ssh
 
 ```
-
-* To allow the `postgres` user to execute `lshw` without a password, add the following privileges:
-
-```bash
-sudo visudo
->>>
-postgres ALL=(root) NOPASSWD: /usr/bin/lshw
-```
 see more details on benchmark configuration over an SSH connection [here](doc/ssh_mode_usage.md).
+
+### Local connection
+
+For establishing a local connection to the database, you need to set the connection type:
+```
+--connection-type=local
+```
+
+When using a local connection, the application must be configured in the postgres user's environment.
+```
+su - postgres 
+git clone https://github.com/TantorLabs/pg_perfbench.git
+cd pg_perfbench
+```
+For more details on configuring the local database load, see [here](doc/local_mode_usage.md).
+
 ### Docker connection
 Preconfigure access to Docker for the user who is running the tool.
 
@@ -158,19 +188,7 @@ Preconfigure access to Docker for the user who is running the tool.
 | `--docker-pg-host` | Container PostgreSQL database host (default: 127.0.0.1) |
 | `--docker-pg-port` | Container PostgreSQL database port (default: 5432)      |      
 
-
 see more details on benchmark configuration for a database in a Docker container [here](doc/docker_mode_usage.md).
-### Common instruction
-When utilizing an SSH connection, ensure that the postgres user has the privilege to clear the file 
-system cache on the database server. For a Docker connection, identify the user operating the tool 
-and execute the following command on the tool host.:
-
-```
-# ========================================
-# Actions on the data base server
-# ========================================
-echo ' $(whoami) ALL=(ALL) NOPASSWD: /bin/sh -c echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches' | sudo EDITOR='tee -a' visudo -f /etc/sudoers
-```
 
 ### PostgreSQL database options:
 The flags `pg_host` and `pg_port` are optional parameters for forwarding the address and port 
@@ -274,7 +292,7 @@ python -m pg_perfbench --mode=benchmark \
 
 See more details about workload configuration [here](doc/workload_description.md).
 
-**Example benchmark report** - [benchmark-report.html](examples/benchmark/benchmark-ssh-default-workload.html)
+**Example benchmark report** - [benchmark-report.html](examples/benchmark/benchmark-docker-default.html)
 
 ## `collect info` mode
 The mode of information collection is described [here](doc/logic_building_and_comparing_reports.md).
@@ -338,9 +356,9 @@ Template for the comparison criteria file:
 {
         "description": "Comparison of database performance across different configurations in the same environment using the same PostgreSQL version",
         "items": [
-            "<section_name_of_report_struct>.<report_name>.data",
+            "sections.<section_name_of_report_struct>.reports.<report_name>.data",
             ....
-            "system.uname_a.data",
+            "sections.system.reports.uname_a.data",
         ]
 }
 ```
@@ -351,6 +369,8 @@ python -m pg_perfbench --mode=join \
 --reference-report=benchmark_report.json \
 --input-dir=/path/to/some/reports
 ```
+
+Examples of join report - [examples.](examples/join)
 # Configuring report
 See more details about report configuration [here](doc/logic_building_and_comparing_reports.md).
 

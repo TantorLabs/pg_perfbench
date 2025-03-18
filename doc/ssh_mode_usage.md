@@ -8,7 +8,7 @@ Review and follow the steps outlined in the README [preparation](../README.md#de
 #### Environment preparation for SSH connection
 Review and follow the steps outlined in the README [preparation for ssh connection](../README.md#connection-options)
 
-#### Logic for testing over SSH connection
+### Application configuration for remote access to the database via an SSH connection
 
 
 #### Simple test configuration of a PostgreSQL database instance located on a remote host 

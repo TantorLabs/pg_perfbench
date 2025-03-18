@@ -1,0 +1,4568 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
+
+	<script type="text/javascript" language="javascript"
+		src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+	<script type="text/javascript" language="javascript"
+		src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" language="javascript"
+		src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.44.0/apexcharts.min.js"></script>
+
+
+	<style>
+		.acc {
+			background-color: rgb(206, 173, 250);
+			color: #444;
+			cursor: pointer;
+			padding: 20px;
+			width: 100%;
+			border: none;
+			text-align: left;
+			margin: 10px 0 10px 0;
+		}
+
+		.acc_collapsed,
+		.accordion:hover {
+			background-color: #ccc;
+		}
+
+		.panel {
+			padding: 0 20px 20px 20px;
+			display: none;
+			background-color: white;
+			overflow: hidden;
+		}
+
+		.root_div {
+			margin: 20px;
+		}
+
+		.common_div {
+			margin: 20px 0 20px 0;
+		}
+
+		.bold_font_txt {
+			margin: 15px 0 15px 0;
+            font-weight: bold;
+		}
+
+		p.consolas-font {
+			color: #333;
+            white-space: pre-wrap;
+		}
+
+		.paginate_button,
+		.page-item,
+		.active>a {
+			background-color: rgb(206, 173, 250) !important;
+			border-color: rgb(206, 173, 250) !important;
+		}
+
+		.paginate_button,
+		.page-item>a {
+			color: rgb(33, 37, 41) !important;
+		}
+
+		.paginate_button,
+		.page-item,
+		.disabled>a {
+			background-color: rgb(223, 223, 223) !important;
+		}
+
+		.dataTables_paginate,
+		.paging_simple_numbers {
+			margin-top: 10px !important;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="root_div">
+		<div id="main_content" class="main_content">
+			<div style="display: flex; justify-content: flex-end">
+				<button id="expand_all" type="button" class="btn btn-secondary">Expand all</button>
+				<button id="collapse_all" type="button" class="btn btn-secondary" style="margin-left: 10px;">Collapse
+					all</button>
+			</div>
+		</div>
+	</div>
+
+
+
+	<script type="text/javascript">
+		var tables = [];
+
+		var report_data = {
+    "header": "Server and Database Information Report",
+    "report_name": "collect-all-info-docker",
+    "description": "18/03/2025 23:38:29",
+    "sections": {
+        "system": {
+            "header": "System properties <hn>",
+            "description": "Common info about current host",
+            "state": "expanded",
+            "reports": {
+                "uname_a": {
+                    "header": "Linux kernel version and machine architecture | uname -r -m",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "uname_a.sh",
+                    "data": "6.8.0-52-generic x86_64\n"
+                },
+                "etc_os_release": {
+                    "header": "OS distribution information | /etc/os-release",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_os_release.sh",
+                    "data": "PRETTY_NAME=\"Ubuntu 22.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"22.04\"\nVERSION=\"22.04.5 LTS (Jammy Jellyfish)\"\nVERSION_CODENAME=jammy\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=jammy\n"
+                },
+                "sys_memory_total": {
+                    "header": "System memory information | /proc/meminfo",
+                    "description": "Current state of the system's memory during the benchmarking",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sys_memory_total.sh",
+                    "data": "MemTotal:       49031732 kB\nMlocked:              48 kB\nSwapTotal:       2097148 kB\nSwapFree:        2097148 kB\nZswap:                 0 kB\nZswapped:              0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nCommitLimit:    26613012 kB\nVmallocTotal:   34359738367 kB\nVmallocChunk:          0 kB\nPercpu:            21952 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:         0 kB\nFileHugePages:         0 kB\nUnaccepted:            0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      353728 kB\nDirectMap2M:     9832448 kB\nDirectMap1G:    40894464 kB\n"
+                },
+                "total_ram": {
+                    "header": "Total RAM capacity | /proc/meminfo",
+                    "description": "Total database host RAM ",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "total_ram.sh",
+                    "data": "46 GB\n"
+                },
+                "cpu_info": {
+                    "header": "CPU architecture and specification display tool | lscpu",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "cpu_info.sh",
+                    "data": "Architecture:                         x86_64\nCPU op-mode(s):                       32-bit, 64-bit\nAddress sizes:                        39 bits physical, 48 bits virtual\nByte Order:                           Little Endian\nCPU(s):                               16\nOn-line CPU(s) list:                  0-15\nVendor ID:                            GenuineIntel\nModel name:                           12th Gen Intel(R) Core(TM) i7-1260P\nCPU family:                           6\nModel:                                154\nThread(s) per core:                   2\nCore(s) per socket:                   12\nSocket(s):                            1\nStepping:                             3\nCPU max MHz:                          4700.0000\nCPU min MHz:                          400.0000\nBogoMIPS:                             4992.00\nFlags:                                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid movdiri movdir64b fsrm md_clear serialize arch_lbr ibt flush_l1d arch_capabilities\nVirtualization:                       VT-x\nL1d cache:                            448 KiB (12 instances)\nL1i cache:                            640 KiB (12 instances)\nL2 cache:                             9 MiB (6 instances)\nL3 cache:                             18 MiB (1 instance)\nNUMA node(s):                         1\nNUMA node0 CPU(s):                    0-15\nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Mitigation; Clear Register File\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:             Mitigation; Enhanced / Automatic IBRS; IBPB conditional; RSB filling; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n"
+                },
+                "df_h": {
+                    "header": "Disk space usage | df -h",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "df_h.sh",
+                    "data": "Filesystem      Size  Used Avail Use% Mounted on\noverlay          97G   83G  8.8G  91% /\ntmpfs            64M     0   64M   0% /dev\nshm              64M  1.1M   63M   2% /dev/shm\n/dev/nvme0n1p4   97G   83G  8.8G  91% /etc/hosts\n"
+                },
+                "etc_fstab": {
+                    "header": "File system mount configuration | fstab",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_fstab.sh",
+                    "data": "# UNCONFIGURED FSTAB FOR BASE SYSTEM\n"
+                },
+                "mount": {
+                    "header": "Current filesystem mounts and their details | mount",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "mount.sh",
+                    "data": "overlay on / type overlay (rw,relatime,lowerdir=/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/IDBRLAKD62XOF5WT3NDEJQ3RXD:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/4UBQR6D42E3WHJMLJK75ZMZ2DY:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/U6HTQS33RU5F72ZQ5ROEMOYEFQ:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/MEZLRKWW7MD42TED6ETOD5PNRO:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/DA4AVNXZ4JAOQZQ6EXISPSK5UP:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/K75O3GXSLP4Z2AF3W55DP2ESDJ:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/QSOKD67CZNM4QZZGFOUCKQ7OM2:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/DQMHPUO4ATDPXOMQWE64B5DGAA:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/TJY6TWZWMQDJIRUPVSQBH4C7JQ:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/DBMWA4ZB7ETMRLOJF2RL5CQ4UF,upperdir=/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/dfa982c1785e034f839b67accfdade42cc676936ac602b19ed9d2a58cb960343/diff,workdir=/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/dfa982c1785e034f839b67accfdade42cc676936ac602b19ed9d2a58cb960343/work,nouserxattr)\nproc on /proc type proc (rw,nosuid,nodev,noexec,relatime)\ntmpfs on /dev type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)\ndevpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666)\nsysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)\ncgroup on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)\nmqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)\nshm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,inode64)\n/dev/nvme0n1p4 on /etc/resolv.conf type ext4 (rw,relatime,errors=remount-ro)\n/dev/nvme0n1p4 on /etc/hostname type ext4 (rw,relatime,errors=remount-ro)\n/dev/nvme0n1p4 on /etc/hosts type ext4 (rw,relatime,errors=remount-ro)\n/dev/nvme0n1p4 on /var/lib/postgresql/data type ext4 (rw,relatime,errors=remount-ro)\n"
+                },
+                "ip_br_addr": {
+                    "header": "Local hostname-to-IP mapping | ip -br addr",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "ip_br_addr.sh",
+                    "data": "127.0.0.1\tlocalhost\n::1\tlocalhost ip6-localhost ip6-loopback\nfe00::0\tip6-localnet\nff00::0\tip6-mcastprefix\nff02::1\tip6-allnodes\nff02::2\tip6-allrouters\n172.17.0.2\t80c1b26ee87a\n"
+                },
+                "sysctl_vm": {
+                    "header": "Kernel parameters related to virtual memory | /sbin/sysctl vm",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_vm.sh",
+                    "data": "vm.admin_reserve_kbytes = 8192\nvm.compact_unevictable_allowed = 1\nvm.compaction_proactiveness = 20\nvm.dirty_background_bytes = 0\nvm.dirty_background_ratio = 10\nvm.dirty_bytes = 0\nvm.dirty_expire_centisecs = 3000\nvm.dirty_ratio = 20\nvm.dirty_writeback_centisecs = 500\nvm.dirtytime_expire_seconds = 43200\nvm.extfrag_threshold = 500\nvm.hugetlb_optimize_vmemmap = 0\nvm.hugetlb_shm_group = 0\nvm.laptop_mode = 0\nvm.legacy_va_layout = 0\nvm.lowmem_reserve_ratio = 256\t256\t32\t0\t0\nvm.max_map_count = 65530\nvm.memfd_noexec = 0\nvm.memory_failure_early_kill = 0\nvm.memory_failure_recovery = 1\nvm.min_free_kbytes = 67584\nvm.min_slab_ratio = 5\nvm.min_unmapped_ratio = 1\nvm.mmap_min_addr = 65536\nvm.nr_hugepages = 0\nvm.nr_hugepages_mempolicy = 0\nvm.nr_overcommit_hugepages = 0\nvm.numa_stat = 1\nvm.numa_zonelist_order = Node\nvm.oom_dump_tasks = 1\nvm.oom_kill_allocating_task = 0\nvm.overcommit_kbytes = 0\nvm.overcommit_memory = 0\nvm.overcommit_ratio = 50\nvm.page-cluster = 3\nvm.page_lock_unfairness = 5\nvm.panic_on_oom = 0\nvm.percpu_pagelist_high_fraction = 0\nvm.stat_interval = 1\nvm.swappiness = 60\nvm.unprivileged_userfaultfd = 0\nvm.user_reserve_kbytes = 131072\nvm.vfs_cache_pressure = 100\nvm.watermark_boost_factor = 15000\nvm.watermark_scale_factor = 10\nvm.zone_reclaim_mode = 0\n"
+                },
+                "sysctl_net_ipv4_tcp": {
+                    "header": "Kernel parameters related to IPv4 TCP networking settings | /sbin/sysctl -a | grep \"^net\\.ipv4\\.tcp\"",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_net_ipv4_tcp.sh",
+                    "data": "net.ipv4.tcp_abort_on_overflow = 0\nnet.ipv4.tcp_adv_win_scale = 1\nnet.ipv4.tcp_allowed_congestion_control = reno cubic\nnet.ipv4.tcp_app_win = 31\nnet.ipv4.tcp_autocorking = 1\nnet.ipv4.tcp_available_congestion_control = reno cubic\nnet.ipv4.tcp_backlog_ack_defer = 1\nnet.ipv4.tcp_base_mss = 1024\nnet.ipv4.tcp_challenge_ack_limit = 2147483647\nnet.ipv4.tcp_child_ehash_entries = 0\nnet.ipv4.tcp_comp_sack_delay_ns = 1000000\nnet.ipv4.tcp_comp_sack_nr = 44\nnet.ipv4.tcp_comp_sack_slack_ns = 100000\nnet.ipv4.tcp_congestion_control = cubic\nnet.ipv4.tcp_dsack = 1\nnet.ipv4.tcp_early_demux = 1\nnet.ipv4.tcp_early_retrans = 3\nnet.ipv4.tcp_ecn = 2\nnet.ipv4.tcp_ecn_fallback = 1\nnet.ipv4.tcp_ehash_entries = -524288\nnet.ipv4.tcp_fack = 0\nnet.ipv4.tcp_fastopen = 1\nnet.ipv4.tcp_fastopen_blackhole_timeout_sec = 0\nnet.ipv4.tcp_fin_timeout = 60\nnet.ipv4.tcp_frto = 2\nnet.ipv4.tcp_fwmark_accept = 0\nnet.ipv4.tcp_invalid_ratelimit = 500\nnet.ipv4.tcp_keepalive_intvl = 75\nnet.ipv4.tcp_keepalive_probes = 9\nnet.ipv4.tcp_keepalive_time = 7200\nnet.ipv4.tcp_l3mdev_accept = 0\nnet.ipv4.tcp_limit_output_bytes = 1048576\nnet.ipv4.tcp_max_reordering = 300\nnet.ipv4.tcp_max_syn_backlog = 4096\nnet.ipv4.tcp_max_tw_buckets = 262144\nnet.ipv4.tcp_migrate_req = 0\nnet.ipv4.tcp_min_rtt_wlen = 300\nnet.ipv4.tcp_min_snd_mss = 48\nnet.ipv4.tcp_min_tso_segs = 2\nnet.ipv4.tcp_moderate_rcvbuf = 1\nnet.ipv4.tcp_mtu_probe_floor = 48\nnet.ipv4.tcp_mtu_probing = 0\nnet.ipv4.tcp_no_metrics_save = 0\nnet.ipv4.tcp_no_ssthresh_metrics_save = 1\nnet.ipv4.tcp_notsent_lowat = 4294967295\nnet.ipv4.tcp_orphan_retries = 0\nnet.ipv4.tcp_pacing_ca_ratio = 120\nnet.ipv4.tcp_pacing_ss_ratio = 200\nnet.ipv4.tcp_pingpong_thresh = 1\nnet.ipv4.tcp_plb_cong_thresh = 128\nnet.ipv4.tcp_plb_enabled = 0\nnet.ipv4.tcp_plb_idle_rehash_rounds = 3\nnet.ipv4.tcp_plb_rehash_rounds = 12\nnet.ipv4.tcp_plb_suspend_rto_sec = 60\nnet.ipv4.tcp_probe_interval = 600\nnet.ipv4.tcp_probe_threshold = 8\nnet.ipv4.tcp_recovery = 1\nnet.ipv4.tcp_reflect_tos = 0\nnet.ipv4.tcp_reordering = 3\nnet.ipv4.tcp_retrans_collapse = 1\nnet.ipv4.tcp_retries1 = 3\nnet.ipv4.tcp_retries2 = 15\nnet.ipv4.tcp_rfc1337 = 0\nnet.ipv4.tcp_rmem = 4096\t131072\t6291456\nnet.ipv4.tcp_sack = 1\nnet.ipv4.tcp_shrink_window = 0\nnet.ipv4.tcp_slow_start_after_idle = 1\nnet.ipv4.tcp_stdurg = 0\nnet.ipv4.tcp_syn_linear_timeouts = 4\nnet.ipv4.tcp_syn_retries = 6\nnet.ipv4.tcp_synack_retries = 5\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_thin_linear_timeouts = 0\nnet.ipv4.tcp_timestamps = 1\nnet.ipv4.tcp_tso_rtt_log = 9\nnet.ipv4.tcp_tso_win_divisor = 3\nnet.ipv4.tcp_tw_reuse = 2\nnet.ipv4.tcp_window_scaling = 1\nnet.ipv4.tcp_wmem = 4096\t16384\t4194304\nnet.ipv4.tcp_workaround_signed_windows = 0\n"
+                },
+                "sysctl_net_ipv4_udp": {
+                    "header": "Kernel parameters related to IPv4 UDP networking settings | /sbin/sysctl -a | grep \"^net\\.ipv4\\.udp\"",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_net_ipv4_udp.sh",
+                    "data": "net.ipv4.udp_child_hash_entries = 0\nnet.ipv4.udp_early_demux = 1\nnet.ipv4.udp_hash_entries = -32768\nnet.ipv4.udp_l3mdev_accept = 0\nnet.ipv4.udp_rmem_min = 4096\nnet.ipv4.udp_wmem_min = 4096\n"
+                },
+                "lshw_system": {
+                    "header": "System Components | lshw -class system",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_system.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "version",
+                        "serial",
+                        "width",
+                        "configuration",
+                        "capabilities",
+                        "physid"
+                    ],
+                    "data": [
+                        [
+                            "80c1b26ee87a",
+                            "system",
+                            true,
+                            "DMI:001B",
+                            "Notebook",
+                            "21AHA015CD (LENOVO_MT_21AH_BU_Think_FM_ThinkPad T14 Gen 3)",
+                            "LENOVO",
+                            "ThinkPad T14 Gen 3",
+                            "PF3VZGML",
+                            64,
+                            {
+                                "administrator_password": "disabled",
+                                "chassis": "notebook",
+                                "family": "ThinkPad T14 Gen 3",
+                                "power-on_password": "disabled",
+                                "sku": "LENOVO_MT_21AH_BU_Think_FM_ThinkPad T14 Gen 3",
+                                "uuid": "9752e04c-3244-11b2-a85c-84a90993fe65"
+                            },
+                            {
+                                "smbios-3.4.0": "SMBIOS version 3.4.0",
+                                "dmi-3.4.0": "DMI version 3.4.0",
+                                "smp": "Symmetric Multi-Processing",
+                                "vsyscall32": "32-bit processes"
+                            },
+                            null
+                        ],
+                        [
+                            "pnp00:00",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "0"
+                        ],
+                        [
+                            "pnp00:01",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "1"
+                        ],
+                        [
+                            "pnp00:04",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "4"
+                        ],
+                        [
+                            "pnp00:05",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "5"
+                        ],
+                        [
+                            "pnp00:06",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "6"
+                        ],
+                        [
+                            "pnp00:07",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "7"
+                        ],
+                        [
+                            "pnp00:08",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c01",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "8"
+                        ]
+                    ]
+                },
+                "lshw_bus": {
+                    "header": "Buses and Interfaces | lshw -class bus",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_bus.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "version",
+                        "serial",
+                        "slot",
+                        "businfo",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "core",
+                            "bus",
+                            true,
+                            "DMI:001C",
+                            "Motherboard",
+                            "21AHA015CD",
+                            "LENOVO",
+                            "0",
+                            "SDK0T76479 WIN",
+                            "L1HF26J0509",
+                            "Not Available",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "usb:0",
+                            "bus",
+                            true,
+                            "PCI:0000:00:0d.0",
+                            "USB controller",
+                            "Alder Lake-P Thunderbolt 4 USB Controller",
+                            "Intel Corporation",
+                            "d",
+                            "02",
+                            null,
+                            null,
+                            "pci@0000:00:0d.0",
+                            64,
+                            33000000,
+                            {
+                                "driver": "xhci_hcd",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "xhci": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "usb:1",
+                            "bus",
+                            true,
+                            "PCI:0000:00:0d.2",
+                            "USB controller",
+                            "Alder Lake-P Thunderbolt 4 NHI #0",
+                            "Intel Corporation",
+                            "d.2",
+                            "02",
+                            null,
+                            null,
+                            "pci@0000:00:0d.2",
+                            64,
+                            33000000,
+                            {
+                                "driver": "thunderbolt",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "msix": "MSI-X",
+                                "usb4_host_interface": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "usb:2",
+                            "bus",
+                            true,
+                            "PCI:0000:00:0d.3",
+                            "USB controller",
+                            "Alder Lake-P Thunderbolt 4 NHI #1",
+                            "Intel Corporation",
+                            "d.3",
+                            "02",
+                            null,
+                            null,
+                            "pci@0000:00:0d.3",
+                            64,
+                            33000000,
+                            {
+                                "driver": "thunderbolt",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "msix": "MSI-X",
+                                "usb4_host_interface": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "usb:3",
+                            "bus",
+                            true,
+                            "PCI:0000:00:14.0",
+                            "USB controller",
+                            "Alder Lake PCH USB 3.2 xHCI Host Controller",
+                            "Intel Corporation",
+                            "14",
+                            "01",
+                            null,
+                            null,
+                            "pci@0000:00:14.0",
+                            64,
+                            33000000,
+                            {
+                                "driver": "xhci_hcd",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "xhci": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "serial:0",
+                            "bus",
+                            true,
+                            "PCI:0000:00:15.0",
+                            "Serial bus controller",
+                            "Alder Lake PCH Serial IO I2C Controller #0",
+                            "Intel Corporation",
+                            "15",
+                            "01",
+                            null,
+                            null,
+                            "pci@0000:00:15.0",
+                            64,
+                            33000000,
+                            {
+                                "driver": "intel-lpss",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "serial:1",
+                            "bus",
+                            true,
+                            "PCI:0000:00:1f.4",
+                            "SMBus",
+                            "Alder Lake PCH-P SMBus Host Controller",
+                            "Intel Corporation",
+                            "1f.4",
+                            "01",
+                            null,
+                            null,
+                            "pci@0000:00:1f.4",
+                            64,
+                            33000000,
+                            {
+                                "driver": "i801_smbus",
+                                "latency": "0"
+                            },
+                            null
+                        ],
+                        [
+                            "serial:2",
+                            "bus",
+                            true,
+                            "PCI:0000:00:1f.5",
+                            "Serial bus controller",
+                            "Alder Lake-P PCH SPI Controller",
+                            "Intel Corporation",
+                            "1f.5",
+                            "01",
+                            null,
+                            null,
+                            "pci@0000:00:1f.5",
+                            32,
+                            33000000,
+                            {
+                                "driver": "intel-spi",
+                                "latency": "0"
+                            },
+                            null
+                        ]
+                    ]
+                },
+                "lshw_memory": {
+                    "header": "System Memory Information | lshw -class memory",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_memory.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "physid",
+                        "slot",
+                        "units",
+                        "size",
+                        "product",
+                        "vendor",
+                        "serial",
+                        "width",
+                        "clock",
+                        "capacity",
+                        "configuration",
+                        "capabilities",
+                        "version",
+                        "date",
+                        "businfo"
+                    ],
+                    "data": [
+                        [
+                            "memory",
+                            "memory",
+                            true,
+                            "DMI:0001",
+                            "System Memory",
+                            "1",
+                            "System board or motherboard",
+                            "bytes",
+                            51539607552,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:0",
+                            "memory",
+                            true,
+                            "DMI:0002",
+                            "SODIMM DDR4 Synchronous 3200 MHz (0.3 ns)",
+                            "0",
+                            "Controller0-ChannelA",
+                            "bytes",
+                            17179869184,
+                            "4ATS2G64HZ-3G2B1",
+                            "Micron Technology",
+                            "00000000",
+                            64,
+                            3200000000,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:1",
+                            "memory",
+                            true,
+                            "DMI:0003",
+                            "[empty]",
+                            "1",
+                            "Controller0-ChannelB-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:2",
+                            "memory",
+                            true,
+                            "DMI:0004",
+                            "[empty]",
+                            "2",
+                            "Controller0-ChannelC-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:3",
+                            "memory",
+                            true,
+                            "DMI:0005",
+                            "[empty]",
+                            "3",
+                            "Controller0-ChannelD-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:4",
+                            "memory",
+                            true,
+                            "DMI:0006",
+                            "SODIMM DDR4 Synchronous 3200 MHz (0.3 ns)",
+                            "4",
+                            "Controller1-ChannelA-DIMM0",
+                            "bytes",
+                            34359738368,
+                            "9905744-101.A00G",
+                            "Kingston",
+                            "B8980C53",
+                            64,
+                            3200000000,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:5",
+                            "memory",
+                            true,
+                            "DMI:0007",
+                            "[empty]",
+                            "5",
+                            "Controller1-ChannelB-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:6",
+                            "memory",
+                            true,
+                            "DMI:0008",
+                            "[empty]",
+                            "6",
+                            "Controller1-ChannelC-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:7",
+                            "memory",
+                            true,
+                            "DMI:0009",
+                            "[empty]",
+                            "7",
+                            "Controller1-ChannelD-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:0",
+                            "memory",
+                            true,
+                            "DMI:0011",
+                            "L1 cache",
+                            "11",
+                            "L1 Cache",
+                            "bytes",
+                            196608,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            196608,
+                            {
+                                "level": "1"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "data": "Data cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:1",
+                            "memory",
+                            true,
+                            "DMI:0012",
+                            "L1 cache",
+                            "12",
+                            "L1 Cache",
+                            "bytes",
+                            131072,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            131072,
+                            {
+                                "level": "1"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "instruction": "Instruction cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:2",
+                            "memory",
+                            true,
+                            "DMI:0013",
+                            "L2 cache",
+                            "13",
+                            "L2 Cache",
+                            "bytes",
+                            5242880,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            5242880,
+                            {
+                                "level": "2"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "unified": "Unified cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:3",
+                            "memory",
+                            true,
+                            "DMI:0014",
+                            "L3 cache",
+                            "14",
+                            "L3 Cache",
+                            "bytes",
+                            18874368,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            18874368,
+                            {
+                                "level": "3"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "unified": "Unified cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:4",
+                            "memory",
+                            true,
+                            "DMI:0015",
+                            "L1 cache",
+                            "15",
+                            "L1 Cache",
+                            "bytes",
+                            262144,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            262144,
+                            {
+                                "level": "1"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "data": "Data cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:5",
+                            "memory",
+                            true,
+                            "DMI:0016",
+                            "L1 cache",
+                            "16",
+                            "L1 Cache",
+                            "bytes",
+                            524288,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            524288,
+                            {
+                                "level": "1"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "instruction": "Instruction cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:6",
+                            "memory",
+                            true,
+                            "DMI:0017",
+                            "L2 cache",
+                            "17",
+                            "L2 Cache",
+                            "bytes",
+                            4194304,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            4194304,
+                            {
+                                "level": "2"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "unified": "Unified cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:7",
+                            "memory",
+                            true,
+                            "DMI:0018",
+                            "L3 cache",
+                            "18",
+                            "L3 Cache",
+                            "bytes",
+                            18874368,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            18874368,
+                            {
+                                "level": "3"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "unified": "Unified cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "firmware",
+                            "memory",
+                            true,
+                            null,
+                            "BIOS",
+                            "1a",
+                            null,
+                            "bytes",
+                            131072,
+                            null,
+                            "LENOVO",
+                            null,
+                            null,
+                            null,
+                            33554432,
+                            null,
+                            {
+                                "pci": "PCI bus",
+                                "pnp": "Plug-and-Play",
+                                "upgrade": "BIOS EEPROM can be upgraded",
+                                "shadowing": "BIOS shadowing",
+                                "cdboot": "Booting from CD-ROM/DVD",
+                                "bootselect": "Selectable boot path",
+                                "edd": "Enhanced Disk Drive extensions",
+                                "int13floppy720": "3.5\" 720KB floppy",
+                                "int5printscreen": "Print Screen key",
+                                "int9keyboard": "i8042 keyboard controller",
+                                "int14serial": "INT14 serial line control",
+                                "int17printer": "INT17 printer control",
+                                "int10video": "INT10 CGA/Mono video",
+                                "acpi": "ACPI",
+                                "usb": "USB legacy emulation",
+                                "biosbootspecification": "BIOS boot specification",
+                                "uefi": "UEFI specification is supported"
+                            },
+                            "N3MET22W (1.21 )",
+                            "09/27/2024",
+                            null
+                        ],
+                        [
+                            "memory",
+                            "memory",
+                            null,
+                            "PCI:0000:00:14.2",
+                            "RAM memory",
+                            "14.2",
+                            null,
+                            null,
+                            null,
+                            "Alder Lake PCH Shared SRAM",
+                            "Intel Corporation",
+                            null,
+                            64,
+                            33000000,
+                            null,
+                            {
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "cap_list": "PCI capabilities listing"
+                            },
+                            "01",
+                            null,
+                            "pci@0000:00:14.2"
+                        ]
+                    ]
+                },
+                "lshw_processor": {
+                    "header": "Processor Details | lshw -class processor",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_processor.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "serial",
+                        "slot",
+                        "units",
+                        "size",
+                        "capacity",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "cpu",
+                            "processor",
+                            true,
+                            "DMI:0019",
+                            "CPU",
+                            "12th Gen Intel(R) Core(TM) i7-1260P",
+                            "Intel Corp.",
+                            "19",
+                            "cpu@0",
+                            "6.154.3",
+                            "None",
+                            "U3E1",
+                            "Hz",
+                            400089000,
+                            4700000000,
+                            64,
+                            100000000,
+                            {
+                                "cores": "12",
+                                "enabledcores": "12",
+                                "microcode": "1078",
+                                "threads": "16"
+                            },
+                            {
+                                "lm": "64bits extensions (x86-64)",
+                                "fpu": "mathematical co-processor",
+                                "fpu_exception": "FPU exceptions reporting",
+                                "wp": true,
+                                "vme": "virtual mode extensions",
+                                "de": "debugging extensions",
+                                "pse": "page size extensions",
+                                "tsc": "time stamp counter",
+                                "msr": "model-specific registers",
+                                "pae": "4GB+ memory addressing (Physical Address Extension)",
+                                "mce": "machine check exceptions",
+                                "cx8": "compare and exchange 8-byte",
+                                "apic": "on-chip advanced programmable interrupt controller (APIC)",
+                                "sep": "fast system calls",
+                                "mtrr": "memory type range registers",
+                                "pge": "page global enable",
+                                "mca": "machine check architecture",
+                                "cmov": "conditional move instruction",
+                                "pat": "page attribute table",
+                                "pse36": "36-bit page size extensions",
+                                "clflush": true,
+                                "dts": "debug trace and EMON store MSRs",
+                                "acpi": "thermal control (ACPI)",
+                                "mmx": "multimedia extensions (MMX)",
+                                "fxsr": "fast floating point save/restore",
+                                "sse": "streaming SIMD extensions (SSE)",
+                                "sse2": "streaming SIMD extensions (SSE2)",
+                                "ss": "self-snoop",
+                                "ht": "HyperThreading",
+                                "tm": "thermal interrupt and status",
+                                "pbe": "pending break event",
+                                "syscall": "fast system calls",
+                                "nx": "no-execute bit (NX)",
+                                "pdpe1gb": true,
+                                "rdtscp": true,
+                                "x86-64": "64bits extensions (x86-64)",
+                                "constant_tsc": true,
+                                "art": true,
+                                "arch_perfmon": true,
+                                "pebs": true,
+                                "bts": true,
+                                "rep_good": true,
+                                "nopl": true,
+                                "xtopology": true,
+                                "nonstop_tsc": true,
+                                "cpuid": true,
+                                "aperfmperf": true,
+                                "tsc_known_freq": true,
+                                "pni": true,
+                                "pclmulqdq": true,
+                                "dtes64": true,
+                                "monitor": true,
+                                "ds_cpl": true,
+                                "vmx": true,
+                                "smx": true,
+                                "est": true,
+                                "tm2": true,
+                                "ssse3": true,
+                                "sdbg": true,
+                                "fma": true,
+                                "cx16": true,
+                                "xtpr": true,
+                                "pdcm": true,
+                                "pcid": true,
+                                "sse4_1": true,
+                                "sse4_2": true,
+                                "x2apic": true,
+                                "movbe": true,
+                                "popcnt": true,
+                                "tsc_deadline_timer": true,
+                                "aes": true,
+                                "xsave": true,
+                                "avx": true,
+                                "f16c": true,
+                                "rdrand": true,
+                                "lahf_lm": true,
+                                "abm": true,
+                                "3dnowprefetch": true,
+                                "cpuid_fault": true,
+                                "epb": true,
+                                "ssbd": true,
+                                "ibrs": true,
+                                "ibpb": true,
+                                "stibp": true,
+                                "ibrs_enhanced": true,
+                                "tpr_shadow": true,
+                                "flexpriority": true,
+                                "ept": true,
+                                "vpid": true,
+                                "ept_ad": true,
+                                "fsgsbase": true,
+                                "tsc_adjust": true,
+                                "bmi1": true,
+                                "avx2": true,
+                                "smep": true,
+                                "bmi2": true,
+                                "erms": true,
+                                "invpcid": true,
+                                "rdseed": true,
+                                "adx": true,
+                                "smap": true,
+                                "clflushopt": true,
+                                "clwb": true,
+                                "intel_pt": true,
+                                "sha_ni": true,
+                                "xsaveopt": true,
+                                "xsavec": true,
+                                "xgetbv1": true,
+                                "xsaves": true,
+                                "split_lock_detect": true,
+                                "user_shstk": true,
+                                "avx_vnni": true,
+                                "dtherm": true,
+                                "ida": true,
+                                "arat": true,
+                                "pln": true,
+                                "pts": true,
+                                "hwp": true,
+                                "hwp_notify": true,
+                                "hwp_act_window": true,
+                                "hwp_epp": true,
+                                "hwp_pkg_req": true,
+                                "hfi": true,
+                                "vnmi": true,
+                                "umip": true,
+                                "pku": true,
+                                "ospke": true,
+                                "waitpkg": true,
+                                "gfni": true,
+                                "vaes": true,
+                                "vpclmulqdq": true,
+                                "rdpid": true,
+                                "movdiri": true,
+                                "movdir64b": true,
+                                "fsrm": true,
+                                "md_clear": true,
+                                "serialize": true,
+                                "arch_lbr": true,
+                                "ibt": true,
+                                "flush_l1d": true,
+                                "arch_capabilities": true,
+                                "cpufreq": "CPU Frequency scaling"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_bridge": {
+                    "header": "Bridges and Controllers | lshw -class bridge",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_bridge.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "pci",
+                            "bridge",
+                            true,
+                            "PCIBUS:0000:00",
+                            "Host bridge",
+                            "Intel Corporation",
+                            "Intel Corporation",
+                            "100",
+                            "pci@0000:00:00.0",
+                            "02",
+                            32,
+                            33000000,
+                            {
+                                "driver": "igen6_edac"
+                            },
+                            null
+                        ],
+                        [
+                            "pci:0",
+                            "bridge",
+                            true,
+                            "PCIBUS:0000:02",
+                            "PCI bridge",
+                            "12th Gen Core Processor PCI Express x4 Controller #0",
+                            "Intel Corporation",
+                            "6",
+                            "pci@0000:00:06.0",
+                            "02",
+                            32,
+                            33000000,
+                            {
+                                "driver": "pcieport"
+                            },
+                            {
+                                "pci": true,
+                                "pciexpress": "PCI Express",
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "normal_decode": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "pci:1",
+                            "bridge",
+                            true,
+                            "PCIBUS:0000:20",
+                            "PCI bridge",
+                            "Alder Lake-P Thunderbolt 4 PCI Express Root Port #0",
+                            "Intel Corporation",
+                            "7",
+                            "pci@0000:00:07.0",
+                            "02",
+                            32,
+                            33000000,
+                            {
+                                "driver": "pcieport"
+                            },
+                            {
+                                "pci": true,
+                                "pciexpress": "PCI Express",
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "normal_decode": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "pci:2",
+                            "bridge",
+                            true,
+                            "PCIBUS:0000:50",
+                            "PCI bridge",
+                            "Alder Lake-P Thunderbolt 4 PCI Express Root Port #2",
+                            "Intel Corporation",
+                            "7.2",
+                            "pci@0000:00:07.2",
+                            "02",
+                            32,
+                            33000000,
+                            {
+                                "driver": "pcieport"
+                            },
+                            {
+                                "pci": true,
+                                "pciexpress": "PCI Express",
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "normal_decode": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "isa",
+                            "bridge",
+                            true,
+                            "PCI:0000:00:1f.0",
+                            "ISA bridge",
+                            "Alder Lake PCH eSPI Controller",
+                            "Intel Corporation",
+                            "1f",
+                            "pci@0000:00:1f.0",
+                            "01",
+                            32,
+                            33000000,
+                            {
+                                "latency": "0"
+                            },
+                            {
+                                "isa": true,
+                                "bus_master": "bus mastering"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_display": {
+                    "header": "Graphics Adapters | lshw -class display",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_display.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "logicalname",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "display",
+                            "display",
+                            true,
+                            "PCI:0000:00:02.0",
+                            "VGA compatible controller",
+                            "Alder Lake-P Integrated Graphics Controller",
+                            "Intel Corporation",
+                            "2",
+                            "pci@0000:00:02.0",
+                            "/dev/fb0",
+                            "0c",
+                            64,
+                            33000000,
+                            {
+                                "depth": "32",
+                                "driver": "i915",
+                                "latency": "0",
+                                "mode": "1920x1200",
+                                "resolution": "1920,1200",
+                                "visual": "truecolor",
+                                "xres": "1920",
+                                "yres": "1200"
+                            },
+                            {
+                                "pciexpress": "PCI Express",
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "vga_controller": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing",
+                                "rom": "extension ROM",
+                                "fb": "framebuffer"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_network": {
+                    "header": "Network Interfaces | lshw -class network",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_network.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "network:0",
+                            "network",
+                            true,
+                            "PCI:0000:00:14.3",
+                            "Network controller",
+                            "Alder Lake-P PCH CNVi WiFi",
+                            "Intel Corporation",
+                            "14.3",
+                            "pci@0000:00:14.3",
+                            "01",
+                            64,
+                            33000000,
+                            {
+                                "driver": "iwlwifi",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "pciexpress": "PCI Express",
+                                "msix": "MSI-X",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "network:1",
+                            "network",
+                            true,
+                            "PCI:0000:00:1f.6",
+                            "Ethernet controller",
+                            "Ethernet Connection (16) I219-V",
+                            "Intel Corporation",
+                            "1f.6",
+                            "pci@0000:00:1f.6",
+                            "01",
+                            32,
+                            33000000,
+                            {
+                                "driver": "e1000e",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_storage": {
+                    "header": "Storage Controllers | lshw -class storage",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_storage.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "physid",
+                        "businfo",
+                        "logicalname",
+                        "version",
+                        "serial",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "nvme",
+                            "storage",
+                            true,
+                            "PCI:0000:02:00.0",
+                            "NVMe device",
+                            "Netac NVMe SSD 1TB",
+                            "0",
+                            "pci@0000:02:00.0",
+                            "/dev/nvme0",
+                            "V0714C0",
+                            "AA202303281TB4657375",
+                            64,
+                            33000000,
+                            {
+                                "driver": "nvme",
+                                "latency": "0",
+                                "nqn": "nqn.2014.08.org.nvmexpress:126f126fAA202303281TB4657375Netac NVMe SSD 1TB",
+                                "state": "live"
+                            },
+                            {
+                                "nvme": true,
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "pciexpress": "PCI Express",
+                                "msix": "MSI-X",
+                                "nvm_express": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_disk": {
+                    "header": "Hard Drives and SSDs | lshw -class disk",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_disk.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "description",
+                        "physid",
+                        "logicalname",
+                        "handle",
+                        "businfo",
+                        "units",
+                        "size",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "namespace:0",
+                            "disk",
+                            true,
+                            "NVMe disk",
+                            "0",
+                            "hwmon3",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "namespace:1",
+                            "disk",
+                            true,
+                            "NVMe disk",
+                            "2",
+                            "/dev/ng0n1",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "namespace:2",
+                            "disk",
+                            true,
+                            "NVMe disk",
+                            "1",
+                            "/dev/nvme0n1",
+                            "GUID:5d35c811-476e-4401-88bb-bfd01ccd4b2c",
+                            "nvme@0:1",
+                            "bytes",
+                            1000204886016,
+                            {
+                                "guid": "5d35c811-476e-4401-88bb-bfd01ccd4b2c",
+                                "logicalsectorsize": "512",
+                                "sectorsize": "512",
+                                "wwid": "nvme.126f-4141323032333033323831544234363537333735-4e65746163204e564d652053534420315442-00000001"
+                            },
+                            {
+                                "gpt-1.00": "GUID Partition Table version 1.00",
+                                "partitioned": "Partitioned disk",
+                                "partitioned:gpt": "GUID partition table"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_volume": {
+                    "header": "Disk Partitions and Volumes | lshw -class volume",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_volume.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "logicalname",
+                        "dev",
+                        "version",
+                        "serial",
+                        "size",
+                        "capacity",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "volume:0",
+                            "volume",
+                            true,
+                            "GUID:b91488d2-b631-4681-b234-fd3a215013d6",
+                            "Windows FAT volume",
+                            "mkfs.fat",
+                            "1",
+                            "nvme@0:1,1",
+                            "/dev/nvme0n1p1",
+                            "259:1",
+                            "FAT32",
+                            "f805-69d5",
+                            535805952,
+                            536870400,
+                            {
+                                "FATs": "2",
+                                "filesystem": "fat",
+                                "name": "EFI System Partition"
+                            },
+                            {
+                                "boot": "Contains boot code",
+                                "fat": "Windows FAT",
+                                "initialized": "initialized volume"
+                            }
+                        ],
+                        [
+                            "volume:1",
+                            "volume",
+                            true,
+                            "GUID:5b65d17a-a253-4191-993d-2d8a88ee2219",
+                            "EXT4 volume",
+                            "Linux",
+                            "2",
+                            "nvme@0:1,2",
+                            "/dev/nvme0n1p2",
+                            "259:2",
+                            "1.0",
+                            "84f23b72-0650-49c0-a4e9-a9152af47fd8",
+                            684183912448,
+                            684183913472,
+                            {
+                                "created": "2023-08-01 14:39:27",
+                                "filesystem": "ext4",
+                                "lastmountpoint": "/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd81",
+                                "modified": "2025-03-11 18:51:20",
+                                "mounted": "2025-03-11 18:51:20",
+                                "state": "clean"
+                            },
+                            {
+                                "journaled": true,
+                                "extended_attributes": "Extended Attributes",
+                                "large_files": "4GB+ files",
+                                "huge_files": "16TB+ files",
+                                "dir_nlink": "directories with 65000+ subdirs",
+                                "recover": "needs recovery",
+                                "64bit": "64bit filesystem",
+                                "extents": "extent-based allocation",
+                                "ext4": true,
+                                "ext2": "EXT2/EXT3",
+                                "initialized": "initialized volume"
+                            }
+                        ],
+                        [
+                            "volume:2",
+                            "volume",
+                            true,
+                            "GUID:ef1061cb-f1e0-4757-b4a6-992c8eacf2cc",
+                            "EXT4 volume",
+                            "Linux",
+                            "3",
+                            "nvme@0:1,3",
+                            "/dev/nvme0n1p3",
+                            "259:3",
+                            "1.0",
+                            "011992de-e192-443a-9383-2f86b8cbb2e0",
+                            209521213440,
+                            null,
+                            {
+                                "created": "2024-10-29 13:26:52",
+                                "filesystem": "ext4",
+                                "label": "dev",
+                                "lastmountpoint": "/media/nad/dev",
+                                "modified": "2025-03-17 07:38:52",
+                                "mounted": "2025-03-17 07:38:52",
+                                "state": "clean"
+                            },
+                            {
+                                "journaled": true,
+                                "extended_attributes": "Extended Attributes",
+                                "large_files": "4GB+ files",
+                                "huge_files": "16TB+ files",
+                                "dir_nlink": "directories with 65000+ subdirs",
+                                "recover": "needs recovery",
+                                "64bit": "64bit filesystem",
+                                "extents": "extent-based allocation",
+                                "ext4": true,
+                                "ext2": "EXT2/EXT3",
+                                "initialized": "initialized volume"
+                            }
+                        ],
+                        [
+                            "volume:3",
+                            "volume",
+                            true,
+                            "GUID:19b56fbe-8e0c-4e5c-b695-3497de1d1f6b",
+                            "EXT4 volume",
+                            "Linux",
+                            "4",
+                            "nvme@0:1,4",
+                            [
+                                "/dev/nvme0n1p4",
+                                "/etc/resolv.conf",
+                                "/etc/hostname",
+                                "/etc/hosts",
+                                "/var/lib/postgresql/data"
+                            ],
+                            "259:4",
+                            "1.0",
+                            "f0035527-98dc-4c68-a0f1-ab47c8e3f24f",
+                            105960701952,
+                            null,
+                            {
+                                "created": "2024-10-26 16:31:20",
+                                "filesystem": "ext4",
+                                "lastmountpoint": "/",
+                                "modified": "2025-03-17 19:32:10",
+                                "mount.fstype": "ext4",
+                                "mount.options": "rw,relatime,errors=remount-ro",
+                                "mounted": "2025-03-16 11:21:02",
+                                "state": "mounted"
+                            },
+                            {
+                                "journaled": true,
+                                "extended_attributes": "Extended Attributes",
+                                "large_files": "4GB+ files",
+                                "huge_files": "16TB+ files",
+                                "dir_nlink": "directories with 65000+ subdirs",
+                                "recover": "needs recovery",
+                                "64bit": "64bit filesystem",
+                                "extents": "extent-based allocation",
+                                "ext4": true,
+                                "ext2": "EXT2/EXT3",
+                                "initialized": "initialized volume"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_input": {
+                    "header": "Input Devices | lshw -class input",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_input.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "product",
+                        "physid",
+                        "logicalname",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "input:0",
+                            "input",
+                            true,
+                            "Sleep Button",
+                            "2",
+                            [
+                                "input0",
+                                "/dev/input/event0"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:1",
+                            "input",
+                            true,
+                            "Lid Switch",
+                            "3",
+                            [
+                                "input1",
+                                "/dev/input/event1"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:2",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful Mouse",
+                            "4",
+                            [
+                                "input15",
+                                "/dev/input/event12",
+                                "/dev/input/mouse4"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:3",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful Consumer Control",
+                            "5",
+                            [
+                                "input16",
+                                "/dev/input/event13"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:4",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful System Control",
+                            "6",
+                            [
+                                "input17",
+                                "/dev/input/event14"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:5",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful",
+                            "7",
+                            [
+                                "input18",
+                                "/dev/input/event15"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:6",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful",
+                            "8",
+                            [
+                                "input19",
+                                "/dev/input/event16",
+                                "input19::capslock",
+                                "input19::compose",
+                                "input19::kana",
+                                "input19::numlock",
+                                "input19::scrolllock"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:7",
+                            "input",
+                            true,
+                            "Power Button",
+                            "9",
+                            [
+                                "input2",
+                                "/dev/input/event2"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:8",
+                            "input",
+                            true,
+                            "Intel HID events",
+                            "a",
+                            [
+                                "input20",
+                                "/dev/input/event17"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:9",
+                            "input",
+                            true,
+                            "ThinkPad Extra Buttons",
+                            "b",
+                            [
+                                "input21",
+                                "/dev/input/event18"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:10",
+                            "input",
+                            true,
+                            "SYNA8018:00 06CB:CE67 Mouse",
+                            "c",
+                            [
+                                "input22",
+                                "/dev/input/event4",
+                                "/dev/input/mouse0"
+                            ],
+                            {
+                                "i2c": "I²C bus"
+                            }
+                        ],
+                        [
+                            "input:11",
+                            "input",
+                            true,
+                            "SYNA8018:00 06CB:CE67 Touchpad",
+                            "d",
+                            [
+                                "input23",
+                                "/dev/input/event5",
+                                "/dev/input/mouse1"
+                            ],
+                            {
+                                "i2c": "I²C bus"
+                            }
+                        ],
+                        [
+                            "input:12",
+                            "input",
+                            true,
+                            "Video Bus",
+                            "e",
+                            [
+                                "input25",
+                                "/dev/input/event19"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:13",
+                            "input",
+                            true,
+                            "sof-hda-dsp Mic",
+                            "f",
+                            [
+                                "input26",
+                                "/dev/input/event20"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:14",
+                            "input",
+                            true,
+                            "sof-hda-dsp Headphone",
+                            "10",
+                            [
+                                "input27",
+                                "/dev/input/event21"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:15",
+                            "input",
+                            true,
+                            "sof-hda-dsp HDMI/DP,pcm=3",
+                            "11",
+                            [
+                                "input28",
+                                "/dev/input/event22"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:16",
+                            "input",
+                            true,
+                            "sof-hda-dsp HDMI/DP,pcm=4",
+                            "12",
+                            [
+                                "input29",
+                                "/dev/input/event23"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:17",
+                            "input",
+                            true,
+                            "AT Translated Set 2 keyboard",
+                            "13",
+                            [
+                                "input3",
+                                "/dev/input/event3",
+                                "input3::capslock",
+                                "input3::numlock",
+                                "input3::scrolllock"
+                            ],
+                            {
+                                "i8042": "i8042 PC AT keyboard controller"
+                            }
+                        ],
+                        [
+                            "input:18",
+                            "input",
+                            true,
+                            "sof-hda-dsp HDMI/DP,pcm=5",
+                            "14",
+                            [
+                                "input30",
+                                "/dev/input/event24"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:19",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD",
+                            "15",
+                            [
+                                "input38",
+                                "/dev/input/event7",
+                                "input38::capslock",
+                                "input38::compose",
+                                "input38::kana",
+                                "input38::numlock",
+                                "input38::scrolllock"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:20",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD Keyboard",
+                            "16",
+                            [
+                                "input39",
+                                "/dev/input/event8",
+                                "input39::capslock",
+                                "input39::compose",
+                                "input39::kana",
+                                "input39::numlock",
+                                "input39::scrolllock"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:21",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD Mouse",
+                            "17",
+                            [
+                                "input41",
+                                "/dev/input/event9",
+                                "/dev/input/mouse3"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:22",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD Wireless Radio Control",
+                            "18",
+                            [
+                                "input42",
+                                "/dev/input/event10"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:23",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD",
+                            "19",
+                            [
+                                "input43",
+                                "/dev/input/event11"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:24",
+                            "input",
+                            true,
+                            "JBL TUNE770NC (AVRCP)",
+                            "1a",
+                            [
+                                "input44",
+                                "/dev/input/event25"
+                            ],
+                            {
+                                "bluetooth": "Bluetooth"
+                            }
+                        ],
+                        [
+                            "input:25",
+                            "input",
+                            true,
+                            "TPPS/2 Elan TrackPoint",
+                            "1b",
+                            [
+                                "input5",
+                                "/dev/input/event6",
+                                "/dev/input/mouse2"
+                            ],
+                            {
+                                "i8042": "i8042 PC AT keyboard controller"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_communication": {
+                    "header": "Communication Devices | lshw -class communication",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_communication.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "communication",
+                            "communication",
+                            true,
+                            "PCI:0000:00:16.0",
+                            "Communication controller",
+                            "Alder Lake PCH HECI Controller",
+                            "Intel Corporation",
+                            "16",
+                            "pci@0000:00:16.0",
+                            "01",
+                            64,
+                            33000000,
+                            {
+                                "driver": "mei_me",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_multimedia": {
+                    "header": "Audio and Multimedia Devices | lshw -class multimedia",
+                    "state": "hidden",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_multimedia.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "logicalname",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "multimedia",
+                            "multimedia",
+                            true,
+                            "PCI:0000:00:1f.3",
+                            "Audio device",
+                            "Alder Lake PCH-P High Definition Audio Controller",
+                            "Intel Corporation",
+                            "1f.3",
+                            "pci@0000:00:1f.3",
+                            [
+                                "card0",
+                                "/dev/snd/controlC0",
+                                "/dev/snd/hwC0D0",
+                                "/dev/snd/hwC0D2",
+                                "/dev/snd/pcmC0D0c",
+                                "/dev/snd/pcmC0D0p",
+                                "/dev/snd/pcmC0D1c",
+                                "/dev/snd/pcmC0D1p",
+                                "/dev/snd/pcmC0D3p",
+                                "/dev/snd/pcmC0D4p",
+                                "/dev/snd/pcmC0D5p",
+                                "/dev/snd/pcmC0D6c",
+                                "/dev/snd/pcmC0D7c"
+                            ],
+                            "01",
+                            64,
+                            33000000,
+                            {
+                                "driver": "sof-audio-pci-intel-tgl",
+                                "latency": "64"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_power": {
+                    "header": "Power Components | lshw -class power",
+                    "state": "hidden",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_power.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "slot",
+                        "units",
+                        "capacity",
+                        "configuration"
+                    ],
+                    "data": [
+                        [
+                            "battery",
+                            "power",
+                            true,
+                            "DMI:0031",
+                            "5B10W51865",
+                            "SMP",
+                            "1",
+                            "Front",
+                            "mWh",
+                            52570,
+                            {
+                                "voltage": "15.5V"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_generic": {
+                    "header": "Generic Devices | lshw -class generic",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_generic.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "generic:0",
+                            "generic",
+                            true,
+                            "PCI:0000:00:04.0",
+                            "Signal processing controller",
+                            "Alder Lake Innovation Platform Framework Processor Participant",
+                            "Intel Corporation",
+                            "4",
+                            "pci@0000:00:04.0",
+                            "02",
+                            64,
+                            33000000,
+                            {
+                                "driver": "proc_thermal_pci",
+                                "latency": "0"
+                            },
+                            {
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "generic:1",
+                            "generic",
+                            true,
+                            "PCI:0000:00:0a.0",
+                            "Signal processing controller",
+                            "Platform Monitoring Technology",
+                            "Intel Corporation",
+                            "a",
+                            "pci@0000:00:0a.0",
+                            "01",
+                            64,
+                            33000000,
+                            {
+                                "driver": "intel_vsec",
+                                "latency": "0"
+                            },
+                            {
+                                "pciexpress": "PCI Express",
+                                "pm": "Power Management",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "pnp00:02",
+                            "generic",
+                            true,
+                            null,
+                            null,
+                            "PnP device LEN0071",
+                            null,
+                            "2",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "i8042 kbd"
+                            },
+                            {
+                                "pnp": true
+                            }
+                        ],
+                        [
+                            "pnp00:03",
+                            "generic",
+                            true,
+                            null,
+                            null,
+                            "PnP device LEN030b",
+                            null,
+                            "3",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "i8042 aux"
+                            },
+                            {
+                                "pnp": true
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
+        "db": {
+            "header": "Common database info",
+            "description": "Common info about current database",
+            "state": "expanded",
+            "reports": {
+                "full_version": {
+                    "header": "PostgreSQL full version",
+                    "description": "Information about the installed PostgreSQL version, including the version number, system architecture, utilized compiler, and operating system",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": "PostgreSQL 16.8 (Ubuntu 16.8-1.pgdg22.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit"
+                },
+                "version_major": {
+                    "header": "PostgreSQL major version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": "PostgreSQL 16.8 (Ubuntu 16.8-1.pgdg22.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit"
+                },
+                "version_minor": {
+                    "header": "PostgreSQL minor version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "server_version.sql",
+                    "data": "16.8 (Ubuntu 16.8-1.pgdg22.04+1)"
+                },
+                "pg_config": {
+                    "header": "PostgreSQL pg_config",
+                    "description": "Configuration parameters of the currently installed PostgreSQL version",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "pg_config.sh",
+                    "data": "BINDIR = /usr/lib/postgresql/16/bin\nDOCDIR = /usr/share/doc/postgresql-doc-16\nHTMLDIR = /usr/share/doc/postgresql-doc-16\nINCLUDEDIR = /usr/include/postgresql\nPKGINCLUDEDIR = /usr/include/postgresql\nINCLUDEDIR-SERVER = /usr/include/postgresql/16/server\nLIBDIR = /usr/lib/x86_64-linux-gnu\nPKGLIBDIR = /usr/lib/postgresql/16/lib\nLOCALEDIR = /usr/share/locale\nMANDIR = /usr/share/postgresql/16/man\nSHAREDIR = /usr/share/postgresql/16\nSYSCONFDIR = /etc/postgresql-common\nPGXS = /usr/lib/postgresql/16/lib/pgxs/src/makefiles/pgxs.mk\nCONFIGURE =  '--build=x86_64-linux-gnu' '--prefix=/usr' '--includedir=${prefix}/include' '--mandir=${prefix}/share/man' '--infodir=${prefix}/share/info' '--sysconfdir=/etc' '--localstatedir=/var' '--disable-option-checking' '--disable-silent-rules' '--libdir=${prefix}/lib/x86_64-linux-gnu' '--runstatedir=/run' '--disable-maintainer-mode' '--disable-dependency-tracking' '--with-tcl' '--with-perl' '--with-python' '--with-pam' '--with-openssl' '--with-libxml' '--with-libxslt' '--mandir=/usr/share/postgresql/16/man' '--docdir=/usr/share/doc/postgresql-doc-16' '--sysconfdir=/etc/postgresql-common' '--datarootdir=/usr/share/' '--datadir=/usr/share/postgresql/16' '--bindir=/usr/lib/postgresql/16/bin' '--libdir=/usr/lib/x86_64-linux-gnu/' '--libexecdir=/usr/lib/postgresql/' '--includedir=/usr/include/postgresql/' '--with-extra-version= (Ubuntu 16.8-1.pgdg22.04+1)' '--enable-nls' '--enable-thread-safety' '--enable-debug' '--disable-rpath' '--with-uuid=e2fs' '--with-gnu-ld' '--with-gssapi' '--with-ldap' '--with-pgport=5432' '--with-system-tzdata=/usr/share/zoneinfo' 'AWK=mawk' 'MKDIR_P=/bin/mkdir -p' 'PROVE=/usr/bin/prove' 'PYTHON=/usr/bin/python3' 'TAR=/bin/tar' 'XSLTPROC=xsltproc --nonet' 'CFLAGS=-g -O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fno-omit-frame-pointer' 'LDFLAGS=-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now' '--enable-tap-tests' '--with-icu' '--with-llvm' 'LLVM_CONFIG=/usr/bin/llvm-config-15' 'CLANG=/usr/bin/clang-15' '--with-lz4' '--with-zstd' '--with-systemd' '--with-selinux' '--enable-dtrace' 'build_alias=x86_64-linux-gnu' 'CPPFLAGS=-Wdate-time -D_FORTIFY_SOURCE=2' 'CXXFLAGS=-g -O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security'\nCC = gcc\nCPPFLAGS = -Wdate-time -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -I/usr/include/libxml2\nCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Werror=vla -Wendif-labels -Wmissing-format-attribute -Wimplicit-fallthrough=3 -Wcast-function-type -Wshadow=compatible-local -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -Wno-format-truncation -Wno-stringop-truncation -g -g -O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fno-omit-frame-pointer\nCFLAGS_SL = -fPIC\nLDFLAGS = -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now -L/usr/lib/llvm-15/lib -Wl,--as-needed\nLDFLAGS_EX = \nLDFLAGS_SL = \nLIBS = -lpgcommon -lpgport -lselinux -lzstd -llz4 -lxslt -lxml2 -lpam -lssl -lcrypto -lgssapi_krb5 -lz -lreadline -lm \nVERSION = PostgreSQL 16.8 (Ubuntu 16.8-1.pgdg22.04+1)\n"
+                },
+                "pg_settings": {
+                    "header": "PostgreSQL settings",
+                    "description": "Configuration settings of the PostgreSQL server",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "server_settings.sql",
+                    "theader": [
+                        "name",
+                        "setting"
+                    ],
+                    "data": [
+                        [
+                            "allow_in_place_tablespaces",
+                            "off"
+                        ],
+                        [
+                            "allow_system_table_mods",
+                            "off"
+                        ],
+                        [
+                            "application_name",
+                            ""
+                        ],
+                        [
+                            "archive_cleanup_command",
+                            ""
+                        ],
+                        [
+                            "archive_command",
+                            "(disabled)"
+                        ],
+                        [
+                            "archive_library",
+                            ""
+                        ],
+                        [
+                            "archive_mode",
+                            "off"
+                        ],
+                        [
+                            "archive_timeout",
+                            "0"
+                        ],
+                        [
+                            "array_nulls",
+                            "on"
+                        ],
+                        [
+                            "authentication_timeout",
+                            "60"
+                        ],
+                        [
+                            "autovacuum",
+                            "on"
+                        ],
+                        [
+                            "autovacuum_analyze_scale_factor",
+                            "0.1"
+                        ],
+                        [
+                            "autovacuum_analyze_threshold",
+                            "50"
+                        ],
+                        [
+                            "autovacuum_freeze_max_age",
+                            "200000000"
+                        ],
+                        [
+                            "autovacuum_max_workers",
+                            "3"
+                        ],
+                        [
+                            "autovacuum_multixact_freeze_max_age",
+                            "400000000"
+                        ],
+                        [
+                            "autovacuum_naptime",
+                            "60"
+                        ],
+                        [
+                            "autovacuum_vacuum_cost_delay",
+                            "2"
+                        ],
+                        [
+                            "autovacuum_vacuum_cost_limit",
+                            "-1"
+                        ],
+                        [
+                            "autovacuum_vacuum_insert_scale_factor",
+                            "0.2"
+                        ],
+                        [
+                            "autovacuum_vacuum_insert_threshold",
+                            "1000"
+                        ],
+                        [
+                            "autovacuum_vacuum_scale_factor",
+                            "0.2"
+                        ],
+                        [
+                            "autovacuum_vacuum_threshold",
+                            "50"
+                        ],
+                        [
+                            "autovacuum_work_mem",
+                            "-1"
+                        ],
+                        [
+                            "backend_flush_after",
+                            "0"
+                        ],
+                        [
+                            "backslash_quote",
+                            "safe_encoding"
+                        ],
+                        [
+                            "backtrace_functions",
+                            ""
+                        ],
+                        [
+                            "bgwriter_delay",
+                            "200"
+                        ],
+                        [
+                            "bgwriter_flush_after",
+                            "64"
+                        ],
+                        [
+                            "bgwriter_lru_maxpages",
+                            "100"
+                        ],
+                        [
+                            "bgwriter_lru_multiplier",
+                            "2"
+                        ],
+                        [
+                            "block_size",
+                            "8192"
+                        ],
+                        [
+                            "bonjour",
+                            "off"
+                        ],
+                        [
+                            "bonjour_name",
+                            ""
+                        ],
+                        [
+                            "bytea_output",
+                            "hex"
+                        ],
+                        [
+                            "check_function_bodies",
+                            "on"
+                        ],
+                        [
+                            "checkpoint_completion_target",
+                            "0.9"
+                        ],
+                        [
+                            "checkpoint_flush_after",
+                            "32"
+                        ],
+                        [
+                            "checkpoint_timeout",
+                            "300"
+                        ],
+                        [
+                            "checkpoint_warning",
+                            "30"
+                        ],
+                        [
+                            "client_connection_check_interval",
+                            "0"
+                        ],
+                        [
+                            "client_encoding",
+                            "UTF8"
+                        ],
+                        [
+                            "client_min_messages",
+                            "notice"
+                        ],
+                        [
+                            "cluster_name",
+                            ""
+                        ],
+                        [
+                            "commit_delay",
+                            "0"
+                        ],
+                        [
+                            "commit_siblings",
+                            "5"
+                        ],
+                        [
+                            "compute_query_id",
+                            "auto"
+                        ],
+                        [
+                            "config_file",
+                            "/var/lib/postgresql/16/main/postgresql.conf"
+                        ],
+                        [
+                            "constraint_exclusion",
+                            "partition"
+                        ],
+                        [
+                            "cpu_index_tuple_cost",
+                            "0.005"
+                        ],
+                        [
+                            "cpu_operator_cost",
+                            "0.0025"
+                        ],
+                        [
+                            "cpu_tuple_cost",
+                            "0.01"
+                        ],
+                        [
+                            "createrole_self_grant",
+                            ""
+                        ],
+                        [
+                            "cursor_tuple_fraction",
+                            "0.1"
+                        ],
+                        [
+                            "data_checksums",
+                            "off"
+                        ],
+                        [
+                            "data_directory",
+                            "/var/lib/postgresql/16/main"
+                        ],
+                        [
+                            "data_directory_mode",
+                            "0750"
+                        ],
+                        [
+                            "data_sync_retry",
+                            "off"
+                        ],
+                        [
+                            "DateStyle",
+                            "ISO, MDY"
+                        ],
+                        [
+                            "db_user_namespace",
+                            "off"
+                        ],
+                        [
+                            "deadlock_timeout",
+                            "1000"
+                        ],
+                        [
+                            "debug_assertions",
+                            "off"
+                        ],
+                        [
+                            "debug_discard_caches",
+                            "0"
+                        ],
+                        [
+                            "debug_io_direct",
+                            ""
+                        ],
+                        [
+                            "debug_logical_replication_streaming",
+                            "buffered"
+                        ],
+                        [
+                            "debug_parallel_query",
+                            "off"
+                        ],
+                        [
+                            "debug_pretty_print",
+                            "on"
+                        ],
+                        [
+                            "debug_print_parse",
+                            "off"
+                        ],
+                        [
+                            "debug_print_plan",
+                            "off"
+                        ],
+                        [
+                            "debug_print_rewritten",
+                            "off"
+                        ],
+                        [
+                            "default_statistics_target",
+                            "100"
+                        ],
+                        [
+                            "default_table_access_method",
+                            "heap"
+                        ],
+                        [
+                            "default_tablespace",
+                            ""
+                        ],
+                        [
+                            "default_text_search_config",
+                            "pg_catalog.english"
+                        ],
+                        [
+                            "default_toast_compression",
+                            "pglz"
+                        ],
+                        [
+                            "default_transaction_deferrable",
+                            "off"
+                        ],
+                        [
+                            "default_transaction_isolation",
+                            "read committed"
+                        ],
+                        [
+                            "default_transaction_read_only",
+                            "off"
+                        ],
+                        [
+                            "dynamic_library_path",
+                            "$libdir"
+                        ],
+                        [
+                            "dynamic_shared_memory_type",
+                            "posix"
+                        ],
+                        [
+                            "effective_cache_size",
+                            "524288"
+                        ],
+                        [
+                            "effective_io_concurrency",
+                            "1"
+                        ],
+                        [
+                            "enable_async_append",
+                            "on"
+                        ],
+                        [
+                            "enable_bitmapscan",
+                            "on"
+                        ],
+                        [
+                            "enable_gathermerge",
+                            "on"
+                        ],
+                        [
+                            "enable_hashagg",
+                            "on"
+                        ],
+                        [
+                            "enable_hashjoin",
+                            "on"
+                        ],
+                        [
+                            "enable_incremental_sort",
+                            "on"
+                        ],
+                        [
+                            "enable_indexonlyscan",
+                            "on"
+                        ],
+                        [
+                            "enable_indexscan",
+                            "on"
+                        ],
+                        [
+                            "enable_material",
+                            "on"
+                        ],
+                        [
+                            "enable_memoize",
+                            "on"
+                        ],
+                        [
+                            "enable_mergejoin",
+                            "on"
+                        ],
+                        [
+                            "enable_nestloop",
+                            "on"
+                        ],
+                        [
+                            "enable_parallel_append",
+                            "on"
+                        ],
+                        [
+                            "enable_parallel_hash",
+                            "on"
+                        ],
+                        [
+                            "enable_partition_pruning",
+                            "on"
+                        ],
+                        [
+                            "enable_partitionwise_aggregate",
+                            "off"
+                        ],
+                        [
+                            "enable_partitionwise_join",
+                            "off"
+                        ],
+                        [
+                            "enable_presorted_aggregate",
+                            "on"
+                        ],
+                        [
+                            "enable_seqscan",
+                            "on"
+                        ],
+                        [
+                            "enable_sort",
+                            "on"
+                        ],
+                        [
+                            "enable_tidscan",
+                            "on"
+                        ],
+                        [
+                            "escape_string_warning",
+                            "on"
+                        ],
+                        [
+                            "event_source",
+                            "PostgreSQL"
+                        ],
+                        [
+                            "exit_on_error",
+                            "off"
+                        ],
+                        [
+                            "extension_destdir",
+                            ""
+                        ],
+                        [
+                            "external_pid_file",
+                            ""
+                        ],
+                        [
+                            "extra_float_digits",
+                            "1"
+                        ],
+                        [
+                            "from_collapse_limit",
+                            "8"
+                        ],
+                        [
+                            "fsync",
+                            "on"
+                        ],
+                        [
+                            "full_page_writes",
+                            "on"
+                        ],
+                        [
+                            "geqo",
+                            "on"
+                        ],
+                        [
+                            "geqo_effort",
+                            "5"
+                        ],
+                        [
+                            "geqo_generations",
+                            "0"
+                        ],
+                        [
+                            "geqo_pool_size",
+                            "0"
+                        ],
+                        [
+                            "geqo_seed",
+                            "0"
+                        ],
+                        [
+                            "geqo_selection_bias",
+                            "2"
+                        ],
+                        [
+                            "geqo_threshold",
+                            "12"
+                        ],
+                        [
+                            "gin_fuzzy_search_limit",
+                            "0"
+                        ],
+                        [
+                            "gin_pending_list_limit",
+                            "4096"
+                        ],
+                        [
+                            "gss_accept_delegation",
+                            "off"
+                        ],
+                        [
+                            "hash_mem_multiplier",
+                            "2"
+                        ],
+                        [
+                            "hba_file",
+                            "/var/lib/postgresql/16/main/pg_hba.conf"
+                        ],
+                        [
+                            "hot_standby",
+                            "on"
+                        ],
+                        [
+                            "hot_standby_feedback",
+                            "off"
+                        ],
+                        [
+                            "huge_page_size",
+                            "0"
+                        ],
+                        [
+                            "huge_pages",
+                            "try"
+                        ],
+                        [
+                            "icu_validation_level",
+                            "warning"
+                        ],
+                        [
+                            "ident_file",
+                            "/var/lib/postgresql/16/main/pg_ident.conf"
+                        ],
+                        [
+                            "idle_in_transaction_session_timeout",
+                            "0"
+                        ],
+                        [
+                            "idle_session_timeout",
+                            "0"
+                        ],
+                        [
+                            "ignore_checksum_failure",
+                            "off"
+                        ],
+                        [
+                            "ignore_invalid_pages",
+                            "off"
+                        ],
+                        [
+                            "ignore_system_indexes",
+                            "off"
+                        ],
+                        [
+                            "in_hot_standby",
+                            "off"
+                        ],
+                        [
+                            "integer_datetimes",
+                            "on"
+                        ],
+                        [
+                            "IntervalStyle",
+                            "postgres"
+                        ],
+                        [
+                            "jit",
+                            "on"
+                        ],
+                        [
+                            "jit_above_cost",
+                            "100000"
+                        ],
+                        [
+                            "jit_debugging_support",
+                            "off"
+                        ],
+                        [
+                            "jit_dump_bitcode",
+                            "off"
+                        ],
+                        [
+                            "jit_expressions",
+                            "on"
+                        ],
+                        [
+                            "jit_inline_above_cost",
+                            "500000"
+                        ],
+                        [
+                            "jit_optimize_above_cost",
+                            "500000"
+                        ],
+                        [
+                            "jit_profiling_support",
+                            "off"
+                        ],
+                        [
+                            "jit_provider",
+                            "llvmjit"
+                        ],
+                        [
+                            "jit_tuple_deforming",
+                            "on"
+                        ],
+                        [
+                            "join_collapse_limit",
+                            "8"
+                        ],
+                        [
+                            "krb_caseins_users",
+                            "off"
+                        ],
+                        [
+                            "krb_server_keyfile",
+                            "FILE:/etc/postgresql-common/krb5.keytab"
+                        ],
+                        [
+                            "lc_messages",
+                            "C"
+                        ],
+                        [
+                            "lc_monetary",
+                            "C"
+                        ],
+                        [
+                            "lc_numeric",
+                            "C"
+                        ],
+                        [
+                            "lc_time",
+                            "C"
+                        ],
+                        [
+                            "listen_addresses",
+                            "*"
+                        ],
+                        [
+                            "lo_compat_privileges",
+                            "off"
+                        ],
+                        [
+                            "local_preload_libraries",
+                            ""
+                        ],
+                        [
+                            "lock_timeout",
+                            "0"
+                        ],
+                        [
+                            "log_autovacuum_min_duration",
+                            "600000"
+                        ],
+                        [
+                            "log_checkpoints",
+                            "on"
+                        ],
+                        [
+                            "log_connections",
+                            "off"
+                        ],
+                        [
+                            "log_destination",
+                            "stderr"
+                        ],
+                        [
+                            "log_directory",
+                            "/var/lib/postgresql/log_1"
+                        ],
+                        [
+                            "log_disconnections",
+                            "off"
+                        ],
+                        [
+                            "log_duration",
+                            "off"
+                        ],
+                        [
+                            "log_error_verbosity",
+                            "default"
+                        ],
+                        [
+                            "log_executor_stats",
+                            "off"
+                        ],
+                        [
+                            "log_file_mode",
+                            "0600"
+                        ],
+                        [
+                            "log_filename",
+                            "postgresql-%Y-%m-%d_%H%M%S.log"
+                        ],
+                        [
+                            "log_hostname",
+                            "off"
+                        ],
+                        [
+                            "log_line_prefix",
+                            "%m [%p] "
+                        ],
+                        [
+                            "log_lock_waits",
+                            "off"
+                        ],
+                        [
+                            "log_min_duration_sample",
+                            "-1"
+                        ],
+                        [
+                            "log_min_duration_statement",
+                            "-1"
+                        ],
+                        [
+                            "log_min_error_statement",
+                            "error"
+                        ],
+                        [
+                            "log_min_messages",
+                            "warning"
+                        ],
+                        [
+                            "log_parameter_max_length",
+                            "-1"
+                        ],
+                        [
+                            "log_parameter_max_length_on_error",
+                            "0"
+                        ],
+                        [
+                            "log_parser_stats",
+                            "off"
+                        ],
+                        [
+                            "log_planner_stats",
+                            "off"
+                        ],
+                        [
+                            "log_recovery_conflict_waits",
+                            "off"
+                        ],
+                        [
+                            "log_replication_commands",
+                            "off"
+                        ],
+                        [
+                            "log_rotation_age",
+                            "1440"
+                        ],
+                        [
+                            "log_rotation_size",
+                            "10240"
+                        ],
+                        [
+                            "log_startup_progress_interval",
+                            "10000"
+                        ],
+                        [
+                            "log_statement",
+                            "none"
+                        ],
+                        [
+                            "log_statement_sample_rate",
+                            "1"
+                        ],
+                        [
+                            "log_statement_stats",
+                            "off"
+                        ],
+                        [
+                            "log_temp_files",
+                            "-1"
+                        ],
+                        [
+                            "log_timezone",
+                            "Etc/UTC"
+                        ],
+                        [
+                            "log_transaction_sample_rate",
+                            "0"
+                        ],
+                        [
+                            "log_truncate_on_rotation",
+                            "off"
+                        ],
+                        [
+                            "logging_collector",
+                            "on"
+                        ],
+                        [
+                            "logical_decoding_work_mem",
+                            "65536"
+                        ],
+                        [
+                            "maintenance_io_concurrency",
+                            "10"
+                        ],
+                        [
+                            "maintenance_work_mem",
+                            "65536"
+                        ],
+                        [
+                            "max_connections",
+                            "100"
+                        ],
+                        [
+                            "max_files_per_process",
+                            "1000"
+                        ],
+                        [
+                            "max_function_args",
+                            "100"
+                        ],
+                        [
+                            "max_identifier_length",
+                            "63"
+                        ],
+                        [
+                            "max_index_keys",
+                            "32"
+                        ],
+                        [
+                            "max_locks_per_transaction",
+                            "64"
+                        ],
+                        [
+                            "max_logical_replication_workers",
+                            "4"
+                        ],
+                        [
+                            "max_parallel_apply_workers_per_subscription",
+                            "2"
+                        ],
+                        [
+                            "max_parallel_maintenance_workers",
+                            "2"
+                        ],
+                        [
+                            "max_parallel_workers",
+                            "8"
+                        ],
+                        [
+                            "max_parallel_workers_per_gather",
+                            "2"
+                        ],
+                        [
+                            "max_pred_locks_per_page",
+                            "2"
+                        ],
+                        [
+                            "max_pred_locks_per_relation",
+                            "-2"
+                        ],
+                        [
+                            "max_pred_locks_per_transaction",
+                            "64"
+                        ],
+                        [
+                            "max_prepared_transactions",
+                            "0"
+                        ],
+                        [
+                            "max_replication_slots",
+                            "10"
+                        ],
+                        [
+                            "max_slot_wal_keep_size",
+                            "-1"
+                        ],
+                        [
+                            "max_stack_depth",
+                            "2048"
+                        ],
+                        [
+                            "max_standby_archive_delay",
+                            "30000"
+                        ],
+                        [
+                            "max_standby_streaming_delay",
+                            "30000"
+                        ],
+                        [
+                            "max_sync_workers_per_subscription",
+                            "2"
+                        ],
+                        [
+                            "max_wal_senders",
+                            "10"
+                        ],
+                        [
+                            "max_wal_size",
+                            "1024"
+                        ],
+                        [
+                            "max_worker_processes",
+                            "8"
+                        ],
+                        [
+                            "min_dynamic_shared_memory",
+                            "0"
+                        ],
+                        [
+                            "min_parallel_index_scan_size",
+                            "64"
+                        ],
+                        [
+                            "min_parallel_table_scan_size",
+                            "1024"
+                        ],
+                        [
+                            "min_wal_size",
+                            "80"
+                        ],
+                        [
+                            "old_snapshot_threshold",
+                            "-1"
+                        ],
+                        [
+                            "parallel_leader_participation",
+                            "on"
+                        ],
+                        [
+                            "parallel_setup_cost",
+                            "1000"
+                        ],
+                        [
+                            "parallel_tuple_cost",
+                            "0.1"
+                        ],
+                        [
+                            "password_encryption",
+                            "scram-sha-256"
+                        ],
+                        [
+                            "plan_cache_mode",
+                            "auto"
+                        ],
+                        [
+                            "port",
+                            "5432"
+                        ],
+                        [
+                            "post_auth_delay",
+                            "0"
+                        ],
+                        [
+                            "pre_auth_delay",
+                            "0"
+                        ],
+                        [
+                            "primary_conninfo",
+                            ""
+                        ],
+                        [
+                            "primary_slot_name",
+                            ""
+                        ],
+                        [
+                            "quote_all_identifiers",
+                            "off"
+                        ],
+                        [
+                            "random_page_cost",
+                            "4"
+                        ],
+                        [
+                            "recovery_end_command",
+                            ""
+                        ],
+                        [
+                            "recovery_init_sync_method",
+                            "fsync"
+                        ],
+                        [
+                            "recovery_min_apply_delay",
+                            "0"
+                        ],
+                        [
+                            "recovery_prefetch",
+                            "try"
+                        ],
+                        [
+                            "recovery_target",
+                            ""
+                        ],
+                        [
+                            "recovery_target_action",
+                            "pause"
+                        ],
+                        [
+                            "recovery_target_inclusive",
+                            "on"
+                        ],
+                        [
+                            "recovery_target_lsn",
+                            ""
+                        ],
+                        [
+                            "recovery_target_name",
+                            ""
+                        ],
+                        [
+                            "recovery_target_time",
+                            ""
+                        ],
+                        [
+                            "recovery_target_timeline",
+                            "latest"
+                        ],
+                        [
+                            "recovery_target_xid",
+                            ""
+                        ],
+                        [
+                            "recursive_worktable_factor",
+                            "10"
+                        ],
+                        [
+                            "remove_temp_files_after_crash",
+                            "on"
+                        ],
+                        [
+                            "reserved_connections",
+                            "0"
+                        ],
+                        [
+                            "restart_after_crash",
+                            "on"
+                        ],
+                        [
+                            "restore_command",
+                            ""
+                        ],
+                        [
+                            "restrict_nonsystem_relation_kind",
+                            ""
+                        ],
+                        [
+                            "row_security",
+                            "on"
+                        ],
+                        [
+                            "scram_iterations",
+                            "4096"
+                        ],
+                        [
+                            "search_path",
+                            "\"$user\", public"
+                        ],
+                        [
+                            "segment_size",
+                            "131072"
+                        ],
+                        [
+                            "send_abort_for_crash",
+                            "off"
+                        ],
+                        [
+                            "send_abort_for_kill",
+                            "off"
+                        ],
+                        [
+                            "seq_page_cost",
+                            "1"
+                        ],
+                        [
+                            "server_encoding",
+                            "UTF8"
+                        ],
+                        [
+                            "server_version",
+                            "16.8 (Ubuntu 16.8-1.pgdg22.04+1)"
+                        ],
+                        [
+                            "server_version_num",
+                            "160008"
+                        ],
+                        [
+                            "session_preload_libraries",
+                            ""
+                        ],
+                        [
+                            "session_replication_role",
+                            "origin"
+                        ],
+                        [
+                            "shared_buffers",
+                            "16384"
+                        ],
+                        [
+                            "shared_memory_size",
+                            "143"
+                        ],
+                        [
+                            "shared_memory_size_in_huge_pages",
+                            "72"
+                        ],
+                        [
+                            "shared_memory_type",
+                            "mmap"
+                        ],
+                        [
+                            "shared_preload_libraries",
+                            ""
+                        ],
+                        [
+                            "ssl",
+                            "off"
+                        ],
+                        [
+                            "ssl_ca_file",
+                            ""
+                        ],
+                        [
+                            "ssl_cert_file",
+                            "server.crt"
+                        ],
+                        [
+                            "ssl_ciphers",
+                            "HIGH:MEDIUM:+3DES:!aNULL"
+                        ],
+                        [
+                            "ssl_crl_dir",
+                            ""
+                        ],
+                        [
+                            "ssl_crl_file",
+                            ""
+                        ],
+                        [
+                            "ssl_dh_params_file",
+                            ""
+                        ],
+                        [
+                            "ssl_ecdh_curve",
+                            "prime256v1"
+                        ],
+                        [
+                            "ssl_key_file",
+                            "server.key"
+                        ],
+                        [
+                            "ssl_library",
+                            "OpenSSL"
+                        ],
+                        [
+                            "ssl_max_protocol_version",
+                            ""
+                        ],
+                        [
+                            "ssl_min_protocol_version",
+                            "TLSv1.2"
+                        ],
+                        [
+                            "ssl_passphrase_command",
+                            ""
+                        ],
+                        [
+                            "ssl_passphrase_command_supports_reload",
+                            "off"
+                        ],
+                        [
+                            "ssl_prefer_server_ciphers",
+                            "on"
+                        ],
+                        [
+                            "standard_conforming_strings",
+                            "on"
+                        ],
+                        [
+                            "statement_timeout",
+                            "0"
+                        ],
+                        [
+                            "stats_fetch_consistency",
+                            "cache"
+                        ],
+                        [
+                            "superuser_reserved_connections",
+                            "3"
+                        ],
+                        [
+                            "synchronize_seqscans",
+                            "on"
+                        ],
+                        [
+                            "synchronous_commit",
+                            "on"
+                        ],
+                        [
+                            "synchronous_standby_names",
+                            ""
+                        ],
+                        [
+                            "syslog_facility",
+                            "local0"
+                        ],
+                        [
+                            "syslog_ident",
+                            "postgres"
+                        ],
+                        [
+                            "syslog_sequence_numbers",
+                            "on"
+                        ],
+                        [
+                            "syslog_split_messages",
+                            "on"
+                        ],
+                        [
+                            "tcp_keepalives_count",
+                            "9"
+                        ],
+                        [
+                            "tcp_keepalives_idle",
+                            "7200"
+                        ],
+                        [
+                            "tcp_keepalives_interval",
+                            "75"
+                        ],
+                        [
+                            "tcp_user_timeout",
+                            "0"
+                        ],
+                        [
+                            "temp_buffers",
+                            "1024"
+                        ],
+                        [
+                            "temp_file_limit",
+                            "-1"
+                        ],
+                        [
+                            "temp_tablespaces",
+                            ""
+                        ],
+                        [
+                            "TimeZone",
+                            "Etc/UTC"
+                        ],
+                        [
+                            "timezone_abbreviations",
+                            "Default"
+                        ],
+                        [
+                            "trace_notify",
+                            "off"
+                        ],
+                        [
+                            "trace_recovery_messages",
+                            "log"
+                        ],
+                        [
+                            "trace_sort",
+                            "off"
+                        ],
+                        [
+                            "track_activities",
+                            "on"
+                        ],
+                        [
+                            "track_activity_query_size",
+                            "1024"
+                        ],
+                        [
+                            "track_commit_timestamp",
+                            "off"
+                        ],
+                        [
+                            "track_counts",
+                            "on"
+                        ],
+                        [
+                            "track_functions",
+                            "none"
+                        ],
+                        [
+                            "track_io_timing",
+                            "off"
+                        ],
+                        [
+                            "track_wal_io_timing",
+                            "off"
+                        ],
+                        [
+                            "transaction_deferrable",
+                            "off"
+                        ],
+                        [
+                            "transaction_isolation",
+                            "read committed"
+                        ],
+                        [
+                            "transaction_read_only",
+                            "off"
+                        ],
+                        [
+                            "transform_null_equals",
+                            "off"
+                        ],
+                        [
+                            "unix_socket_directories",
+                            "/var/run/postgresql"
+                        ],
+                        [
+                            "unix_socket_group",
+                            ""
+                        ],
+                        [
+                            "unix_socket_permissions",
+                            "0777"
+                        ],
+                        [
+                            "update_process_title",
+                            "on"
+                        ],
+                        [
+                            "vacuum_buffer_usage_limit",
+                            "256"
+                        ],
+                        [
+                            "vacuum_cost_delay",
+                            "0"
+                        ],
+                        [
+                            "vacuum_cost_limit",
+                            "200"
+                        ],
+                        [
+                            "vacuum_cost_page_dirty",
+                            "20"
+                        ],
+                        [
+                            "vacuum_cost_page_hit",
+                            "1"
+                        ],
+                        [
+                            "vacuum_cost_page_miss",
+                            "2"
+                        ],
+                        [
+                            "vacuum_failsafe_age",
+                            "1600000000"
+                        ],
+                        [
+                            "vacuum_freeze_min_age",
+                            "50000000"
+                        ],
+                        [
+                            "vacuum_freeze_table_age",
+                            "150000000"
+                        ],
+                        [
+                            "vacuum_multixact_failsafe_age",
+                            "1600000000"
+                        ],
+                        [
+                            "vacuum_multixact_freeze_min_age",
+                            "5000000"
+                        ],
+                        [
+                            "vacuum_multixact_freeze_table_age",
+                            "150000000"
+                        ],
+                        [
+                            "wal_block_size",
+                            "8192"
+                        ],
+                        [
+                            "wal_buffers",
+                            "512"
+                        ],
+                        [
+                            "wal_compression",
+                            "off"
+                        ],
+                        [
+                            "wal_consistency_checking",
+                            ""
+                        ],
+                        [
+                            "wal_decode_buffer_size",
+                            "524288"
+                        ],
+                        [
+                            "wal_init_zero",
+                            "on"
+                        ],
+                        [
+                            "wal_keep_size",
+                            "0"
+                        ],
+                        [
+                            "wal_level",
+                            "replica"
+                        ],
+                        [
+                            "wal_log_hints",
+                            "off"
+                        ],
+                        [
+                            "wal_receiver_create_temp_slot",
+                            "off"
+                        ],
+                        [
+                            "wal_receiver_status_interval",
+                            "10"
+                        ],
+                        [
+                            "wal_receiver_timeout",
+                            "60000"
+                        ],
+                        [
+                            "wal_recycle",
+                            "on"
+                        ],
+                        [
+                            "wal_retrieve_retry_interval",
+                            "5000"
+                        ],
+                        [
+                            "wal_segment_size",
+                            "16777216"
+                        ],
+                        [
+                            "wal_sender_timeout",
+                            "60000"
+                        ],
+                        [
+                            "wal_skip_threshold",
+                            "2048"
+                        ],
+                        [
+                            "wal_sync_method",
+                            "fdatasync"
+                        ],
+                        [
+                            "wal_writer_delay",
+                            "200"
+                        ],
+                        [
+                            "wal_writer_flush_after",
+                            "128"
+                        ],
+                        [
+                            "work_mem",
+                            "4096"
+                        ],
+                        [
+                            "xmlbinary",
+                            "base64"
+                        ],
+                        [
+                            "xmloption",
+                            "content"
+                        ],
+                        [
+                            "zero_damaged_pages",
+                            "off"
+                        ]
+                    ]
+                },
+                "pg_available_extensions": {
+                    "header": "PostgreSQL extensions",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "available_server_extensions.sql",
+                    "theader": [
+                        "name",
+                        "default_version",
+                        "installed_version"
+                    ],
+                    "data": [
+                        [
+                            "adminpack",
+                            "2.1",
+                            null
+                        ],
+                        [
+                            "amcheck",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "autoinc",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "bloom",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "btree_gin",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "btree_gist",
+                            "1.7",
+                            null
+                        ],
+                        [
+                            "citext",
+                            "1.6",
+                            null
+                        ],
+                        [
+                            "cube",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "dblink",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "dict_int",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "dict_xsyn",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "earthdistance",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "file_fdw",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "fuzzystrmatch",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "hstore",
+                            "1.8",
+                            null
+                        ],
+                        [
+                            "insert_username",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "intagg",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "intarray",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "isn",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "lo",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "ltree",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "moddatetime",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "old_snapshot",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "pageinspect",
+                            "1.12",
+                            null
+                        ],
+                        [
+                            "pg_buffercache",
+                            "1.4",
+                            null
+                        ],
+                        [
+                            "pg_freespacemap",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pg_prewarm",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pg_stat_statements",
+                            "1.10",
+                            null
+                        ],
+                        [
+                            "pg_surgery",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "pg_trgm",
+                            "1.6",
+                            null
+                        ],
+                        [
+                            "pg_visibility",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pg_walinspect",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "pgcrypto",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "pgrowlocks",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pgstattuple",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "plpgsql",
+                            "1.0",
+                            "1.0"
+                        ],
+                        [
+                            "postgres_fdw",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "refint",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "seg",
+                            "1.4",
+                            null
+                        ],
+                        [
+                            "sslinfo",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "tablefunc",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "tcn",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "tsm_system_rows",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "tsm_system_time",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "unaccent",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "uuid-ossp",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "xml2",
+                            "1.1",
+                            null
+                        ]
+                    ]
+                }
+            }
+        }
+    }
+}
+		$(document).ready(function () {
+
+
+			for (const report_item in report_data) {
+
+				if (report_item == 'header') {
+					$("#main_content").append("<h2 style='text-align: center'>" + report_data[report_item] + "</h2>");
+				}
+				if (report_item == 'report_name') {
+					var d = $("<div class='bold_font_txt' style='white-space: pre-wrap;'></div>");
+					d.html('Report name: ' + report_data[report_item]);
+					$("#main_content").append(d);
+				}
+				if (report_item == 'description') {
+					var d = $("<div class='common_div' style='white-space: pre-wrap;'></div>");
+					d.html(report_data[report_item]);
+					$("#main_content").append(d);
+				}
+
+				if (report_item == 'sections') {
+
+					for (const section in report_data.sections) {
+
+						var section_id = "sections_" + section;
+						var d = $("<div id='" + section_id + "'></div>");
+						$("#main_content").append(d);
+						$("#" + section_id).append('<button class="acc"  style="background-color: rgba(219, 175, 0, 0.818);">' + report_data.sections[section].header + '</button>');
+
+						if (report_data.sections[section].state == 'collapsed')
+							$("#" + section_id).append('<div class="panel" style="display: none"></div>');
+						if (report_data.sections[section].state == 'expanded')
+							$("#" + section_id).append('<div class="panel" style="display: block"></div>');
+
+						$("#" + section_id + " > .panel").append("<p class='common_div'>" + report_data.sections[section].description + "</p>");
+
+
+						for (const report in report_data.sections[section].reports) {
+
+							var report_id = "reports_" + report;
+							var report_div = $("<div id='" + report_id + "'></div>");
+							$("#" + section_id + " > .panel").append(report_div);
+
+							if (report_data.sections[section].reports[report].state == 'collapsed') {
+								$("#" + report_id).append('<button class="acc acc_content acc_collapsed">' + report_data.sections[section].reports[report].header + '</button>');
+								$("#" + report_id).append('<div class="panel" style="display: none"></div>');
+							}
+							if (report_data.sections[section].reports[report].state == 'expanded') {
+								$("#" + report_id).append('<button class="acc acc_content">' + report_data.sections[section].reports[report].header + '</button>');
+								$("#" + report_id).append('<div class="panel" style="display: block"></div>');
+							}
+							if (report_data.sections[section].reports[report].description && report_data.sections[section].reports[report].description.trim() !== "") {
+								$("#" + report_id + " > .panel").append("<p class='consolas-font'>" + report_data.sections[section].reports[report].description + "</p></div>");
+							}
+							if (report_data.sections[section].reports[report].item_type == 'plain_text') {
+								var font_style = 'font-family: Consolas, monospace; padding: 10px; white-space: pre-wrap; border: 1px solid #ccc; border-radius: 4px; background-color: #1a1a1a; color: #fff; border-color: #444;';
+								var listview_id = 'lv_' + report_id;
+								var value = report_data.sections[section].reports[report].data;
+								if (Array.isArray(value)) {
+									$("#" + report_id + " > button.acc_collapsed").css("background-color", "pink");
+									value.forEach(item => {
+										$("#" + report_id + " > .panel").append('<br>');
+										$("#" + report_id + " > .panel").append("<p class='common_div'>" + item[0] + "</p></div>");
+										$("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + item[1] + "</p>");
+									});
+								} else {
+									$("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + value + "</p>");
+								}
+							}
+							if (report_data.sections[section].reports[report].item_type == 'link') {
+								var font_style = 'font-family: Consolas, monospace; padding: 10px; white-space: pre-wrap; border: 1px solid #ccc; border-radius: 4px; background-color: #1a1a1a; color: #fff; border-color: #444;';
+								var listview_id = 'lv_' + report_id;
+								var value = report_data.sections[section].reports[report].data;
+								if (Array.isArray(value)) {
+									$("#" + report_id + " > button.acc_collapsed").css("background-color", "pink");
+									value.forEach(item => {
+										$("#" + report_id + " > .panel").append("<br>");
+                                        $("#" + report_id + " > .panel").append("<p class='common_div'>" + item[0] + "</p></div>");
+                                        $("#" + report_id + " > .panel").append("<a href=" + item[1] + ">" + item[1] + "</div>"); //.zip
+									});
+								}else{
+									$("#" + report_id + " > .panel").append("<a href="+value+" >"+value+"</a>"); //.zip
+								}
+							}
+							if (report_data.sections[section].reports[report].item_type == 'table') {
+								var tbl_id = 'tbl_' + report_id;
+								var tblData = report_data.sections[section].reports[report].data;
+								var tbl_header = report_data.sections[section].reports[report].theader;
+
+								if (Array.isArray(tblData) && tblData.length > 0 && typeof tblData[0][0] === 'string' && Array.isArray(tblData[0][1])) {
+									$("#" + report_id + " > button.acc_collapsed").css("background-color", "pink");
+									$("#" + report_id + " > .panel").append('<br>');
+
+									for (var table_index = 0; table_index < tblData.length; table_index++) {
+										for (var table_index = 0; table_index < tblData.length; table_index++) {
+											var table_item = tblData[table_index];
+											var tbl_id = 'tbl_' + report_id + '_' + table_index;
+											var tblDataItem = table_item[1];
+
+											$("#" + report_id + " > .panel").append("<p class='common_div'>" + table_item[0] + "</p>");
+
+
+											$("#" + report_id + " > .panel").append('<table id="' + tbl_id + '" class="table table-striped" style="width:100%; border: 1px solid grey;">');
+											$('#' + tbl_id).append('<thead ></thead>');
+											$('#' + tbl_id + " thead").append('<tr ></tr>');
+											for (var tbl_header_i in tbl_header) {
+												$('#' + tbl_id + " thead tr").append('<th >' + tbl_header[tbl_header_i] + '</th>');
+											}
+
+											$('#' + tbl_id).append('<tbody ></tbody>');
+											for (var i = 0; i < tblDataItem.length; i++) {
+												$('#' + tbl_id + " tbody").append('<tr ></tr>');
+												for (var j = 0; j < tbl_header.length; j++) {
+                                                    const cellValue = tblDataItem[i][j];
+                                                    var CellContent =  tblDataItem[i][j];
+
+                                                    if (typeof cellValue === 'object' && cellValue !== null) {
+                                                        const formattedJSON = JSON.stringify(cellValue, null, 4);
+
+                                                        const escapedJSON = formattedJSON
+                                                            .replace(/&/g, "&amp;")
+                                                            .replace(/</g, "&lt;")
+                                                            .replace(/>/g, "&gt;")
+                                                            .replace(/"/g, "&quot;")
+                                                            .replace(/'/g, "&#039;");
+
+                                                        CellContent = `<pre>${escapedJSON}</pre>`;
+                                                    } else {
+                                                        CellContent = cellValue !== null ? cellValue : '';
+                                                    }
+
+                                                    $('#' + tbl_id + " tbody tr:last").append('<td>' + CellContent + '</td>');
+													// $('#' + tbl_id + " tbody tr:last").append('<td>' + tblDataItem[i][j] + '</td>');
+												}
+											}
+										}
+									}
+									continue;
+								}
+								$("#" + report_id + " > .panel").append('<table id="' + tbl_id + '" class="table table-striped" style="width:100%; border: 1px solid grey;">');
+								$('#' + tbl_id).append('<thead></thead>');
+
+								$('#' + tbl_id + " thead").append('<tr></tr>');
+								for (tbl_header_i in tbl_header) {
+									$('#' + tbl_id + " thead tr").append('<th>' + tbl_header[tbl_header_i] + '</th>');
+								}
+
+								$('#' + tbl_id).append('<tbody></tbody>');
+								for (var i = 0; i < tblData.length; i++) {
+                                    $('#' + tbl_id + " tbody").append('<tr></tr>');
+                                    for (var j = 0; j < tbl_header.length; j++) {
+                                    const cellValue = tblData[i][j];
+                                    var CellContent =  tblData[i][j];
+
+                                    if (typeof cellValue === 'object' && cellValue !== null) {
+                                        // Convert the object to a formatted JSON string
+                                        const formattedJSON = JSON.stringify(cellValue, null, 4);
+
+                                        // Escape HTML special characters to prevent XSS
+                                        const escapedJSON = formattedJSON
+                                            .replace(/&/g, "&amp;")
+                                            .replace(/</g, "&lt;")
+                                            .replace(/>/g, "&gt;")
+                                            .replace(/"/g, "&quot;")
+                                            .replace(/'/g, "&#039;");
+
+                                        // Use backticks for template literals and insert the escaped JSON within <pre> tags
+                                        CellContent = `<pre>${escapedJSON}</pre>`;
+                                    } else {
+                                        // For non-object values, display them directly or leave empty if null
+                                        CellContent = cellValue !== null ? cellValue : '';
+                                    }
+
+                                    $('#' + tbl_id + " tbody tr:last").append('<td>' + CellContent + '</td>');
+										// $('#' + tbl_id + " tbody tr:last").append('<td>' + tblData[i][j] + '</td>');
+									}
+								}
+							}
+							if (report_data.sections[section].reports[report].item_type == 'chart') {
+								var chartData = report_data.sections[section].reports[report].data;
+								var chartContainerId = 'chart_' + report_id;
+								var chartContainer = $("<div id='" + chartContainerId + "'></div>");
+								$("#" + report_id + " > .panel").append(chartContainer);
+
+								var chartOptions = JSON.parse(JSON.stringify(chartData));
+								var chart = new ApexCharts(document.querySelector("#" + chartContainerId), chartOptions);
+								chart.render();
+							}
+						}
+					}
+				}
+			}
+
+			$('table[id^="tbl_"]').each(function () {
+				var table = $(this).DataTable({
+					"aLengthMenu": [[5, 15, 50, 100, 500, -1], [5, 15, 50, 100, 500, "All"]],
+					"iDisplayLength": 15,
+					scrollX: true,
+					"responsive": true,
+					"lengthChange": true,
+					columnDefs: [{
+						targets: '_all',
+						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+							var $cell = $(cell);
+							if (cellData.length > 500) {
+								$(cell).contents().wrap("<div class='content'></div>");
+								var $content = $cell.find(".content");
+
+								$(cell).append($("<button class='btn btn-secondary' style='float: right'>Show more</button>"));
+								$btn = $(cell).find("button");
+
+
+								$content.css({
+									"height": "auto",
+									"overflow": "hidden",
+									"width": "auto"
+								})
+								$cell.data("isLess", true);
+
+								$btn.click(function () {
+									var isLess = $cell.data("isLess");
+									$content.css("height", isLess ? "auto" : "70px")
+									$(this).text(isLess ? "Show less" : "Show more")
+									$cell.data("isLess", !isLess)
+								});
+							}
+						}
+					}]
+				});
+				tables.push(table);
+			});
+
+
+
+			$("#expand_all").click(function () {
+				$('div.panel').css('display', 'block');
+				$("button.acc").removeClass('acc_collapsed');
+				tables.forEach(t => t.draw());
+			});
+
+			$("#collapse_all").click(function () {
+				$('div.panel').css('display', 'none');
+				$("button.acc").addClass('acc_collapsed');
+			});
+
+			$("button.acc").click(function () {
+				if ($(this).next().css("display") == 'block') {
+					$(this).next().css('display', 'none');
+					$(this).addClass('acc_collapsed');
+				} else {
+					$(this).next().css('display', 'block');
+					$(this).removeClass('acc_collapsed');
+					tables.forEach(t => t.draw());
+				}
+			});
+
+		});
+
+	</script>
+
+</body>
+
+</html>
