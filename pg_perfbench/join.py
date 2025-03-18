@@ -9,7 +9,7 @@ from pg_perfbench.const import (
     DEFAULT_REPORT_NAME,
     get_datetime_report
 )
-from pg_perfbench.log import setup_logger
+from pg_perfbench.log import setup_logger, display_user_configuration
 from pg_perfbench.report.processing import parse_json_in_order
 
 logger = logging.getLogger(__name__)
@@ -125,6 +125,7 @@ def _add_result(base: dict, inc: dict) -> None:
     if inc_series:
         inc_series[0]['name'] = inc.get('report_name', 'Unnamed')
         chart_series.append(inc_series[0])
+
     base_outputs = base.get('sections', {}) \
         .get('result', {}) \
         .get('reports', {}) \
@@ -138,6 +139,20 @@ def _add_result(base: dict, inc: dict) -> None:
     if 'data' in inc_outputs and isinstance(inc_outputs['data'], list):
         base_outputs['data'].append([inc.get('report_name', 'Unnamed'), inc_outputs['data']])
 
+    base_logs = base.get('sections', {}) \
+        .get('result', {}) \
+        .get('reports', {}) \
+        .get('logs', {})
+
+    inc_logs = inc.get('sections', {}) \
+        .get('result', {}) \
+        .get('reports', {}) \
+        .get('logs', {})
+
+    if 'data' not in base_logs or not isinstance(base_logs['data'], list):
+        base_outputs['data'] = []
+    if 'data' in base_logs and isinstance(inc_logs['data'], str):
+        base_logs['data'].append([inc.get('report_name', 'Unnamed'), inc_logs['data']])
 
 def _merge_reports(names: list[str], reports: list[dict], compare_items: list[str]) -> dict | None:
     ref = reports[0]
@@ -151,6 +166,11 @@ def _merge_reports(names: list[str], reports: list[dict], compare_items: list[st
             [ref.get('report_name', 'Unnamed'),
              ref['sections']['result']['reports']['pgbench_outputs'].get('data', [])]
         ]
+        if 'logs' in ref['sections']['result']['reports']:
+            ref['sections']['result']['reports']['logs']['data'] = [
+                [ref.get('report_name', 'Unnamed'),
+                 ref['sections']['result']['reports']['logs'].get('data', "")]
+            ]
     except Exception:
         logger.warning('Incomplete structure in reference report')
     for name, r in zip(names, reports):
@@ -166,10 +186,9 @@ def _merge_reports(names: list[str], reports: list[dict], compare_items: list[st
     return ref
 
 
-def join_reports(join_tasks: str, reference_report: str, input_dir: str, report_name: str, logger) -> dict | None:
-    if not logger:
-        logger = setup_logger("info")
-    logger.info("Starting join_reports process.")
+def join_reports(args, join_tasks: str, reference_report: str, input_dir: str, report_name: str, logger) -> dict | None:
+
+    display_user_configuration(args, logger)
 
     if not join_tasks:
         logger.error("No join_tasks specified.")
@@ -179,7 +198,8 @@ def join_reports(join_tasks: str, reference_report: str, input_dir: str, report_
     if not compare_items:
         logger.error("No compare_items found.")
         return None
-    logger.info(f"Compare items loaded successfully: {compare_items}")
+    tasks_list = '\n'.join(compare_items)
+    logger.info(f"Compare items '{join_tasks}' loaded successfully:\n{tasks_list}")
 
     loaded = _load_reports(input_dir, reference_report)
     if not loaded:
@@ -195,7 +215,6 @@ def join_reports(join_tasks: str, reference_report: str, input_dir: str, report_
     logger.info("Reports merged successfully.")
 
     joined["report_name"] = report_name or f"join_{DEFAULT_REPORT_NAME}"
-    logger.info(f"Join report name set to: {joined['report_name']}")
 
     all_names = "\n".join(names)
     tasks_path = os.path.join(JOIN_TASKS_PATH, join_tasks)
@@ -208,6 +227,5 @@ def join_reports(join_tasks: str, reference_report: str, input_dir: str, report_
         logger.error(tasks_content)
 
     joined["description"] = f"\nComparison Reports:\n{all_names}\n\nJoined by:\n{tasks_content}"
-    logger.info("Join report description set successfully.")
     logger.info("Join reports process completed successfully.")
     return joined

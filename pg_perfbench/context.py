@@ -348,6 +348,7 @@ class CollectInfoContext:
 class JoinContext:
     def __init__(self, args, logger):
         self.structured_params = {
+            "args":vars(args),
             "join_tasks": args.join_tasks,
             "reference_report": args.reference_report,
             "input_dir": args.input_dir,

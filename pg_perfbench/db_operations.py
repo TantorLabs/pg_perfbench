@@ -78,10 +78,11 @@ class DBTasks:
 
 
 class SSHTasks:
-    def __init__(self, db_conf, conn):
+    def __init__(self, db_conf, conn, logger):
         self.pg_bin_path = db_conf['pg_bin_path']
         self.pg_data_path = db_conf['pg_data_path']
         self.conn = conn
+        self.logger = logger
 
     async def stop_db(self):
         res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}")
@@ -101,10 +102,11 @@ class SSHTasks:
 
 
 class DockerTasks:
-    def __init__(self, db_conf, conn):
+    def __init__(self, db_conf, conn, logger):
         self.conn = conn
         self.pg_bin_path = db_conf['pg_bin_path']
         self.pg_data_path = db_conf['pg_data_path']
+        self.logger = logger
 
     async def stop_db(self):
         res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}")
@@ -124,10 +126,11 @@ class DockerTasks:
 
 
 class LocalConnTasks:
-    def __init__(self, db_conf, conn):
+    def __init__(self, db_conf, conn, logger):
         self.conn = conn
         self.pg_bin_path = db_conf['pg_bin_path']
         self.pg_data_path = db_conf['pg_data_path']
+        self.logger = logger
 
     async def stop_db(self):
         res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}'")

@@ -139,7 +139,7 @@ async def reset_db_environment(logger, conn_type, conn, db_conf, workload_conf):
     # stop DB, drop DB, sync and drop caches, then start DB and init DB
     try:
         db_tasks = DBTasks(db_conf, logger)
-        conn_tasks = get_conn_type_tasks(conn_type)(db_conf=workload_conf, conn=conn)
+        conn_tasks = get_conn_type_tasks(conn_type)(db_conf=workload_conf, conn=conn, logger=logger)
         try:
             await conn_tasks.start_db()
         except Exception as e:
@@ -225,7 +225,8 @@ async def run_benchmark_and_collect_metrics(
                 db_data_path = workload_conf.get("pg_data_path", "")
                 logger.info(f"Custom DB config selected: {custom_config_path}")
                 remote_config = await client.send_pg_config_file(custom_config_path, db_data_path)
-                logger.info(f"User's DB config set successfully: {remote_config}")
+                logger.info(f"User's DB config set successfully: "
+                            f"{workload_conf['pg_custom_config']} ---> {remote_config}")
 
             # Run each load iteration
             logger.info("Start load testing.")
@@ -241,19 +242,24 @@ async def run_benchmark_and_collect_metrics(
             # Store pgbench results
             report_data["pgbench_outputs"] = perf_results
             # Connect to PostgreSQL to fill additional info
+
+            logger.info("Collection of monitoring metrics.")
             db_conn = await asyncpg.connect(**db_conf)
             logger.info("Connected to DB successfully.")
-            await fill_info_report(client, db_conn, report_data, report)
+            await fill_info_report(logger, client, db_conn, report_data, report)
             logger.info("Monitoring info collected successfully.")
 
             # Optionally collect DB logs
             if log_conf.get("collect_pg_logs"):
+                logger.info("Collection of database logs.")
                 log_dir = await db_conn.fetchval("show log_directory")
-                await collect_logs(client, log_dir, report["report_name"])
-                logger.info("DB logs collected successfully.")
+                log_report = await collect_logs(logger, client, log_dir, report["report_name"])
+                if log_report:
+                    report["sections"]["result"]["reports"].update(log_report)
+                    logger.info("DB logs collected successfully.")
             await db_conn.close()
 
-        logger.info("DB benchmark processed successfully.")
+        logger.info("Benchmark process completed successfully.")
         return report
 
     except Exception as e:

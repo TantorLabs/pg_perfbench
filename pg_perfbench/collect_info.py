@@ -46,7 +46,7 @@ async def _handle_db_info(client, conn_type, db_conf, logger):
 
         tasks = get_conn_type_tasks(conn_type)
         if tasks:
-            task_object = tasks(db_conf=db_env, conn=client)
+            task_object = tasks(db_conf=db_env, conn=client, logger=logger)
             try:
                 await task_object.start_db()
             except Exception as e:
@@ -112,12 +112,23 @@ async def collect_info(
                 logger.info("Database connection established successfully for collecting DB info.")
 
             # Collect monitoring information.
-            await fill_info_report(client, db_conn, report_data, report)
+            await fill_info_report(logger, client, db_conn, report_data, report)
             logger.info("Monitoring info collected successfully.")
 
             # Optionally collect DB logs.
             if args["mode"] in [WorkMode.COLLECT_DB_INFO, WorkMode.COLLECT_ALL_INFO]:
-                logger.info("DB logs collected successfully.")
+                if log_conf.get("collect_pg_logs"):
+                    logger.info("Collection of database logs.")
+                    log_dir = await db_conn.fetchval("show log_directory")
+                    log_report = await collect_logs(logger, client, log_dir, report["report_name"])
+                    if log_report:
+                        report["sections"]["logs"] = {
+                            "header": "Tests result info",
+                            "description": "Results of tests",
+                            "state": "expanded",
+                            "reports": log_report
+                        }
+                        logger.info("DB logs collected successfully.")
                 await db_conn.close()
                 logger.info("Database connection closed.")
 

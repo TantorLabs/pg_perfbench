@@ -178,10 +178,10 @@
 									value.forEach(item => {
 										$("#" + report_id + " > .panel").append("<br>");
                                         $("#" + report_id + " > .panel").append("<p class='common_div'>" + item[0] + "</p></div>");
-                                        $("#" + report_id + " > .panel").append("<a href=" + item[1] + ".zip >" + item[1] + "</div>");
+                                        $("#" + report_id + " > .panel").append("<a href=" + item[1] + ">" + item[1] + "</div>"); //.zip
 									});
 								}else{
-									$("#" + report_id + " > .panel").append("<a href="+value+" >"+value+".zip</a>");
+									$("#" + report_id + " > .panel").append("<a href="+value+" >"+value+"</a>"); //.zip
 								}
 							}
 							if (report_data.sections[section].reports[report].item_type == 'table') {

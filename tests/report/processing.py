@@ -14,6 +14,7 @@ from pg_perfbench.report.processing import (
     dump_updated_json
 )
 
+
 class TestReportProcessing(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()

@@ -298,11 +298,14 @@ def chart_tps_clients(report_data, item):
     )
 
 
-async def collect_logs(connect, remote_logs_path, report_name: str = DEFAULT_LOG_ARCHIVE_NAME):
+async def collect_logs(logger, connect, remote_logs_path, report_name: str = DEFAULT_LOG_ARCHIVE_NAME):
     # check if remote_logs_path is provided
     if not remote_logs_path:
         print("Remote logs path is not provided. Skipping log collection.")
         return None
+
+    if logger:
+        logger.info(f"Copying logs from {remote_logs_path} -> {LOCAL_DB_LOGS_PATH}/{report_name}")
 
     data = await connect.copy_db_log_files(remote_logs_path, LOCAL_DB_LOGS_PATH, report_name)
     if data:
@@ -314,25 +317,30 @@ async def collect_logs(connect, remote_logs_path, report_name: str = DEFAULT_LOG
             'python_command': 'collect_logs',
             'data': data
         }
+
+        if logger:
+            logger.info(f"The log archive has been collected to: {report_item['data']}")
         return {
             'logs': report_item
         }
     else:
-        print('Error collecting log files')
+        logger.error('Error collecting db log files')
         return None
 
 
-async def execute_steps_in_order(command_steps, report_data, conn, db) -> None:
+async def execute_steps_in_order(logger, command_steps, report_data, conn, db) -> None:
     # validate command_steps is a list
     if not isinstance(command_steps, list):
-        print("command_steps is not a valid list. Skipping.")
+        if logger:
+            logger.error("Command_steps is not a valid list. Skipping.")
         return
 
     for step in command_steps:
         cmd_type = step.get('cmd_type')
         report_obj = step.get('report_obj')
         if not report_obj:
-            print("Missing 'report_obj' in step. Skipping.")
+            if logger:
+                logger.warning("Missing 'report_obj' in step. Skipping.")
             continue
 
         if cmd_type == 'shell_command':
@@ -343,7 +351,8 @@ async def execute_steps_in_order(command_steps, report_data, conn, db) -> None:
             if db:
                 await run_sql_command(db, report_obj)
             else:
-                print("No database connection provided for sql_command. Skipping.")
+                if logger:
+                    logger.error("No database connection provided for sql_command. Skipping.")
 
         elif cmd_type == 'python_command':
             func_name = report_obj.get('python_command')
@@ -357,12 +366,11 @@ async def execute_steps_in_order(command_steps, report_data, conn, db) -> None:
             report_obj['data'] = output_str
 
 
-async def fill_info_report(conn, db, workload_conf, report):
+async def fill_info_report(logger, conn, db, workload_conf, report):
     # We parse the report to get steps in order
     command_steps, json_data = parse_json_in_order(report)
     if not command_steps:
-        # If there's nothing to process, just return silently
+        # If there's nothing to process
         return
-
     # Then execute them as usual
-    await execute_steps_in_order(command_steps, workload_conf, conn, db)
+    await execute_steps_in_order(logger, command_steps, workload_conf, conn, db)

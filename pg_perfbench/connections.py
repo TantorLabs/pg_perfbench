@@ -74,12 +74,13 @@ class SSHConnection:
             raise TimeoutError(str(e))
 
     async def copy_db_log_files(self, log_source_path, local_path, report_name):
-        if not self.client:
-            raise ConnectionError("SSH client not initialized.")
-
-        log_archive_local_path = os.path.join(local_path, report_name + '.tar')
-        log_archive_source_path = f'{SRC_LOG_ARCHIVE_DIR}/{report_name}'
         try:
+            if not self.client:
+                raise ConnectionError("SSH client not initialized.")
+
+            log_archive_local_path = os.path.join(local_path, report_name) #  + '.tar'
+            log_archive_source_path = f'{SRC_LOG_ARCHIVE_DIR}/{report_name}'
+
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
 
@@ -95,13 +96,11 @@ class SSHConnection:
                 await sftp_client.get(log_archive_source_path, log_archive_local_path)
 
             await self.run_command(f'rm -rf {SRC_LOG_ARCHIVE_DIR}')
-            if self.logger:
-                self.logger.info(f'The log archive has been sent to: {log_archive_local_path}')
             return str(log_archive_local_path)
 
         except Exception as e:
             if self.logger:
-                self.logger.error(f'Failed to transfer logs: {str(e)}')
+                self.logger.error(str(e))
             return None
 
     async def __aenter__(self) -> "SSHConnection":
@@ -147,11 +146,11 @@ class DockerConnection:
 
         if self.container.status == "running":
             if self.logger:
-                self.logger.info(f"Container '{name}' is already running.")
+                self.logger.debug(f"Container '{name}' is already running.")
         else:
             self.container.start()
             if self.logger:
-                self.logger.info(f"Container '{name}' has been started.")
+                self.logger.debug(f"Container '{name}' has been started.")
 
     def close(self):
         if not self.container:
@@ -165,10 +164,10 @@ class DockerConnection:
             if self.container.status == "running":
                 self.container.stop()
                 if self.logger:
-                    self.logger.info(f"Container '{name}' has been stopped.")
+                    self.logger.debug(f"Container '{name}' has been stopped.")
             else:
                 if self.logger:
-                    self.logger.info(f"Container '{name}' is already stopped.")
+                    self.logger.debug(f"Container '{name}' is already stopped.")
         except Exception as e:
             if self.logger:
                 self.logger.error(f"Error stopping container: {str(e)}")
@@ -263,10 +262,12 @@ class DockerConnection:
             with open(archive_path, "wb") as f:
                 f.write(tar_bytes)
 
-            with tarfile.open(archive_path, "r") as tar:
-                tar.extractall(local_archive_dir)
-            return local_archive_dir
-        except Exception:
+            # with tarfile.open(archive_path, "r") as tar:
+            #     tar.extractall(local_archive_dir)
+            return archive_path
+        except Exception as e:
+            if self.logger:
+                self.logger.error(str(e))
             return None
 
     async def __aenter__(self) -> "DockerConnection":
@@ -353,9 +354,6 @@ class LocalConnection:
         if not os.path.isdir(remote_data_dir):
             raise FileNotFoundError(f"Destination directory not found: {remote_data_dir}")
 
-        if self.logger:
-            self.logger.info(f"Copying file {local_config_path} -> {remote_data_dir}")
-
         dest_path = os.path.join(remote_data_dir, "postgresql.conf")
 
         shutil.copy2(local_config_path, dest_path)
@@ -363,21 +361,23 @@ class LocalConnection:
         return dest_path
 
     async def copy_db_log_files(self, log_source_path: str, local_path: str, report_name: str) -> str:
-        if self.logger:
-            self.logger.info(f"Copying logs from {log_source_path} -> {local_path}/{report_name}")
+        try:
+            if not os.path.isdir(log_source_path):
+                raise FileNotFoundError(f"Log source path does not exist or is not a directory: {log_source_path}")
 
-        if not os.path.isdir(log_source_path):
-            raise FileNotFoundError(f"Log source path does not exist or is not a directory: {log_source_path}")
+            if not os.listdir(log_source_path):
+                raise ValueError(f"Log source directory is empty: {log_source_path}")
 
-        if not os.listdir(log_source_path):
-            raise ValueError(f"Log source directory is empty: {log_source_path}")
+            os.makedirs(local_path, exist_ok=True)
+            dest_path = os.path.join(local_path, f"{report_name}")
 
-        os.makedirs(local_path, exist_ok=True)
-        dest_path = os.path.join(local_path, f"{report_name}.tar")
-
-        with tarfile.open(dest_path, "w") as tar:
-            tar.add(log_source_path, arcname=os.path.basename(log_source_path))
-        return dest_path
+            with tarfile.open(dest_path, "w") as tar:
+                tar.add(log_source_path, arcname=os.path.basename(log_source_path))
+            return dest_path
+        except Exception as e:
+            if self.logger:
+                self.logger.error(str(e))
+            return None
 
     async def __aenter__(self) -> "LocalConnection":
         await self.start()

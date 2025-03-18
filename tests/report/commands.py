@@ -10,6 +10,7 @@ from pg_perfbench.report.commands import (
     run_sql_command
 )
 
+
 class TestReportCommands(IsolatedAsyncioTestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
@@ -45,6 +46,7 @@ class TestReportCommands(IsolatedAsyncioTestCase):
         class MockDB:
             async def fetch(self, sql):
                 return []
+
             async def fetchval(self, sql):
                 return "val"
 
