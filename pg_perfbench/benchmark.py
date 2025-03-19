@@ -106,8 +106,7 @@ def load_iterations_config(db_conf, workload_conf):
 async def run_command(logger, command: str, check: bool = True) -> str:
     # run shell command asynchronously
     if not command.strip():
-        logger.warning("Attempting to run an empty command string.")
-        return ''
+        raise Exception("Attempting to run an empty command string.")
 
     try:
         process = await asyncio.create_subprocess_shell(
@@ -118,18 +117,17 @@ async def run_command(logger, command: str, check: bool = True) -> str:
             limit=262144,
         )
     except Exception as e:
-        logger.error(f"Failed to start subprocess for command: {command}\nError: {str(e)}")
-        return ''
+        raise Exception(f"Failed to start subprocess for command: {command}\nError:\n{str(e)} .")
 
     stdout, stderr = await process.communicate()
 
     # if return code != 0, log error if check is True
     if process.returncode != 0:
         logger.error(f"Command '{command}' failed with exit code {process.returncode}.")
-        logger.error(f"STDERR: {stderr.decode('utf-8', errors='replace')}")
+        logger.error(f"STDERR: {stderr.decode('utf-8', errors='replace')} .")
         if check:
             # If we want to fail on error
-            raise Exception(f"Command '{command}' returned non-zero exit code.")
+            raise Exception(f"Command '{command}' - returned non-zero exit code.")
     await process.wait()
 
     return stdout.decode('utf-8')
@@ -152,7 +150,7 @@ async def reset_db_environment(logger, conn_type, conn, db_conf, workload_conf):
         await db_tasks.init_db()
         await db_tasks.check_db_access()
     except Exception as e:
-        raise RuntimeError(f"Failed to reset DB environment: {str(e)}")
+        raise RuntimeError(f"Failed to reset DB environment:\n{str(e)}")
 
 
 async def run_benchmark(logger, load_iteration: [Any]):
@@ -164,6 +162,7 @@ async def run_benchmark(logger, load_iteration: [Any]):
     init_result = await run_command(logger, init_cmd, check=True)
     logger.info(f"Initial command result: \n {init_result}")
 
+    logger.info(f"Performance command executing: \n {workload_cmd}")
     perf_result = await run_command(logger, workload_cmd, check=True)
     logger.info(f"Performance command result: \n {perf_result}")
 

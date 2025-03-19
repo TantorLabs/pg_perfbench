@@ -154,6 +154,7 @@ def _add_result(base: dict, inc: dict) -> None:
     if 'data' in base_logs and isinstance(inc_logs['data'], str):
         base_logs['data'].append([inc.get('report_name', 'Unnamed'), inc_logs['data']])
 
+
 def _merge_reports(names: list[str], reports: list[dict], compare_items: list[str]) -> dict | None:
     ref = reports[0]
     if not isinstance(ref, dict):
@@ -187,7 +188,6 @@ def _merge_reports(names: list[str], reports: list[dict], compare_items: list[st
 
 
 def join_reports(args, join_tasks: str, reference_report: str, input_dir: str, report_name: str, logger) -> dict | None:
-
     display_user_configuration(args, logger)
 
     if not join_tasks:

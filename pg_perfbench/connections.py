@@ -25,17 +25,21 @@ class SSHConnection:
             self.client = await asyncssh.connect(**self.conn_params)
             if self.tunnel_params is not None:
                 from sshtunnel import SSHTunnelForwarder
-                self.tunnel = SSHTunnelForwarder(**self.tunnel_params)
-                self.tunnel.start()
+                try:
+                    self.tunnel = SSHTunnelForwarder(**self.tunnel_params)
+                    self.tunnel.start()
+                except Exception as e:
+                    raise ConnectionError(f"SSH tunnel forwarding failed: {e}")
 
         except asyncssh.misc.PermissionDenied:
-            raise PermissionError("Permission denied (key issue or insufficient permissions).")
+            raise PermissionError("Verify the specified SSH key for remote server access.")
 
         except asyncssh.misc.ConnectionLost:
-            raise TimeoutError("SSH connection lost or timed out.")
+            raise TimeoutError("No access to the remote server: Verify access to the remote server.")
 
         except Exception as e:
-            raise ConnectionError(f"SSH connection failed: {e}")
+            raise ConnectionError(f"SSH connection failed: {e} "
+                                  f"\nVerify SSH connection parameters.")
 
     def close(self):
         if self.tunnel_params is not None and self.tunnel:
@@ -43,7 +47,7 @@ class SSHConnection:
         if self.client:
             self.client.close()
 
-    async def run_command(self, cmd: str) -> str:
+    async def run_command(self, cmd: str, check=False) -> str:
         if not self.client:
             raise ConnectionError("SSH client not initialized.")
 
@@ -55,6 +59,8 @@ class SSHConnection:
 
         process = await self.client.create_process(cmd)
         stdout, stderr = await process.communicate()
+        if stderr != "" and check:
+            raise RuntimeError(f"Command \"{cmd}\" failed for SSH connection with error:\n{stderr}")
         process.close()
         return stdout
 
@@ -71,14 +77,14 @@ class SSHConnection:
                 await sftp_client.put(localpaths=local_config_path, remotepath=remote_config_path)
             return remote_config_path
         except Exception as e:
-            raise TimeoutError(str(e))
+            raise TimeoutError(f"Unsuccessful attempt to install the database user configuration:\n{str(e)}")
 
     async def copy_db_log_files(self, log_source_path, local_path, report_name):
         try:
             if not self.client:
                 raise ConnectionError("SSH client not initialized.")
 
-            log_archive_local_path = os.path.join(local_path, report_name) #  + '.tar'
+            log_archive_local_path = os.path.join(local_path, report_name)  # + '.tar'
             log_archive_source_path = f'{SRC_LOG_ARCHIVE_DIR}/{report_name}'
 
             if not os.path.exists(local_path):
@@ -100,7 +106,8 @@ class SSHConnection:
 
         except Exception as e:
             if self.logger:
-                self.logger.error(str(e))
+                self.logger.error(f"Unsuccessful attempt to copy the database logs to the local directory 'db_logs':\n"
+                                  f"{str(e)}")
             return None
 
     async def __aenter__(self) -> "SSHConnection":
@@ -177,7 +184,7 @@ class DockerConnection:
         self.container = None
         self.docker_client = None
 
-    async def run_command(self, cmd: str) -> str:
+    async def run_command(self, cmd: str, check=False) -> str:
         if not self.container:
             raise PermissionError("Container not available or no access to 'postgres' user.")
 
@@ -187,10 +194,11 @@ class DockerConnection:
             demux=True,
             environment=self.env
         )
-        if result.exit_code != 0:
+        if result.exit_code != 0 and check:
             out, err = result.output
             error_message = err.decode("utf-8", "replace") if err else "Unknown error"
-            raise RuntimeError(f"Command \"{cmd}\" failed with exit code {result.exit_code}: {error_message} \n")
+            raise RuntimeError(
+                f"Command \"{cmd}\" failed for Docker connection with exit code {result.exit_code}: {error_message} \n")
         out, _ = result.output
         return out.decode("utf-8", "replace") if out else ""
 
@@ -246,7 +254,7 @@ class DockerConnection:
 
             return remote_file_path
         except Exception as e:
-            raise TimeoutError(str(e))
+            raise TimeoutError(f"Unsuccessful attempt to install the database user configuration:\n{str(e)}")
 
     async def copy_db_log_files(self, log_source_path, local_path, report_name):
         if not self.container:
@@ -267,7 +275,8 @@ class DockerConnection:
             return archive_path
         except Exception as e:
             if self.logger:
-                self.logger.error(str(e))
+                self.logger.error(f"Unsuccessful attempt to copy the database logs to the local directory 'db_logs':\n"
+                                  f"{str(e)}")
             return None
 
     async def __aenter__(self) -> "DockerConnection":
@@ -336,9 +345,9 @@ class LocalConnection:
             return ''
 
         stdout, stderr = await process.communicate()
-        if process.returncode != 0:
+        if process.returncode != 0 and check:
             if self.logger:
-                self.logger.error(f"Command '{cmd}' failed with exit code {process.returncode}.")
+                self.logger.error(f"Command '{cmd}' failed for Local connection with exit code {process.returncode}.")
                 self.logger.error(f"STDERR: {stderr.decode('utf-8', errors='replace')}")
             if check:
                 raise RuntimeError(f"Command '{cmd}' returned non-zero exit code.")
@@ -354,11 +363,14 @@ class LocalConnection:
         if not os.path.isdir(remote_data_dir):
             raise FileNotFoundError(f"Destination directory not found: {remote_data_dir}")
 
-        dest_path = os.path.join(remote_data_dir, "postgresql.conf")
+        try:
+            dest_path = os.path.join(remote_data_dir, "postgresql.conf")
 
-        shutil.copy2(local_config_path, dest_path)
+            shutil.copy2(local_config_path, dest_path)
 
-        return dest_path
+            return dest_path
+        except Exception as e:
+            raise TimeoutError(f"Unsuccessful attempt to install the database user configuration:\n{str(e)}")
 
     async def copy_db_log_files(self, log_source_path: str, local_path: str, report_name: str) -> str:
         try:
@@ -376,7 +388,8 @@ class LocalConnection:
             return dest_path
         except Exception as e:
             if self.logger:
-                self.logger.error(str(e))
+                self.logger.error(f"Unsuccessful attempt to copy the database logs to the local directory 'db_logs':\n"
+                                  f"{str(e)}")
             return None
 
     async def __aenter__(self) -> "LocalConnection":

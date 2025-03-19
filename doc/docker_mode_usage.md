@@ -27,8 +27,6 @@ python -m pg_perfbench <args>
 - Сonfigure docker container usage parameters:
 ```
 --container-name=test_container
---docker-pg-host=127.0.0.1
---docker-pg-port=5432
 --pg-host=127.0.0.1
 --pg-port=5438
 ```
@@ -66,8 +64,6 @@ python -m pg_perfbench --mode=benchmark    \
 --log-level=debug   \
 --collect-pg-logs   \
 --container-name=test_container  \
---docker-pg-host=127.0.0.1  \
---docker-pg-port=5432   \
 --pg-host=127.0.0.1 \
 --pg-port=5438  \
 --pg-user=postgres  \
@@ -107,8 +103,6 @@ Initial application log output with correct configuration:
 #   pg_database = tdb
 #   pg_data_path = /var/lib/postgresql/data
 #   pg_bin_path = /usr/lib/postgresql/16/bin
-#   docker_pg_host = 127.0.0.1
-#   docker_pg_port = 5432
 #   container_name = test_container
 #-----------------------------------
 2024-11-27 18:51:41,621       INFO                                root :   18 - Database connection type - Docker

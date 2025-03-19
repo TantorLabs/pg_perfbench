@@ -19,16 +19,25 @@ class DBTasks:
                    template = template0
         """
 
-        db = await asyncpg.connect(
-            host=self.db_conf['host'],
-            port=self.db_conf['port'],
-            user=self.db_conf['user'],
-            database='postgres',
-            password=self.db_conf['password'],
-        )
-        self.logger.debug('Creating pristine test DB.')
-        await db.execute(create_test_db_sql)
-        await db.close()
+        try:
+            db = await asyncpg.connect(
+                host=self.db_conf["host"],
+                port=self.db_conf["port"],
+                user=self.db_conf["user"],
+                database="postgres",
+                password=self.db_conf["password"],
+            )
+        except Exception as e:
+            raise ConnectionError(
+                f"Error connecting to the 'postgres' database for creating the load testing database:\n{e}")
+
+        self.logger.debug("Creating pristine test DB.")
+        try:
+            await db.execute(create_test_db_sql)
+        except Exception as e:
+            raise RuntimeError(f"Error executing the query to create the database:\n{e}")
+        finally:
+            await db.close()
 
     async def drop_db(self):
         terminate_db_pid_sql = f"""
@@ -40,18 +49,30 @@ class DBTasks:
         drop_database_db_sql = f"""
                 DROP DATABASE IF EXISTS {self.db_conf['database']}
         """
-        db = await asyncpg.connect(
-            host=self.db_conf['host'],
-            port=self.db_conf['port'],
-            user=self.db_conf['user'],
-            database='postgres',
-            password=self.db_conf['password'],
-        )
-        self.logger.debug('Terminating other sessions to the test DB.')
-        await db.execute(terminate_db_pid_sql)
-        self.logger.debug('Dropping test DB.')
-        await db.execute(drop_database_db_sql)
-        await db.close()
+        try:
+            db = await asyncpg.connect(
+                host=self.db_conf["host"],
+                port=self.db_conf["port"],
+                user=self.db_conf["user"],
+                database="postgres",
+                password=self.db_conf["password"],
+            )
+        except Exception as e:
+            raise ConnectionError(f"Failed to connect to the database for dropping test DB: {e}")
+
+        self.logger.debug(f"Terminating other sessions to the test DB: \"{self.db_conf['database']}\".")
+        try:
+            await db.execute(terminate_db_pid_sql)
+        except Exception as e:
+            raise RuntimeError(f"Failed to terminate sessions for test DB \"{self.db_conf['database']}\": {e}")
+
+        self.logger.debug(f"Dropping test DB: \"{self.db_conf['database']}\".")
+        try:
+            await db.execute(drop_database_db_sql)
+        except Exception as e:
+            raise RuntimeError(f"Failed to drop test DB \"{self.db_conf['database']}\": {e}")
+        finally:
+            await db.close()
 
     async def check_db_access(self):
         for attempt in range(1, 11):  # Adjust the number of attempts as needed
@@ -65,16 +86,15 @@ class DBTasks:
                 )
                 await db_connection.fetchval('SELECT 1')
                 await db_connection.close()
-                self.logger.debug('Database is available.')
+                self.logger.debug(f"Database \'{self.db_conf['database']}\' is available.")
                 return True
             except (asyncpg.PostgresError, ConnectionError) as e:
                 self.logger.warning(
-                    f'Database not yet available. Attempt {attempt}/10. Error: {e}.'
+                    f"Database not yet available. Attempt {attempt}/10. Error: {e}."
                 )
                 time.sleep(1)
         else:
-            print('Failed to connect to the database after multiple attempts.')
-            raise Exception('Database not available.')
+            raise ConnectionError("Failed to connect to the database after multiple attempts.")
 
 
 class SSHTasks:
@@ -85,19 +105,23 @@ class SSHTasks:
         self.logger = logger
 
     async def stop_db(self):
-        res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}")
-        return res
+        try:
+            res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}", check=True)
+            return res
+        except Exception as e:
+            raise RuntimeError(f"Database '{self.pg_data_path}' shutdown error:\n{str(e)}")
 
     async def start_db(self):
         res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}")
         return res
 
     async def sync(self):
-        res = await self.conn.run_command("sync")
+        res = await self.conn.run_command("sync", check=False)
         return res
 
     async def drop_caches(self):
-        res = await self.conn.run_command("sudo /bin/sh -c 'echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches'")
+        res = await self.conn.run_command("sudo /bin/sh -c 'echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches'",
+                                          check=False)
         return res
 
 
@@ -109,9 +133,12 @@ class DockerTasks:
         self.logger = logger
 
     async def stop_db(self):
-        res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}")
-        self.conn.close()
-        return res
+        try:
+            res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}")
+            self.conn.close()
+            return res
+        except Exception as e:
+            raise RuntimeError(f"Database '{self.pg_data_path}' shutdown error:\n{str(e)}")
 
     async def start_db(self):
         await self.conn.start()
@@ -133,8 +160,12 @@ class LocalConnTasks:
         self.logger = logger
 
     async def stop_db(self):
-        res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}'")
-        return res
+        try:
+            res = await self.conn.run_command(
+                f"su - postgres -c '{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}'")
+            return res
+        except Exception as e:
+            raise RuntimeError(f"Database '{self.pg_data_path}' shutdown error:\n{str(e)}")
 
     async def start_db(self):
         res = await self.conn.run_command(f"su - postgres -c '{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}'")

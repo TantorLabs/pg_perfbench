@@ -184,9 +184,7 @@ Preconfigure access to Docker for the user who is running the tool.
 
 | Parameter          | Description                                             |
 |--------------------|---------------------------------------------------------|
-| `--container-name` | Name of creating container                              |
-| `--docker-pg-host` | Container PostgreSQL database host (default: 127.0.0.1) |
-| `--docker-pg-port` | Container PostgreSQL database port (default: 5432)      |      
+| `--container-name` | Name of creating container                              | 
 
 see more details on benchmark configuration for a database in a Docker container [here](doc/docker_mode_usage.md).
 

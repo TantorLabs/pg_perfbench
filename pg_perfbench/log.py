@@ -19,7 +19,7 @@ def display_user_configuration(raw_args, logger):
     logger.info('\n'.join(message_lines))
 
 
-def setup_logger(raw_log_level, arg_clear_logs = False):
+def setup_logger(raw_log_level, arg_clear_logs=False):
     # optional clearing of old logs
     if arg_clear_logs:
         clear_logs()
