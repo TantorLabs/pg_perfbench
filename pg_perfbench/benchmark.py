@@ -8,9 +8,9 @@ from pg_perfbench.const import (
     get_datetime_report, CURRENT_TIME
 )
 from pg_perfbench.connections import get_connection
-from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks
+from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks, run_command, collect_db_logs
 from pg_perfbench.report.processing import get_report_structure
-from pg_perfbench.report.commands import collect_logs, fill_info_report
+from pg_perfbench.report.commands import fill_info_report
 from pg_perfbench.log import display_user_configuration
 
 
@@ -103,36 +103,6 @@ def load_iterations_config(db_conf, workload_conf):
     return load_iterations
 
 
-async def run_command(logger, command: str, check: bool = True) -> str:
-    # run shell command asynchronously
-    if not command.strip():
-        raise Exception("Attempting to run an empty command string.")
-
-    try:
-        process = await asyncio.create_subprocess_shell(
-            command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            shell=True,
-            limit=262144,
-        )
-    except Exception as e:
-        raise Exception(f"Failed to start subprocess for command: {command}\nError:\n{str(e)} .")
-
-    stdout, stderr = await process.communicate()
-
-    # if return code != 0, log error if check is True
-    if process.returncode != 0:
-        logger.error(f"Command '{command}' failed with exit code {process.returncode}.")
-        logger.error(f"STDERR: {stderr.decode('utf-8', errors='replace')} .")
-        if check:
-            # If we want to fail on error
-            raise Exception(f"Command '{command}' - returned non-zero exit code.")
-    await process.wait()
-
-    return stdout.decode('utf-8')
-
-
 async def reset_db_environment(logger, conn_type, conn, db_conf, workload_conf):
     # stop DB, drop DB, sync and drop caches, then start DB and init DB
     try:
@@ -142,13 +112,15 @@ async def reset_db_environment(logger, conn_type, conn, db_conf, workload_conf):
             await conn_tasks.start_db()
         except Exception as e:
             logger.warning(str(e))
+        await db_tasks.check_db_access()
         await db_tasks.drop_db()
         await conn_tasks.stop_db()
         await conn_tasks.sync()
         await conn_tasks.drop_caches()
         await conn_tasks.start_db()
-        await db_tasks.init_db()
         await db_tasks.check_db_access()
+        await db_tasks.init_db()
+        await db_tasks.check_user_db_access()
     except Exception as e:
         raise RuntimeError(f"Failed to reset DB environment:\n{str(e)}")
 
@@ -232,11 +204,11 @@ async def run_benchmark_and_collect_metrics(
             for idx, load_iteration in enumerate(load_iterations, start=1):
                 logger.info("Resetting the database.")
                 await reset_db_environment(logger, conn_type, client, db_conf, workload_conf)
-                logger.info("Database reset successfully.")
+                logger.info("Database reset.")
                 logger.info(f"Starting load iteration {idx}...")
                 bench_result = await run_benchmark(logger, load_iteration)
                 perf_results.append(bench_result)
-                logger.info(f"Load iteration {idx} result collected successfully.")
+                logger.info(f"Load iteration {idx} result collected.")
 
             # Store pgbench results
             report_data["pgbench_outputs"] = perf_results
@@ -244,21 +216,17 @@ async def run_benchmark_and_collect_metrics(
 
             logger.info("Collection of monitoring metrics.")
             db_conn = await asyncpg.connect(**db_conf)
-            logger.info("Connected to DB successfully.")
+            logger.info("Connected to DB.")
             await fill_info_report(logger, client, db_conn, report_data, report)
-            logger.info("Monitoring info collected successfully.")
+            logger.info("Monitoring info collected.")
 
             # Optionally collect DB logs
             if log_conf.get("collect_pg_logs"):
-                logger.info("Collection of database logs.")
-                log_dir = await db_conn.fetchval("show log_directory")
-                log_report = await collect_logs(logger, client, log_dir, report["report_name"])
-                if log_report:
-                    report["sections"]["result"]["reports"].update(log_report)
-                    logger.info("DB logs collected successfully.")
+                await collect_db_logs(logger, client, db_conn, report)
             await db_conn.close()
+            logger.info("Database connection closed.")
 
-        logger.info("Benchmark process completed successfully.")
+        logger.info("Benchmark process completed.")
         return report
 
     except Exception as e:

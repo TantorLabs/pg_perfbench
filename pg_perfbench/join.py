@@ -12,12 +12,11 @@ from pg_perfbench.const import (
 from pg_perfbench.log import setup_logger, display_user_configuration
 from pg_perfbench.report.processing import parse_json_in_order
 
-logger = logging.getLogger(__name__)
 JOIN_TASKS_PATH = os.path.join(str(PROJECT_ROOT_FOLDER), 'join_tasks')
 REF_REPORT_IDX = 0
 
 
-def _load_reports(input_dir: str, reference_report: str) -> tuple[list[str], list[dict]] | None:
+def _load_reports(logger, input_dir: str, reference_report: str) -> tuple[list[str], list[dict]] | None:
     if not os.path.isdir(input_dir):
         logger.error(f'Invalid directory: {input_dir}')
         return None
@@ -42,7 +41,7 @@ def _load_reports(input_dir: str, reference_report: str) -> tuple[list[str], lis
     return (files, reports) if reports else None
 
 
-def _load_compare_items(join_tasks_file: str) -> list[str] | None:
+def _load_compare_items(logger, join_tasks_file: str) -> list[str] | None:
     path = os.path.join(JOIN_TASKS_PATH, join_tasks_file)
     if not os.path.isfile(path):
         logger.error(f'join_tasks not found: {path}')
@@ -57,7 +56,7 @@ def _load_compare_items(join_tasks_file: str) -> list[str] | None:
         return None
 
 
-def _compare_data(ref_data, cmp_data) -> bool:
+def _compare_data(logger, ref_data, cmp_data) -> bool:
     if isinstance(ref_data, str) and isinstance(cmp_data, str):
         if ref_data != cmp_data:
             diff = difflib.ndiff(ref_data.splitlines(), cmp_data.splitlines())
@@ -76,7 +75,7 @@ def _compare_data(ref_data, cmp_data) -> bool:
     return False
 
 
-def _compare_reports(ref_rep: dict, cmp_rep: dict, compare_items: list[str]) -> bool:
+def _compare_reports(logger, ref_rep: dict, cmp_rep: dict, compare_items: list[str]) -> bool:
     result = True
     ref_steps, _ = parse_json_in_order(ref_rep)
     cmp_steps, _ = parse_json_in_order(cmp_rep)
@@ -89,7 +88,7 @@ def _compare_reports(ref_rep: dict, cmp_rep: dict, compare_items: list[str]) -> 
             continue
         left = s1['report_obj'].get('data')
         right = s2['report_obj'].get('data')
-        if not _compare_data(left, right):
+        if not _compare_data(logger, left, right):
             result = False
             ck = f'sections.{s1["section"]}.reports.{s1["report"]}.data'
             if ck in compare_items:
@@ -149,13 +148,21 @@ def _add_result(base: dict, inc: dict) -> None:
         .get('reports', {}) \
         .get('logs', {})
 
-    if 'data' not in base_logs or not isinstance(base_logs['data'], list):
-        base_outputs['data'] = []
+    if base_logs == {} and inc_logs != {}:
+        base["sections"]["result"]["reports"]["logs"] = {
+            'header': 'database logs',
+            'description': 'Local path to the database log archive',
+            'item_type': 'link',
+            'state': 'collapsed',
+            'python_command': '',
+            'data': []
+        }
+        base_logs = base["sections"]["result"]["reports"]["logs"]
     if 'data' in base_logs and isinstance(inc_logs['data'], str):
         base_logs['data'].append([inc.get('report_name', 'Unnamed'), inc_logs['data']])
 
 
-def _merge_reports(names: list[str], reports: list[dict], compare_items: list[str]) -> dict | None:
+def _merge_reports(logger, names: list[str], reports: list[dict], compare_items: list[str]) -> dict | None:
     ref = reports[0]
     if not isinstance(ref, dict):
         logger.error('Invalid reference report')
@@ -178,7 +185,7 @@ def _merge_reports(names: list[str], reports: list[dict], compare_items: list[st
         if names.index(name) == 0:
             continue
         try:
-            _compare_reports(reports[0], r, compare_items)
+            _compare_reports(logger, reports[0], r, compare_items)
         except ValueError as ve:
             logger.error(f'Comparison failed: {ve}')
             return None
@@ -187,28 +194,30 @@ def _merge_reports(names: list[str], reports: list[dict], compare_items: list[st
     return ref
 
 
-def join_reports(args, join_tasks: str, reference_report: str, input_dir: str, report_name: str, logger) -> dict | None:
-    display_user_configuration(args, logger)
+def join_reports(raw_args: dict, join_tasks: str, reference_report: str, input_dir: str, report_name: str,
+                 logger) -> dict | None:
+    if raw_args and isinstance(raw_args, dict):
+        display_user_configuration(args, logger)
 
     if not join_tasks:
         logger.error("No join_tasks specified.")
         return None
 
-    compare_items = _load_compare_items(join_tasks)
+    compare_items = _load_compare_items(logger, join_tasks)
     if not compare_items:
         logger.error("No compare_items found.")
         return None
     tasks_list = '\n'.join(compare_items)
     logger.info(f"Compare items '{join_tasks}' loaded successfully:\n{tasks_list}")
 
-    loaded = _load_reports(input_dir, reference_report)
+    loaded = _load_reports(logger, input_dir, reference_report)
     if not loaded:
         logger.error("No reports loaded from input directory.")
         return None
     names, rpts = loaded
     logger.info(f"Loaded {len(names)} report(s): {', '.join(names)}")
 
-    joined = _merge_reports(names, rpts, compare_items)
+    joined = _merge_reports(logger, names, rpts, compare_items)
     if not joined:
         logger.error("Merge of reports failed.")
         return None

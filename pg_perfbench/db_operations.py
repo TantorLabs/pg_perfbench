@@ -1,6 +1,55 @@
-from pg_perfbench.const import ConnectionType
 import asyncpg
+import asyncio
 import time
+
+from pg_perfbench.const import ConnectionType
+from pg_perfbench.report.commands import collect_logs
+
+
+async def run_command(logger, command: str, check: bool = True) -> str:
+    # run shell command asynchronously
+    if not command.strip():
+        raise Exception("Attempting to run an empty command string.")
+
+    try:
+        process = await asyncio.create_subprocess_shell(
+            command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            shell=True,
+            limit=262144,
+        )
+    except Exception as e:
+        raise Exception(f"Failed to start subprocess for command: {command}\nError:\n{str(e)} .")
+
+    stdout, stderr = await process.communicate()
+
+    # if return code != 0, log error if check is True
+    if process.returncode != 0:
+        logger.error(f"Command '{command}' failed with exit code {process.returncode}.")
+        logger.error(f"STDERR: {stderr.decode('utf-8', errors='replace')} .")
+        if check:
+            # If we want to fail on error
+            raise Exception(f"Command '{command}' - returned non-zero exit code.")
+    await process.wait()
+
+    return stdout.decode('utf-8')
+
+
+async def collect_db_logs(logger, client, db_conn, report):
+    try:
+        logger.info("Collection of database logs.")
+        log_dir = await db_conn.fetchval("show log_directory")
+        # If log_dir doesn't contain a slash, fetch data_directory and join them.
+        if "/" not in log_dir:
+            data_dir = await db_conn.fetchval("show data_directory")
+            log_dir = f"{data_dir}/{log_dir}"
+        log_report = await collect_logs(logger, client, log_dir, report["report_name"])
+        if log_report:
+            report["sections"]["result"]["reports"].update(log_report)
+            logger.info("DB logs collected successfully.")
+    except Exception as e:
+        logger.error(f"Failed to collect DB logs: {e}")
 
 
 class DBTasks:
@@ -74,7 +123,7 @@ class DBTasks:
         finally:
             await db.close()
 
-    async def check_db_access(self):
+    async def check_user_db_access(self):
         for attempt in range(1, 11):  # Adjust the number of attempts as needed
             try:
                 db_connection = await asyncpg.connect(
@@ -96,6 +145,29 @@ class DBTasks:
         else:
             raise ConnectionError("Failed to connect to the database after multiple attempts.")
 
+    async def check_db_access(self):
+        for attempt in range(1, 11):  # Adjust the number of attempts as needed
+            try:
+                db_connection = await asyncpg.connect(
+                    host=self.db_conf['host'],
+                    port=self.db_conf['port'],
+                    user=self.db_conf['user'],
+                    database="postgres",
+                    password=self.db_conf['password'],
+                )
+                await db_connection.fetchval('SELECT 1')
+                await db_connection.close()
+                self.logger.debug(f"Database \'{self.db_conf['database']}\' is available.")
+                return True
+            except (asyncpg.PostgresError, ConnectionError) as e:
+                self.logger.warning(
+                    f"Database not yet available. Attempt {attempt}/10. Error: {e}."
+                )
+                time.sleep(1)
+        else:
+            raise ConnectionError("Failed to connect to the database after multiple attempts."
+                                  "\nVerify the database connection parameters.")
+
 
 class SSHTasks:
     def __init__(self, db_conf, conn, logger):
@@ -116,6 +188,7 @@ class SSHTasks:
         return res
 
     async def sync(self):
+        self.logger.debug("Reset database host cache.")
         res = await self.conn.run_command("sync", check=False)
         return res
 
@@ -134,22 +207,23 @@ class DockerTasks:
 
     async def stop_db(self):
         try:
-            res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}")
             self.conn.close()
-            return res
+            return True
         except Exception as e:
             raise RuntimeError(f"Database '{self.pg_data_path}' shutdown error:\n{str(e)}")
 
     async def start_db(self):
         await self.conn.start()
-        res = await self.conn.run_command(f"{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}")
-        return res
+        await asyncio.sleep(0.2)
+        return True
 
     async def sync(self):
-        ...
+        self.logger.debug("Reset database host cache.")
+        await run_command(self.logger, "sync", True)
 
     async def drop_caches(self):
-        ...
+        cmd = "sudo /bin/sh -c 'echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches'"
+        await run_command(self.logger, cmd, True)
 
 
 class LocalConnTasks:
@@ -172,10 +246,15 @@ class LocalConnTasks:
         return res
 
     async def sync(self):
-        ...
+        self.logger.debug("Reset database host cache.")
+        try:
+            await run_command(self.logger, "sync", True)
+        except Exception as e:
+            raise RuntimeError(f"Database '{self.pg_data_path}' shutdown error:\n{str(e)}")
 
     async def drop_caches(self):
-        ...
+        cmd = "sudo /bin/sh -c 'echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches'"
+        await run_command(self.logger, cmd, True)
 
 
 def get_conn_type_tasks(type):
@@ -185,16 +264,3 @@ def get_conn_type_tasks(type):
         return DockerTasks
     if type == ConnectionType.LOCAL:
         return LocalConnTasks
-
-
-async def collect_db_logs(client, db_conn, log_conf, logger, report):
-    """
-    If DB info was collected and log collection is enabled,
-    fetch the log directory and call collect_logs.
-    """
-    if db_conn and log_conf.get("collect_pg_logs"):
-        try:
-            log_dir = await db_conn.fetchval("show log_directory")
-            await collect_logs(client, log_dir, report["report_name"])
-        except Exception as e:
-            logger.warning(f"Error collecting logs: {str(e)}")

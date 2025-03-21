@@ -22,93 +22,106 @@ def get_script_text(full_script_path) -> str:
         raise OSError(f"Failed to open or read script file {full_script_path}: {e}")
 
 
-async def run_shell_command(conn, item):
+async def run_shell_command(logger, conn, item):
     # check necessary fields in item
     shell_cmd_file = item.get('shell_command_file')
     if not shell_cmd_file:
-        print("Missing 'shell_command_file' in item. Skipping execution.")
+        logger.debug("Missing \"shell_command_file\" in item. Skipping execution.")
         return
 
     raw_script_text = get_script_text(SHELL_COMMANDS_PATH / shell_cmd_file)
 
-    try:
-        if item.get('item_type') == 'plain_text':
-            # for plain_text, simply run the command and store output
-            item['data'] = await conn.run_command(raw_script_text)
-
-        elif item.get('item_type') == 'table':
-            # for table, we expect JSON output from shell command
-            data_str = await conn.run_command(raw_script_text)
+    if item.get("item_type") == "plain_text":
+        try:
+            result = await conn.run_command(raw_script_text, True)
+            if result is None:
+                item["data"] = "Error generating report of type \"plain_text\": No output returned."
+            else:
+                item["data"] = result
+        except Exception as e:
+            logger.debug(f"Error generating report of type \"plain_text\": {e}")
+            item["data"] = f"Error generating report of type \"plain_text\": {e}"
+    elif item.get("item_type") == "table":
+        try:
+            data_str = await conn.run_command(raw_script_text, True)
             try:
                 data = json.loads(data_str)
             except json.JSONDecodeError as e:
-                print(f"Failed to parse JSON from shell command output: {str(e)}")
+                logger.debug(f"Error parsing JSON for table report:\n{e}")
+                item["data"] = f"Error parsing JSON for table report: {e}"
+                item["item_type"] = "plain_text"
                 return
 
             if not isinstance(data, list):
-                print("Unexpected data format from shell command. A list of dicts is expected.")
+                logger.debug(f"Unexpected data format from shell command. A list of dicts is expected.")
+                item["data"] = "Unexpected data format from shell command. A list of dicts is expected."
+                item["item_type"] = "plain_text"
                 return
 
             # Ensure 'theader' is a list in item
-            if 'theader' not in item or not isinstance(item['theader'], list):
-                item['theader'] = []
+            if "theader" not in item or not isinstance(item["theader"], list):
+                item["theader"] = []
 
-            if 'data' not in item or not isinstance(item['data'], list):
-                item['data'] = []
+            if "data" not in item or not isinstance(item["data"], list):
+                item["data"] = []
 
             # Build table headers and rows
             for obj in data:
                 if not isinstance(obj, dict):
-                    print(f"Skipping invalid object in shell command output: {obj}")
+                    item["data"].append(f"Skipping invalid object: {obj}")
                     continue
                 for key in obj.keys():
-                    if key not in item['theader']:
-                        item['theader'].append(key)
+                    if key not in item["theader"]:
+                        item["theader"].append(key)
 
             for obj in data:
                 if isinstance(obj, dict):
                     row = []
-                    for key in item['theader']:
+                    for key in item["theader"]:
                         row.append(obj.get(key, None))
-                    item['data'].append(row)
-
-        else:
-            print(f"Unknown item_type in shell_command: {item.get('item_type')}")
-
-    except Exception as e:
-        print(f'Execution of command \"{shell_cmd_file}\" was failed:\n {str(e)}')
+                    item["data"].append(row)
+        except Exception as e:
+            logger.debug(f"Error generating report of type \"table\": {e}")
+            item["data"] = f"Error generating report of type \"table\": {e}"
+            item["item_type"] = "plain_text"
 
 
-async def run_sql_command(dbconn, item):
+async def run_sql_command(logger, dbconn, item):
     sql_cmd_file = item.get('sql_command_file')
     if not sql_cmd_file:
-        print("Missing 'sql_command_file' in item. Skipping execution.")
+        logger.debug("Missing \"sql_command_file\" in item. Skipping execution.")
         return
 
     raw_script_text = get_script_text(SQL_COMMANDS_PATH / sql_cmd_file)
-
-    try:
-        item_type = item.get('item_type')
-        if item_type == 'plain_text':
-            # fetch a single value
-            item['data'] = await dbconn.fetchval(raw_script_text)
-
-        elif item_type == 'table':
-            # fetch multiple rows
+    item_type = item.get('item_type')
+    if item_type == "plain_text":
+        try:
+            result = await dbconn.fetchval(raw_script_text)
+            if result is None:
+                item["data"] = "Error generating report of type \"plain_text\": No data returned."
+            else:
+                item["data"] = result
+        except Exception as e:
+            logger.debug(f"Error generating report of type \"plain_text\": {e}")
+            item["data"] = f"Error generating report of type \"plain_text\": {e}"
+    elif item_type == "table":
+        try:
             fetch_result = await dbconn.fetch(raw_script_text)
             if fetch_result:
-                item['theader'] = [key for key in fetch_result[0].keys()]
-                item['data'] = [list(record) for record in fetch_result]
+                item["theader"] = [key for key in fetch_result[0].keys()]
+                item["data"] = [list(record) for record in fetch_result]
             else:
-                # If no data returned
-                item['theader'] = []
-                item['data'] = []
-
-        else:
-            print(f"Unknown item_type in sql_command: {item_type}")
-
-    except Exception as e:
-        print(f'Execution of command \"{sql_cmd_file}\" was failed:\n {str(e)}')
+                item["theader"] = []
+                item[
+                    "data"] = "Error generating a report of type \"shell_command_file\" for format \"table\": No data returned."
+                item["item_type"] = "plain_text"
+        except Exception as e:
+            logger.debug(f"Error generating report of type \"table\": {e}")
+            item["theader"] = []
+            item["data"] = f"Error generating report of type \"table\": {e}"
+            item["item_type"] = "plain_text"
+    else:
+        logger.debug(f"Unknown item_type in sql_command: {item_type}")
 
 
 def args(report_data, item):
@@ -314,7 +327,7 @@ async def collect_logs(logger, connect, remote_logs_path, report_name: str = DEF
             'description': 'Local path to the database log archive',
             'item_type': 'link',
             'state': 'collapsed',
-            'python_command': 'collect_logs',
+            'python_command': '',
             'data': data
         }
 
@@ -338,18 +351,25 @@ async def execute_steps_in_order(logger, command_steps, report_data, conn, db) -
     for step in command_steps:
         cmd_type = step.get('cmd_type')
         report_obj = step.get('report_obj')
+        section_name = step.get('section')
+        report_name = step.get('report')
+        cmd_value = step.get('cmd_value')
+
+        if logger:
+            logger.debug(f"Executing step - Section: {section_name}, Report: {report_name}, "
+                         f"Command Type: {cmd_type}, Command: {cmd_value}")
         if not report_obj:
             if logger:
                 logger.warning("Missing 'report_obj' in step. Skipping.")
             continue
 
         if cmd_type == 'shell_command':
-            await run_shell_command(conn, report_obj)
+            await run_shell_command(logger, conn, report_obj)
 
         elif cmd_type == 'sql_command':
             # skip if db is None
             if db:
-                await run_sql_command(db, report_obj)
+                await run_sql_command(logger, db, report_obj)
             else:
                 if logger:
                     logger.error("No database connection provided for sql_command. Skipping.")

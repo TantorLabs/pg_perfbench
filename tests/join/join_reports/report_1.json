@@ -1,0 +1,2827 @@
+{
+    "header": "PostgreSQL database benchmark report",
+    "report_name": "report_1",
+    "description": "2025-03-11_00-00-00",
+    "sections": {
+        "system": {
+            "header": "System properties <hn>",
+            "description": "Common info about current host",
+            "state": "expanded",
+            "reports": {
+                "uname_a": {
+                    "header": "Linux kernel version and machine architecture | uname -r -m",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "uname_a.sh",
+                    "data": "6.8.0-52-generic x86_64\n"
+                },
+                "etc_os_release": {
+                    "header": "OS distribution information | /etc/os-release",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_os_release.sh",
+                    "data": "PRETTY_NAME=\"Ubuntu 22.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"22.04\"\nVERSION=\"22.04.5 LTS (Jammy Jellyfish)\"\nVERSION_CODENAME=jammy\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=jammy\n"
+                },
+                "sys_memory_total": {
+                    "header": "System memory information | /proc/meminfo",
+                    "description": "Current state of the system's memory during the benchmarking",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sys_memory_total.sh",
+                    "data": "MemTotal:       49031732 kB\nMlocked:              48 kB\nSwapTotal:       2097148 kB\nSwapFree:        2097148 kB\nZswap:                 0 kB\nZswapped:              0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nCommitLimit:    26613012 kB\nVmallocTotal:   34359738367 kB\nVmallocChunk:          0 kB\nPercpu:            22400 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:         0 kB\nFileHugePages:         0 kB\nUnaccepted:            0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      495040 kB\nDirectMap2M:    17031168 kB\nDirectMap1G:    33554432 kB\n"
+                },
+                "total_ram": {
+                    "header": "Total RAM capacity | /proc/meminfo",
+                    "description": "Total database host RAM ",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "total_ram.sh",
+                    "data": "46 GB\n"
+                },
+                "cpu_info": {
+                    "header": "CPU architecture and specification display tool | lscpu",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "cpu_info.sh",
+                    "data": "Architecture:                         x86_64\nCPU op-mode(s):                       32-bit, 64-bit\nAddress sizes:                        39 bits physical, 48 bits virtual\nByte Order:                           Little Endian\nCPU(s):                               16\nOn-line CPU(s) list:                  0-15\nVendor ID:                            GenuineIntel\nModel name:                           12th Gen Intel(R) Core(TM) i7-1260P\nCPU family:                           6\nModel:                                154\nThread(s) per core:                   2\nCore(s) per socket:                   12\nSocket(s):                            1\nStepping:                             3\nCPU max MHz:                          4700.0000\nCPU min MHz:                          400.0000\nBogoMIPS:                             4992.00\nFlags:                                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid movdiri movdir64b fsrm md_clear serialize arch_lbr ibt flush_l1d arch_capabilities\nVirtualization:                       VT-x\nL1d cache:                            448 KiB (12 instances)\nL1i cache:                            640 KiB (12 instances)\nL2 cache:                             9 MiB (6 instances)\nL3 cache:                             18 MiB (1 instance)\nNUMA node(s):                         1\nNUMA node0 CPU(s):                    0-15\nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Mitigation; Clear Register File\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:             Mitigation; Enhanced / Automatic IBRS; IBPB conditional; RSB filling; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n"
+                },
+                "df_h": {
+                    "header": "Disk space usage | df -h",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "df_h.sh",
+                    "data": "Filesystem      Size  Used Avail Use% Mounted on\noverlay          97G   92G  173M 100% /\ntmpfs            64M     0   64M   0% /dev\nshm              64M  1.1M   63M   2% /dev/shm\n/dev/nvme0n1p4   97G   92G  173M 100% /etc/hosts\n"
+                },
+                "etc_fstab": {
+                    "header": "File system mount configuration | fstab",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_fstab.sh",
+                    "data": "# UNCONFIGURED FSTAB FOR BASE SYSTEM\n"
+                },
+                "mount": {
+                    "header": "Current filesystem mounts and their details | mount",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "mount.sh",
+                    "data": "overlay on / type overlay (rw,relatime,lowerdir=/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/U2JYMVVCKY2EEEC6VRTVQPWKYX:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/AAYWKX3BYSFOHLYRI4CCLZOHVG:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/OOI4I4OVAHMKYYAYPXZ6IY6YCL:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/XJ3V5TWUQPVPOQ5KYZZMNASLFU:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/QXUQ5XT4RNLDI7SPPQ6R5MOOH7:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/YNPEQXQGSAVD42S4G57OKUDLJL:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/ZKDIKU2LLJAEOIDEZWXPQRKRX4:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/BJCKANZTLIPWUGFMMBSSL2JJVV:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/WERL74LQE6WP72YIH6XDVTZWUO:/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/l/H6LR2O5SPFGU5J5UOYLLT6KQX7,upperdir=/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/871331a01c334d15c254be8fb945904647a5d5a6c622d22d14518001f0a7f14c/diff,workdir=/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8/docker-storage/overlay2/871331a01c334d15c254be8fb945904647a5d5a6c622d22d14518001f0a7f14c/work,nouserxattr)\nproc on /proc type proc (rw,nosuid,nodev,noexec,relatime)\ntmpfs on /dev type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)\ndevpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666)\nsysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)\ncgroup on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)\nmqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)\nshm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,inode64)\n/dev/nvme0n1p4 on /etc/resolv.conf type ext4 (rw,relatime,errors=remount-ro)\n/dev/nvme0n1p4 on /etc/hostname type ext4 (rw,relatime,errors=remount-ro)\n/dev/nvme0n1p4 on /etc/hosts type ext4 (rw,relatime,errors=remount-ro)\n/dev/nvme0n1p4 on /var/lib/postgresql/data type ext4 (rw,relatime,errors=remount-ro)\n"
+                },
+                "ip_br_addr": {
+                    "header": "Local hostname-to-IP mapping | ip -br addr",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "ip_br_addr.sh",
+                    "data": "127.0.0.1\tlocalhost\n::1\tlocalhost ip6-localhost ip6-loopback\nfe00::0\tip6-localnet\nff00::0\tip6-mcastprefix\nff02::1\tip6-allnodes\nff02::2\tip6-allrouters\n172.17.0.2\t7c4e45b746b6\n"
+                },
+                "sysctl_vm": {
+                    "header": "Kernel parameters related to virtual memory | /sbin/sysctl vm",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_vm.sh",
+                    "data": "vm.admin_reserve_kbytes = 8192\nvm.compact_unevictable_allowed = 1\nvm.compaction_proactiveness = 20\nvm.dirty_background_bytes = 0\nvm.dirty_background_ratio = 10\nvm.dirty_bytes = 0\nvm.dirty_expire_centisecs = 3000\nvm.dirty_ratio = 20\nvm.dirty_writeback_centisecs = 500\nvm.dirtytime_expire_seconds = 43200\nvm.extfrag_threshold = 500\nvm.hugetlb_optimize_vmemmap = 0\nvm.hugetlb_shm_group = 0\nvm.laptop_mode = 0\nvm.legacy_va_layout = 0\nvm.lowmem_reserve_ratio = 256\t256\t32\t0\t0\nvm.max_map_count = 65530\nvm.memfd_noexec = 0\nvm.memory_failure_early_kill = 0\nvm.memory_failure_recovery = 1\nvm.min_free_kbytes = 67584\nvm.min_slab_ratio = 5\nvm.min_unmapped_ratio = 1\nvm.mmap_min_addr = 65536\nvm.nr_hugepages = 0\nvm.nr_hugepages_mempolicy = 0\nvm.nr_overcommit_hugepages = 0\nvm.numa_stat = 1\nvm.numa_zonelist_order = Node\nvm.oom_dump_tasks = 1\nvm.oom_kill_allocating_task = 0\nvm.overcommit_kbytes = 0\nvm.overcommit_memory = 0\nvm.overcommit_ratio = 50\nvm.page-cluster = 3\nvm.page_lock_unfairness = 5\nvm.panic_on_oom = 0\nvm.percpu_pagelist_high_fraction = 0\nvm.stat_interval = 1\nvm.swappiness = 60\nvm.unprivileged_userfaultfd = 0\nvm.user_reserve_kbytes = 131072\nvm.vfs_cache_pressure = 100\nvm.watermark_boost_factor = 15000\nvm.watermark_scale_factor = 10\nvm.zone_reclaim_mode = 0\n"
+                },
+                "sysctl_net_ipv4_tcp": {
+                    "header": "Kernel parameters related to IPv4 TCP networking settings | /sbin/sysctl -a | grep \"^net\\.ipv4\\.tcp\"",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_net_ipv4_tcp.sh",
+                    "data": "net.ipv4.tcp_abort_on_overflow = 0\nnet.ipv4.tcp_adv_win_scale = 1\nnet.ipv4.tcp_allowed_congestion_control = reno cubic\nnet.ipv4.tcp_app_win = 31\nnet.ipv4.tcp_autocorking = 1\nnet.ipv4.tcp_available_congestion_control = reno cubic\nnet.ipv4.tcp_backlog_ack_defer = 1\nnet.ipv4.tcp_base_mss = 1024\nnet.ipv4.tcp_challenge_ack_limit = 2147483647\nnet.ipv4.tcp_child_ehash_entries = 0\nnet.ipv4.tcp_comp_sack_delay_ns = 1000000\nnet.ipv4.tcp_comp_sack_nr = 44\nnet.ipv4.tcp_comp_sack_slack_ns = 100000\nnet.ipv4.tcp_congestion_control = cubic\nnet.ipv4.tcp_dsack = 1\nnet.ipv4.tcp_early_demux = 1\nnet.ipv4.tcp_early_retrans = 3\nnet.ipv4.tcp_ecn = 2\nnet.ipv4.tcp_ecn_fallback = 1\nnet.ipv4.tcp_ehash_entries = -524288\nnet.ipv4.tcp_fack = 0\nnet.ipv4.tcp_fastopen = 1\nnet.ipv4.tcp_fastopen_blackhole_timeout_sec = 0\nnet.ipv4.tcp_fin_timeout = 60\nnet.ipv4.tcp_frto = 2\nnet.ipv4.tcp_fwmark_accept = 0\nnet.ipv4.tcp_invalid_ratelimit = 500\nnet.ipv4.tcp_keepalive_intvl = 75\nnet.ipv4.tcp_keepalive_probes = 9\nnet.ipv4.tcp_keepalive_time = 7200\nnet.ipv4.tcp_l3mdev_accept = 0\nnet.ipv4.tcp_limit_output_bytes = 1048576\nnet.ipv4.tcp_max_reordering = 300\nnet.ipv4.tcp_max_syn_backlog = 4096\nnet.ipv4.tcp_max_tw_buckets = 262144\nnet.ipv4.tcp_migrate_req = 0\nnet.ipv4.tcp_min_rtt_wlen = 300\nnet.ipv4.tcp_min_snd_mss = 48\nnet.ipv4.tcp_min_tso_segs = 2\nnet.ipv4.tcp_moderate_rcvbuf = 1\nnet.ipv4.tcp_mtu_probe_floor = 48\nnet.ipv4.tcp_mtu_probing = 0\nnet.ipv4.tcp_no_metrics_save = 0\nnet.ipv4.tcp_no_ssthresh_metrics_save = 1\nnet.ipv4.tcp_notsent_lowat = 4294967295\nnet.ipv4.tcp_orphan_retries = 0\nnet.ipv4.tcp_pacing_ca_ratio = 120\nnet.ipv4.tcp_pacing_ss_ratio = 200\nnet.ipv4.tcp_pingpong_thresh = 1\nnet.ipv4.tcp_plb_cong_thresh = 128\nnet.ipv4.tcp_plb_enabled = 0\nnet.ipv4.tcp_plb_idle_rehash_rounds = 3\nnet.ipv4.tcp_plb_rehash_rounds = 12\nnet.ipv4.tcp_plb_suspend_rto_sec = 60\nnet.ipv4.tcp_probe_interval = 600\nnet.ipv4.tcp_probe_threshold = 8\nnet.ipv4.tcp_recovery = 1\nnet.ipv4.tcp_reflect_tos = 0\nnet.ipv4.tcp_reordering = 3\nnet.ipv4.tcp_retrans_collapse = 1\nnet.ipv4.tcp_retries1 = 3\nnet.ipv4.tcp_retries2 = 15\nnet.ipv4.tcp_rfc1337 = 0\nnet.ipv4.tcp_rmem = 4096\t131072\t6291456\nnet.ipv4.tcp_sack = 1\nnet.ipv4.tcp_shrink_window = 0\nnet.ipv4.tcp_slow_start_after_idle = 1\nnet.ipv4.tcp_stdurg = 0\nnet.ipv4.tcp_syn_linear_timeouts = 4\nnet.ipv4.tcp_syn_retries = 6\nnet.ipv4.tcp_synack_retries = 5\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_thin_linear_timeouts = 0\nnet.ipv4.tcp_timestamps = 1\nnet.ipv4.tcp_tso_rtt_log = 9\nnet.ipv4.tcp_tso_win_divisor = 3\nnet.ipv4.tcp_tw_reuse = 2\nnet.ipv4.tcp_window_scaling = 1\nnet.ipv4.tcp_wmem = 4096\t16384\t4194304\nnet.ipv4.tcp_workaround_signed_windows = 0\n"
+                },
+                "sysctl_net_ipv4_udp": {
+                    "header": "Kernel parameters related to IPv4 UDP networking settings | /sbin/sysctl -a | grep \"^net\\.ipv4\\.udp\"",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "shell_command_file": "sysctl_net_ipv4_udp.sh",
+                    "data": "net.ipv4.udp_child_hash_entries = 0\nnet.ipv4.udp_early_demux = 1\nnet.ipv4.udp_hash_entries = -32768\nnet.ipv4.udp_l3mdev_accept = 0\nnet.ipv4.udp_rmem_min = 4096\nnet.ipv4.udp_wmem_min = 4096\n"
+                },
+                "lshw_system": {
+                    "header": "System Components | lshw -class system",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_system.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "version",
+                        "serial",
+                        "width",
+                        "configuration",
+                        "capabilities",
+                        "physid"
+                    ],
+                    "data": [
+                        [
+                            "7c4e45b746b6",
+                            "system",
+                            true,
+                            "DMI:001B",
+                            "Notebook",
+                            "21AHA015CD (LENOVO_MT_21AH_BU_Think_FM_ThinkPad T14 Gen 3)",
+                            "LENOVO",
+                            "ThinkPad T14 Gen 3",
+                            "PF3VZGML",
+                            64,
+                            {
+                                "administrator_password": "disabled",
+                                "chassis": "notebook",
+                                "family": "ThinkPad T14 Gen 3",
+                                "power-on_password": "disabled",
+                                "sku": "LENOVO_MT_21AH_BU_Think_FM_ThinkPad T14 Gen 3",
+                                "uuid": "9752e04c-3244-11b2-a85c-84a90993fe65"
+                            },
+                            {
+                                "smbios-3.4.0": "SMBIOS version 3.4.0",
+                                "dmi-3.4.0": "DMI version 3.4.0",
+                                "smp": "Symmetric Multi-Processing",
+                                "vsyscall32": "32-bit processes"
+                            },
+                            null
+                        ],
+                        [
+                            "pnp00:00",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "0"
+                        ],
+                        [
+                            "pnp00:01",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "1"
+                        ],
+                        [
+                            "pnp00:04",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "4"
+                        ],
+                        [
+                            "pnp00:05",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "5"
+                        ],
+                        [
+                            "pnp00:06",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "6"
+                        ],
+                        [
+                            "pnp00:07",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c02",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "7"
+                        ],
+                        [
+                            "pnp00:08",
+                            "system",
+                            true,
+                            null,
+                            null,
+                            "PnP device PNP0c01",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "system"
+                            },
+                            {
+                                "pnp": true
+                            },
+                            "8"
+                        ]
+                    ]
+                },
+                "lshw_bus": {
+                    "header": "Buses and Interfaces | lshw -class bus",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_bus.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "version",
+                        "serial",
+                        "slot",
+                        "businfo",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "core",
+                            "bus",
+                            true,
+                            "DMI:001C",
+                            "Motherboard",
+                            "21AHA015CD",
+                            "LENOVO",
+                            "0",
+                            "SDK0T76479 WIN",
+                            "L1HF26J0509",
+                            "Not Available",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "usb:0",
+                            "bus",
+                            true,
+                            "PCI:0000:00:0d.0",
+                            "USB controller",
+                            "Alder Lake-P Thunderbolt 4 USB Controller",
+                            "Intel Corporation",
+                            "d",
+                            "02",
+                            null,
+                            null,
+                            "pci@0000:00:0d.0",
+                            64,
+                            33000000,
+                            {
+                                "driver": "xhci_hcd",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "xhci": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "usb:1",
+                            "bus",
+                            true,
+                            "PCI:0000:00:0d.2",
+                            "USB controller",
+                            "Alder Lake-P Thunderbolt 4 NHI #0",
+                            "Intel Corporation",
+                            "d.2",
+                            "02",
+                            null,
+                            null,
+                            "pci@0000:00:0d.2",
+                            64,
+                            33000000,
+                            {
+                                "driver": "thunderbolt",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "msix": "MSI-X",
+                                "usb4_host_interface": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "usb:2",
+                            "bus",
+                            true,
+                            "PCI:0000:00:0d.3",
+                            "USB controller",
+                            "Alder Lake-P Thunderbolt 4 NHI #1",
+                            "Intel Corporation",
+                            "d.3",
+                            "02",
+                            null,
+                            null,
+                            "pci@0000:00:0d.3",
+                            64,
+                            33000000,
+                            {
+                                "driver": "thunderbolt",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "msix": "MSI-X",
+                                "usb4_host_interface": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "usb:3",
+                            "bus",
+                            true,
+                            "PCI:0000:00:14.0",
+                            "USB controller",
+                            "Alder Lake PCH USB 3.2 xHCI Host Controller",
+                            "Intel Corporation",
+                            "14",
+                            "01",
+                            null,
+                            null,
+                            "pci@0000:00:14.0",
+                            64,
+                            33000000,
+                            {
+                                "driver": "xhci_hcd",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "xhci": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "serial:0",
+                            "bus",
+                            true,
+                            "PCI:0000:00:15.0",
+                            "Serial bus controller",
+                            "Alder Lake PCH Serial IO I2C Controller #0",
+                            "Intel Corporation",
+                            "15",
+                            "01",
+                            null,
+                            null,
+                            "pci@0000:00:15.0",
+                            64,
+                            33000000,
+                            {
+                                "driver": "intel-lpss",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "serial:1",
+                            "bus",
+                            true,
+                            "PCI:0000:00:1f.4",
+                            "SMBus",
+                            "Alder Lake PCH-P SMBus Host Controller",
+                            "Intel Corporation",
+                            "1f.4",
+                            "01",
+                            null,
+                            null,
+                            "pci@0000:00:1f.4",
+                            64,
+                            33000000,
+                            {
+                                "driver": "i801_smbus",
+                                "latency": "0"
+                            },
+                            null
+                        ],
+                        [
+                            "serial:2",
+                            "bus",
+                            true,
+                            "PCI:0000:00:1f.5",
+                            "Serial bus controller",
+                            "Alder Lake-P PCH SPI Controller",
+                            "Intel Corporation",
+                            "1f.5",
+                            "01",
+                            null,
+                            null,
+                            "pci@0000:00:1f.5",
+                            32,
+                            33000000,
+                            {
+                                "driver": "intel-spi",
+                                "latency": "0"
+                            },
+                            null
+                        ]
+                    ]
+                },
+                "lshw_memory": {
+                    "header": "System Memory Information | lshw -class memory",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_memory.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "physid",
+                        "slot",
+                        "units",
+                        "size",
+                        "product",
+                        "vendor",
+                        "serial",
+                        "width",
+                        "clock",
+                        "capacity",
+                        "configuration",
+                        "capabilities",
+                        "version",
+                        "date",
+                        "businfo"
+                    ],
+                    "data": [
+                        [
+                            "memory",
+                            "memory",
+                            true,
+                            "DMI:0001",
+                            "System Memory",
+                            "1",
+                            "System board or motherboard",
+                            "bytes",
+                            51539607552,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:0",
+                            "memory",
+                            true,
+                            "DMI:0002",
+                            "SODIMM DDR4 Synchronous 3200 MHz (0.3 ns)",
+                            "0",
+                            "Controller0-ChannelA",
+                            "bytes",
+                            17179869184,
+                            "4ATS2G64HZ-3G2B1",
+                            "Micron Technology",
+                            "00000000",
+                            64,
+                            3200000000,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:1",
+                            "memory",
+                            true,
+                            "DMI:0003",
+                            "[empty]",
+                            "1",
+                            "Controller0-ChannelB-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:2",
+                            "memory",
+                            true,
+                            "DMI:0004",
+                            "[empty]",
+                            "2",
+                            "Controller0-ChannelC-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:3",
+                            "memory",
+                            true,
+                            "DMI:0005",
+                            "[empty]",
+                            "3",
+                            "Controller0-ChannelD-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:4",
+                            "memory",
+                            true,
+                            "DMI:0006",
+                            "SODIMM DDR4 Synchronous 3200 MHz (0.3 ns)",
+                            "4",
+                            "Controller1-ChannelA-DIMM0",
+                            "bytes",
+                            34359738368,
+                            "9905744-101.A00G",
+                            "Kingston",
+                            "B8980C53",
+                            64,
+                            3200000000,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:5",
+                            "memory",
+                            true,
+                            "DMI:0007",
+                            "[empty]",
+                            "5",
+                            "Controller1-ChannelB-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:6",
+                            "memory",
+                            true,
+                            "DMI:0008",
+                            "[empty]",
+                            "6",
+                            "Controller1-ChannelC-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "bank:7",
+                            "memory",
+                            true,
+                            "DMI:0009",
+                            "[empty]",
+                            "7",
+                            "Controller1-ChannelD-DIMM0",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:0",
+                            "memory",
+                            true,
+                            "DMI:0011",
+                            "L1 cache",
+                            "11",
+                            "L1 Cache",
+                            "bytes",
+                            196608,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            196608,
+                            {
+                                "level": "1"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "data": "Data cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:1",
+                            "memory",
+                            true,
+                            "DMI:0012",
+                            "L1 cache",
+                            "12",
+                            "L1 Cache",
+                            "bytes",
+                            131072,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            131072,
+                            {
+                                "level": "1"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "instruction": "Instruction cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:2",
+                            "memory",
+                            true,
+                            "DMI:0013",
+                            "L2 cache",
+                            "13",
+                            "L2 Cache",
+                            "bytes",
+                            5242880,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            5242880,
+                            {
+                                "level": "2"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "unified": "Unified cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:3",
+                            "memory",
+                            true,
+                            "DMI:0014",
+                            "L3 cache",
+                            "14",
+                            "L3 Cache",
+                            "bytes",
+                            18874368,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            18874368,
+                            {
+                                "level": "3"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "unified": "Unified cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:4",
+                            "memory",
+                            true,
+                            "DMI:0015",
+                            "L1 cache",
+                            "15",
+                            "L1 Cache",
+                            "bytes",
+                            262144,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            262144,
+                            {
+                                "level": "1"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "data": "Data cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:5",
+                            "memory",
+                            true,
+                            "DMI:0016",
+                            "L1 cache",
+                            "16",
+                            "L1 Cache",
+                            "bytes",
+                            524288,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            524288,
+                            {
+                                "level": "1"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "instruction": "Instruction cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:6",
+                            "memory",
+                            true,
+                            "DMI:0017",
+                            "L2 cache",
+                            "17",
+                            "L2 Cache",
+                            "bytes",
+                            4194304,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            4194304,
+                            {
+                                "level": "2"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "unified": "Unified cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "cache:7",
+                            "memory",
+                            true,
+                            "DMI:0018",
+                            "L3 cache",
+                            "18",
+                            "L3 Cache",
+                            "bytes",
+                            18874368,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            18874368,
+                            {
+                                "level": "3"
+                            },
+                            {
+                                "synchronous": "Synchronous",
+                                "internal": "Internal",
+                                "write-back": "Write-back",
+                                "unified": "Unified cache"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "firmware",
+                            "memory",
+                            true,
+                            null,
+                            "BIOS",
+                            "1a",
+                            null,
+                            "bytes",
+                            131072,
+                            null,
+                            "LENOVO",
+                            null,
+                            null,
+                            null,
+                            33554432,
+                            null,
+                            {
+                                "pci": "PCI bus",
+                                "pnp": "Plug-and-Play",
+                                "upgrade": "BIOS EEPROM can be upgraded",
+                                "shadowing": "BIOS shadowing",
+                                "cdboot": "Booting from CD-ROM/DVD",
+                                "bootselect": "Selectable boot path",
+                                "edd": "Enhanced Disk Drive extensions",
+                                "int13floppy720": "3.5\" 720KB floppy",
+                                "int5printscreen": "Print Screen key",
+                                "int9keyboard": "i8042 keyboard controller",
+                                "int14serial": "INT14 serial line control",
+                                "int17printer": "INT17 printer control",
+                                "int10video": "INT10 CGA/Mono video",
+                                "acpi": "ACPI",
+                                "usb": "USB legacy emulation",
+                                "biosbootspecification": "BIOS boot specification",
+                                "uefi": "UEFI specification is supported"
+                            },
+                            "N3MET22W (1.21 )",
+                            "09/27/2024",
+                            null
+                        ],
+                        [
+                            "memory",
+                            "memory",
+                            null,
+                            "PCI:0000:00:14.2",
+                            "RAM memory",
+                            "14.2",
+                            null,
+                            null,
+                            null,
+                            "Alder Lake PCH Shared SRAM",
+                            "Intel Corporation",
+                            null,
+                            64,
+                            33000000,
+                            null,
+                            {
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "cap_list": "PCI capabilities listing"
+                            },
+                            "01",
+                            null,
+                            "pci@0000:00:14.2"
+                        ]
+                    ]
+                },
+                "lshw_processor": {
+                    "header": "Processor Details | lshw -class processor",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_processor.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "serial",
+                        "slot",
+                        "units",
+                        "size",
+                        "capacity",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "cpu",
+                            "processor",
+                            true,
+                            "DMI:0019",
+                            "CPU",
+                            "12th Gen Intel(R) Core(TM) i7-1260P",
+                            "Intel Corp.",
+                            "19",
+                            "cpu@0",
+                            "6.154.3",
+                            "None",
+                            "U3E1",
+                            "Hz",
+                            2773333000,
+                            4700000000,
+                            64,
+                            100000000,
+                            {
+                                "cores": "12",
+                                "enabledcores": "12",
+                                "microcode": "1078",
+                                "threads": "16"
+                            },
+                            {
+                                "lm": "64bits extensions (x86-64)",
+                                "fpu": "mathematical co-processor",
+                                "fpu_exception": "FPU exceptions reporting",
+                                "wp": true,
+                                "vme": "virtual mode extensions",
+                                "de": "debugging extensions",
+                                "pse": "page size extensions",
+                                "tsc": "time stamp counter",
+                                "msr": "model-specific registers",
+                                "pae": "4GB+ memory addressing (Physical Address Extension)",
+                                "mce": "machine check exceptions",
+                                "cx8": "compare and exchange 8-byte",
+                                "apic": "on-chip advanced programmable interrupt controller (APIC)",
+                                "sep": "fast system calls",
+                                "mtrr": "memory type range registers",
+                                "pge": "page global enable",
+                                "mca": "machine check architecture",
+                                "cmov": "conditional move instruction",
+                                "pat": "page attribute table",
+                                "pse36": "36-bit page size extensions",
+                                "clflush": true,
+                                "dts": "debug trace and EMON store MSRs",
+                                "acpi": "thermal control (ACPI)",
+                                "mmx": "multimedia extensions (MMX)",
+                                "fxsr": "fast floating point save/restore",
+                                "sse": "streaming SIMD extensions (SSE)",
+                                "sse2": "streaming SIMD extensions (SSE2)",
+                                "ss": "self-snoop",
+                                "ht": "HyperThreading",
+                                "tm": "thermal interrupt and status",
+                                "pbe": "pending break event",
+                                "syscall": "fast system calls",
+                                "nx": "no-execute bit (NX)",
+                                "pdpe1gb": true,
+                                "rdtscp": true,
+                                "x86-64": "64bits extensions (x86-64)",
+                                "constant_tsc": true,
+                                "art": true,
+                                "arch_perfmon": true,
+                                "pebs": true,
+                                "bts": true,
+                                "rep_good": true,
+                                "nopl": true,
+                                "xtopology": true,
+                                "nonstop_tsc": true,
+                                "cpuid": true,
+                                "aperfmperf": true,
+                                "tsc_known_freq": true,
+                                "pni": true,
+                                "pclmulqdq": true,
+                                "dtes64": true,
+                                "monitor": true,
+                                "ds_cpl": true,
+                                "vmx": true,
+                                "smx": true,
+                                "est": true,
+                                "tm2": true,
+                                "ssse3": true,
+                                "sdbg": true,
+                                "fma": true,
+                                "cx16": true,
+                                "xtpr": true,
+                                "pdcm": true,
+                                "pcid": true,
+                                "sse4_1": true,
+                                "sse4_2": true,
+                                "x2apic": true,
+                                "movbe": true,
+                                "popcnt": true,
+                                "tsc_deadline_timer": true,
+                                "aes": true,
+                                "xsave": true,
+                                "avx": true,
+                                "f16c": true,
+                                "rdrand": true,
+                                "lahf_lm": true,
+                                "abm": true,
+                                "3dnowprefetch": true,
+                                "cpuid_fault": true,
+                                "epb": true,
+                                "ssbd": true,
+                                "ibrs": true,
+                                "ibpb": true,
+                                "stibp": true,
+                                "ibrs_enhanced": true,
+                                "tpr_shadow": true,
+                                "flexpriority": true,
+                                "ept": true,
+                                "vpid": true,
+                                "ept_ad": true,
+                                "fsgsbase": true,
+                                "tsc_adjust": true,
+                                "bmi1": true,
+                                "avx2": true,
+                                "smep": true,
+                                "bmi2": true,
+                                "erms": true,
+                                "invpcid": true,
+                                "rdseed": true,
+                                "adx": true,
+                                "smap": true,
+                                "clflushopt": true,
+                                "clwb": true,
+                                "intel_pt": true,
+                                "sha_ni": true,
+                                "xsaveopt": true,
+                                "xsavec": true,
+                                "xgetbv1": true,
+                                "xsaves": true,
+                                "split_lock_detect": true,
+                                "user_shstk": true,
+                                "avx_vnni": true,
+                                "dtherm": true,
+                                "ida": true,
+                                "arat": true,
+                                "pln": true,
+                                "pts": true,
+                                "hwp": true,
+                                "hwp_notify": true,
+                                "hwp_act_window": true,
+                                "hwp_epp": true,
+                                "hwp_pkg_req": true,
+                                "hfi": true,
+                                "vnmi": true,
+                                "umip": true,
+                                "pku": true,
+                                "ospke": true,
+                                "waitpkg": true,
+                                "gfni": true,
+                                "vaes": true,
+                                "vpclmulqdq": true,
+                                "rdpid": true,
+                                "movdiri": true,
+                                "movdir64b": true,
+                                "fsrm": true,
+                                "md_clear": true,
+                                "serialize": true,
+                                "arch_lbr": true,
+                                "ibt": true,
+                                "flush_l1d": true,
+                                "arch_capabilities": true,
+                                "cpufreq": "CPU Frequency scaling"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_bridge": {
+                    "header": "Bridges and Controllers | lshw -class bridge",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_bridge.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "pci",
+                            "bridge",
+                            true,
+                            "PCIBUS:0000:00",
+                            "Host bridge",
+                            "Intel Corporation",
+                            "Intel Corporation",
+                            "100",
+                            "pci@0000:00:00.0",
+                            "02",
+                            32,
+                            33000000,
+                            {
+                                "driver": "igen6_edac"
+                            },
+                            null
+                        ],
+                        [
+                            "pci:0",
+                            "bridge",
+                            true,
+                            "PCIBUS:0000:02",
+                            "PCI bridge",
+                            "12th Gen Core Processor PCI Express x4 Controller #0",
+                            "Intel Corporation",
+                            "6",
+                            "pci@0000:00:06.0",
+                            "02",
+                            32,
+                            33000000,
+                            {
+                                "driver": "pcieport"
+                            },
+                            {
+                                "pci": true,
+                                "pciexpress": "PCI Express",
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "normal_decode": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "pci:1",
+                            "bridge",
+                            true,
+                            "PCIBUS:0000:20",
+                            "PCI bridge",
+                            "Alder Lake-P Thunderbolt 4 PCI Express Root Port #0",
+                            "Intel Corporation",
+                            "7",
+                            "pci@0000:00:07.0",
+                            "02",
+                            32,
+                            33000000,
+                            {
+                                "driver": "pcieport"
+                            },
+                            {
+                                "pci": true,
+                                "pciexpress": "PCI Express",
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "normal_decode": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "pci:2",
+                            "bridge",
+                            true,
+                            "PCIBUS:0000:50",
+                            "PCI bridge",
+                            "Alder Lake-P Thunderbolt 4 PCI Express Root Port #2",
+                            "Intel Corporation",
+                            "7.2",
+                            "pci@0000:00:07.2",
+                            "02",
+                            32,
+                            33000000,
+                            {
+                                "driver": "pcieport"
+                            },
+                            {
+                                "pci": true,
+                                "pciexpress": "PCI Express",
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "normal_decode": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "isa",
+                            "bridge",
+                            true,
+                            "PCI:0000:00:1f.0",
+                            "ISA bridge",
+                            "Alder Lake PCH eSPI Controller",
+                            "Intel Corporation",
+                            "1f",
+                            "pci@0000:00:1f.0",
+                            "01",
+                            32,
+                            33000000,
+                            {
+                                "latency": "0"
+                            },
+                            {
+                                "isa": true,
+                                "bus_master": "bus mastering"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_display": {
+                    "header": "Graphics Adapters | lshw -class display",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_display.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "logicalname",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "display",
+                            "display",
+                            true,
+                            "PCI:0000:00:02.0",
+                            "VGA compatible controller",
+                            "Alder Lake-P Integrated Graphics Controller",
+                            "Intel Corporation",
+                            "2",
+                            "pci@0000:00:02.0",
+                            "/dev/fb0",
+                            "0c",
+                            64,
+                            33000000,
+                            {
+                                "depth": "32",
+                                "driver": "i915",
+                                "latency": "0",
+                                "mode": "1920x1200",
+                                "resolution": "1920,1200",
+                                "visual": "truecolor",
+                                "xres": "1920",
+                                "yres": "1200"
+                            },
+                            {
+                                "pciexpress": "PCI Express",
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "vga_controller": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing",
+                                "rom": "extension ROM",
+                                "fb": "framebuffer"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_network": {
+                    "header": "Network Interfaces | lshw -class network",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_network.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "network:0",
+                            "network",
+                            true,
+                            "PCI:0000:00:14.3",
+                            "Network controller",
+                            "Alder Lake-P PCH CNVi WiFi",
+                            "Intel Corporation",
+                            "14.3",
+                            "pci@0000:00:14.3",
+                            "01",
+                            64,
+                            33000000,
+                            {
+                                "driver": "iwlwifi",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "pciexpress": "PCI Express",
+                                "msix": "MSI-X",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "network:1",
+                            "network",
+                            true,
+                            "PCI:0000:00:1f.6",
+                            "Ethernet controller",
+                            "Ethernet Connection (16) I219-V",
+                            "Intel Corporation",
+                            "1f.6",
+                            "pci@0000:00:1f.6",
+                            "01",
+                            32,
+                            33000000,
+                            {
+                                "driver": "e1000e",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_storage": {
+                    "header": "Storage Controllers | lshw -class storage",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_storage.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "physid",
+                        "businfo",
+                        "logicalname",
+                        "version",
+                        "serial",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "nvme",
+                            "storage",
+                            true,
+                            "PCI:0000:02:00.0",
+                            "NVMe device",
+                            "Netac NVMe SSD 1TB",
+                            "0",
+                            "pci@0000:02:00.0",
+                            "/dev/nvme0",
+                            "V0714C0",
+                            "AA202303281TB4657375",
+                            64,
+                            33000000,
+                            {
+                                "driver": "nvme",
+                                "latency": "0",
+                                "nqn": "nqn.2014.08.org.nvmexpress:126f126fAA202303281TB4657375Netac NVMe SSD 1TB",
+                                "state": "live"
+                            },
+                            {
+                                "nvme": true,
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "pciexpress": "PCI Express",
+                                "msix": "MSI-X",
+                                "nvm_express": true,
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_disk": {
+                    "header": "Hard Drives and SSDs | lshw -class disk",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_disk.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "description",
+                        "physid",
+                        "logicalname",
+                        "handle",
+                        "businfo",
+                        "units",
+                        "size",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "namespace:0",
+                            "disk",
+                            true,
+                            "NVMe disk",
+                            "0",
+                            "hwmon3",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "namespace:1",
+                            "disk",
+                            true,
+                            "NVMe disk",
+                            "2",
+                            "/dev/ng0n1",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "namespace:2",
+                            "disk",
+                            true,
+                            "NVMe disk",
+                            "1",
+                            "/dev/nvme0n1",
+                            "GUID:5d35c811-476e-4401-88bb-bfd01ccd4b2c",
+                            "nvme@0:1",
+                            "bytes",
+                            1000204886016,
+                            {
+                                "guid": "5d35c811-476e-4401-88bb-bfd01ccd4b2c",
+                                "logicalsectorsize": "512",
+                                "sectorsize": "512",
+                                "wwid": "nvme.126f-4141323032333033323831544234363537333735-4e65746163204e564d652053534420315442-00000001"
+                            },
+                            {
+                                "gpt-1.00": "GUID Partition Table version 1.00",
+                                "partitioned": "Partitioned disk",
+                                "partitioned:gpt": "GUID partition table"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_volume": {
+                    "header": "Disk Partitions and Volumes | lshw -class volume",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_volume.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "handle",
+                        "description",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "serial",
+                        "size",
+                        "capacity",
+                        "configuration",
+                        "capabilities",
+                        "claimed",
+                        "logicalname",
+                        "dev"
+                    ],
+                    "data": [
+                        [
+                            "volume:0",
+                            "volume",
+                            "GUID:b91488d2-b631-4681-b234-fd3a215013d6",
+                            "Windows FAT volume",
+                            "mkfs.fat",
+                            "1",
+                            "nvme@0:1,1",
+                            "FAT32",
+                            "f805-69d5",
+                            535805952,
+                            536870400,
+                            {
+                                "FATs": "2",
+                                "filesystem": "fat",
+                                "name": "EFI System Partition"
+                            },
+                            {
+                                "boot": "Contains boot code",
+                                "fat": "Windows FAT",
+                                "initialized": "initialized volume"
+                            },
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "volume:1",
+                            "volume",
+                            "GUID:5b65d17a-a253-4191-993d-2d8a88ee2219",
+                            "EXT4 volume",
+                            "Linux",
+                            "2",
+                            "nvme@0:1,2",
+                            "1.0",
+                            "84f23b72-0650-49c0-a4e9-a9152af47fd8",
+                            684183912448,
+                            684183913472,
+                            {
+                                "created": "2023-08-01 14:39:27",
+                                "filesystem": "ext4",
+                                "lastmountpoint": "/media/nad/84f23b72-0650-49c0-a4e9-a9152af47fd8",
+                                "modified": "2025-03-08 13:59:12",
+                                "mounted": "2025-03-06 10:30:02",
+                                "state": "clean"
+                            },
+                            {
+                                "journaled": true,
+                                "extended_attributes": "Extended Attributes",
+                                "large_files": "4GB+ files",
+                                "huge_files": "16TB+ files",
+                                "dir_nlink": "directories with 65000+ subdirs",
+                                "64bit": "64bit filesystem",
+                                "extents": "extent-based allocation",
+                                "ext4": true,
+                                "ext2": "EXT2/EXT3",
+                                "initialized": "initialized volume"
+                            },
+                            true,
+                            "/dev/nvme0n1p2",
+                            "259:2"
+                        ],
+                        [
+                            "volume:2",
+                            "volume",
+                            "GUID:ef1061cb-f1e0-4757-b4a6-992c8eacf2cc",
+                            "EXT4 volume",
+                            "Linux",
+                            "3",
+                            "nvme@0:1,3",
+                            "1.0",
+                            "011992de-e192-443a-9383-2f86b8cbb2e0",
+                            209521213440,
+                            null,
+                            {
+                                "created": "2024-10-29 13:26:52",
+                                "filesystem": "ext4",
+                                "label": "dev",
+                                "lastmountpoint": "/media/nad/dev",
+                                "modified": "2025-03-08 19:13:27",
+                                "mounted": "2025-03-08 19:13:27",
+                                "state": "clean"
+                            },
+                            {
+                                "journaled": true,
+                                "extended_attributes": "Extended Attributes",
+                                "large_files": "4GB+ files",
+                                "huge_files": "16TB+ files",
+                                "dir_nlink": "directories with 65000+ subdirs",
+                                "recover": "needs recovery",
+                                "64bit": "64bit filesystem",
+                                "extents": "extent-based allocation",
+                                "ext4": true,
+                                "ext2": "EXT2/EXT3",
+                                "initialized": "initialized volume"
+                            },
+                            true,
+                            "/dev/nvme0n1p3",
+                            "259:3"
+                        ],
+                        [
+                            "volume:3",
+                            "volume",
+                            "GUID:19b56fbe-8e0c-4e5c-b695-3497de1d1f6b",
+                            "EXT4 volume",
+                            "Linux",
+                            "4",
+                            "nvme@0:1,4",
+                            "1.0",
+                            "f0035527-98dc-4c68-a0f1-ab47c8e3f24f",
+                            105960701952,
+                            null,
+                            {
+                                "created": "2024-10-26 16:31:20",
+                                "filesystem": "ext4",
+                                "lastmountpoint": "/",
+                                "modified": "2025-03-09 17:45:22",
+                                "mount.fstype": "ext4",
+                                "mount.options": "rw,relatime,errors=remount-ro",
+                                "mounted": "2025-03-08 14:02:22",
+                                "state": "mounted"
+                            },
+                            {
+                                "journaled": true,
+                                "extended_attributes": "Extended Attributes",
+                                "large_files": "4GB+ files",
+                                "huge_files": "16TB+ files",
+                                "dir_nlink": "directories with 65000+ subdirs",
+                                "recover": "needs recovery",
+                                "64bit": "64bit filesystem",
+                                "extents": "extent-based allocation",
+                                "ext4": true,
+                                "ext2": "EXT2/EXT3",
+                                "initialized": "initialized volume"
+                            },
+                            true,
+                            [
+                                "/dev/nvme0n1p4",
+                                "/etc/resolv.conf",
+                                "/etc/hostname",
+                                "/etc/hosts",
+                                "/var/lib/postgresql/data"
+                            ],
+                            "259:4"
+                        ]
+                    ]
+                },
+                "lshw_input": {
+                    "header": "Input Devices | lshw -class input",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_input.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "product",
+                        "physid",
+                        "logicalname",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "input:0",
+                            "input",
+                            true,
+                            "Sleep Button",
+                            "2",
+                            [
+                                "input0",
+                                "/dev/input/event0"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:1",
+                            "input",
+                            true,
+                            "Lid Switch",
+                            "3",
+                            [
+                                "input1",
+                                "/dev/input/event1"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:2",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful Mouse",
+                            "4",
+                            [
+                                "input16",
+                                "/dev/input/event12",
+                                "/dev/input/mouse4"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:3",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful Consumer Control",
+                            "5",
+                            [
+                                "input17",
+                                "/dev/input/event13"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:4",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful System Control",
+                            "6",
+                            [
+                                "input18",
+                                "/dev/input/event14"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:5",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful",
+                            "7",
+                            [
+                                "input19",
+                                "/dev/input/event15"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:6",
+                            "input",
+                            true,
+                            "Power Button",
+                            "8",
+                            [
+                                "input2",
+                                "/dev/input/event2"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:7",
+                            "input",
+                            true,
+                            "Xiaomi Xiaomi Wireless Mouse 3 Colorful",
+                            "9",
+                            [
+                                "input20",
+                                "/dev/input/event16",
+                                "input20::capslock",
+                                "input20::compose",
+                                "input20::kana",
+                                "input20::numlock",
+                                "input20::scrolllock"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:8",
+                            "input",
+                            true,
+                            "Intel HID events",
+                            "a",
+                            [
+                                "input21",
+                                "/dev/input/event17"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:9",
+                            "input",
+                            true,
+                            "ThinkPad Extra Buttons",
+                            "b",
+                            [
+                                "input22",
+                                "/dev/input/event18"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:10",
+                            "input",
+                            true,
+                            "SYNA8018:00 06CB:CE67 Mouse",
+                            "c",
+                            [
+                                "input23",
+                                "/dev/input/event4",
+                                "/dev/input/mouse0"
+                            ],
+                            {
+                                "i2c": "I²C bus"
+                            }
+                        ],
+                        [
+                            "input:11",
+                            "input",
+                            true,
+                            "SYNA8018:00 06CB:CE67 Touchpad",
+                            "d",
+                            [
+                                "input24",
+                                "/dev/input/event5",
+                                "/dev/input/mouse1"
+                            ],
+                            {
+                                "i2c": "I²C bus"
+                            }
+                        ],
+                        [
+                            "input:12",
+                            "input",
+                            true,
+                            "Video Bus",
+                            "e",
+                            [
+                                "input26",
+                                "/dev/input/event19"
+                            ],
+                            {
+                                "platform": true
+                            }
+                        ],
+                        [
+                            "input:13",
+                            "input",
+                            true,
+                            "sof-hda-dsp Mic",
+                            "f",
+                            [
+                                "input27",
+                                "/dev/input/event20"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:14",
+                            "input",
+                            true,
+                            "sof-hda-dsp Headphone",
+                            "10",
+                            [
+                                "input28",
+                                "/dev/input/event21"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:15",
+                            "input",
+                            true,
+                            "sof-hda-dsp HDMI/DP,pcm=3",
+                            "11",
+                            [
+                                "input29",
+                                "/dev/input/event22"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:16",
+                            "input",
+                            true,
+                            "AT Translated Set 2 keyboard",
+                            "12",
+                            [
+                                "input3",
+                                "/dev/input/event3",
+                                "input3::capslock",
+                                "input3::numlock",
+                                "input3::scrolllock"
+                            ],
+                            {
+                                "i8042": "i8042 PC AT keyboard controller"
+                            }
+                        ],
+                        [
+                            "input:17",
+                            "input",
+                            true,
+                            "sof-hda-dsp HDMI/DP,pcm=4",
+                            "13",
+                            [
+                                "input30",
+                                "/dev/input/event23"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:18",
+                            "input",
+                            true,
+                            "sof-hda-dsp HDMI/DP,pcm=5",
+                            "14",
+                            [
+                                "input31",
+                                "/dev/input/event24"
+                            ],
+                            null
+                        ],
+                        [
+                            "input:19",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD",
+                            "15",
+                            [
+                                "input33",
+                                "/dev/input/event7",
+                                "input33::capslock",
+                                "input33::compose",
+                                "input33::kana",
+                                "input33::numlock",
+                                "input33::scrolllock"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:20",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD Keyboard",
+                            "16",
+                            [
+                                "input34",
+                                "/dev/input/event8",
+                                "input34::capslock",
+                                "input34::compose",
+                                "input34::kana",
+                                "input34::numlock",
+                                "input34::scrolllock"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:21",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD Mouse",
+                            "17",
+                            [
+                                "input36",
+                                "/dev/input/event9",
+                                "/dev/input/mouse3"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:22",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD Wireless Radio Control",
+                            "18",
+                            [
+                                "input37",
+                                "/dev/input/event10"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:23",
+                            "input",
+                            true,
+                            "ZXWMicroChip ZXW-KEYBOARD",
+                            "19",
+                            [
+                                "input38",
+                                "/dev/input/event11"
+                            ],
+                            {
+                                "usb": "USB"
+                            }
+                        ],
+                        [
+                            "input:24",
+                            "input",
+                            true,
+                            "TPPS/2 Elan TrackPoint",
+                            "1a",
+                            [
+                                "input6",
+                                "/dev/input/event6",
+                                "/dev/input/mouse2"
+                            ],
+                            {
+                                "i8042": "i8042 PC AT keyboard controller"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_communication": {
+                    "header": "Communication Devices | lshw -class communication",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_communication.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "communication",
+                            "communication",
+                            true,
+                            "PCI:0000:00:16.0",
+                            "Communication controller",
+                            "Alder Lake PCH HECI Controller",
+                            "Intel Corporation",
+                            "16",
+                            "pci@0000:00:16.0",
+                            "01",
+                            64,
+                            33000000,
+                            {
+                                "driver": "mei_me",
+                                "latency": "0"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_multimedia": {
+                    "header": "Audio and Multimedia Devices | lshw -class multimedia",
+                    "state": "hidden",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_multimedia.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "logicalname",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "multimedia",
+                            "multimedia",
+                            true,
+                            "PCI:0000:00:1f.3",
+                            "Audio device",
+                            "Alder Lake PCH-P High Definition Audio Controller",
+                            "Intel Corporation",
+                            "1f.3",
+                            "pci@0000:00:1f.3",
+                            [
+                                "card0",
+                                "/dev/snd/controlC0",
+                                "/dev/snd/hwC0D0",
+                                "/dev/snd/hwC0D2",
+                                "/dev/snd/pcmC0D0c",
+                                "/dev/snd/pcmC0D0p",
+                                "/dev/snd/pcmC0D1c",
+                                "/dev/snd/pcmC0D1p",
+                                "/dev/snd/pcmC0D3p",
+                                "/dev/snd/pcmC0D4p",
+                                "/dev/snd/pcmC0D5p",
+                                "/dev/snd/pcmC0D6c",
+                                "/dev/snd/pcmC0D7c"
+                            ],
+                            "01",
+                            64,
+                            33000000,
+                            {
+                                "driver": "sof-audio-pci-intel-tgl",
+                                "latency": "64"
+                            },
+                            {
+                                "pm": "Power Management",
+                                "msi": "Message Signalled Interrupts",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_power": {
+                    "header": "Power Components | lshw -class power",
+                    "state": "hidden",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_power.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "slot",
+                        "units",
+                        "capacity",
+                        "configuration"
+                    ],
+                    "data": [
+                        [
+                            "battery",
+                            "power",
+                            true,
+                            "DMI:0031",
+                            "5B10W51865",
+                            "SMP",
+                            "1",
+                            "Front",
+                            "mWh",
+                            52570,
+                            {
+                                "voltage": "15.5V"
+                            }
+                        ]
+                    ]
+                },
+                "lshw_generic": {
+                    "header": "Generic Devices | lshw -class generic",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "shell_command_file": "lshw_generic.sh",
+                    "theader": [
+                        "id",
+                        "class",
+                        "claimed",
+                        "handle",
+                        "description",
+                        "product",
+                        "vendor",
+                        "physid",
+                        "businfo",
+                        "version",
+                        "width",
+                        "clock",
+                        "configuration",
+                        "capabilities"
+                    ],
+                    "data": [
+                        [
+                            "generic:0",
+                            "generic",
+                            true,
+                            "PCI:0000:00:04.0",
+                            "Signal processing controller",
+                            "Alder Lake Innovation Platform Framework Processor Participant",
+                            "Intel Corporation",
+                            "4",
+                            "pci@0000:00:04.0",
+                            "02",
+                            64,
+                            33000000,
+                            {
+                                "driver": "proc_thermal_pci",
+                                "latency": "0"
+                            },
+                            {
+                                "msi": "Message Signalled Interrupts",
+                                "pm": "Power Management",
+                                "bus_master": "bus mastering",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "generic:1",
+                            "generic",
+                            true,
+                            "PCI:0000:00:0a.0",
+                            "Signal processing controller",
+                            "Platform Monitoring Technology",
+                            "Intel Corporation",
+                            "a",
+                            "pci@0000:00:0a.0",
+                            "01",
+                            64,
+                            33000000,
+                            {
+                                "driver": "intel_vsec",
+                                "latency": "0"
+                            },
+                            {
+                                "pciexpress": "PCI Express",
+                                "pm": "Power Management",
+                                "cap_list": "PCI capabilities listing"
+                            }
+                        ],
+                        [
+                            "pnp00:02",
+                            "generic",
+                            true,
+                            null,
+                            null,
+                            "PnP device LEN0071",
+                            null,
+                            "2",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "i8042 kbd"
+                            },
+                            {
+                                "pnp": true
+                            }
+                        ],
+                        [
+                            "pnp00:03",
+                            "generic",
+                            true,
+                            null,
+                            null,
+                            "PnP device LEN030b",
+                            null,
+                            "3",
+                            null,
+                            null,
+                            null,
+                            null,
+                            {
+                                "driver": "i8042 aux"
+                            },
+                            {
+                                "pnp": true
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
+        "db": {
+            "header": "Common database info",
+            "description": "Common info about current database",
+            "state": "expanded",
+            "reports": {
+                "full_version": {
+                    "header": "PostgreSQL full version",
+                    "description": "Information about the installed PostgreSQL version, including the version number, system architecture, utilized compiler, and operating system",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": "PostgreSQL 16.8 (Ubuntu 16.8-1.pgdg22.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit"
+                },
+                "version_major": {
+                    "header": "PostgreSQL major version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": "PostgreSQL 16.8 (Ubuntu 16.8-1.pgdg22.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit"
+                },
+                "version_minor": {
+                    "header": "PostgreSQL minor version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "server_version.sql",
+                    "data": "16.8 (Ubuntu 16.8-1.pgdg22.04+1)"
+                },
+                "pg_config": {
+                    "header": "PostgreSQL pg_config",
+                    "description": "Configuration parameters of the currently installed PostgreSQL version",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "pg_config.sh",
+                    "data": "BINDIR = /usr/lib/postgresql/16/bin\nDOCDIR = /usr/share/doc/postgresql-doc-16\nHTMLDIR = /usr/share/doc/postgresql-doc-16\nINCLUDEDIR = /usr/include/postgresql\nPKGINCLUDEDIR = /usr/include/postgresql\nINCLUDEDIR-SERVER = /usr/include/postgresql/16/server\nLIBDIR = /usr/lib/x86_64-linux-gnu\nPKGLIBDIR = /usr/lib/postgresql/16/lib\nLOCALEDIR = /usr/share/locale\nMANDIR = /usr/share/postgresql/16/man\nSHAREDIR = /usr/share/postgresql/16\nSYSCONFDIR = /etc/postgresql-common\nPGXS = /usr/lib/postgresql/16/lib/pgxs/src/makefiles/pgxs.mk\nCONFIGURE =  '--build=x86_64-linux-gnu' '--prefix=/usr' '--includedir=${prefix}/include' '--mandir=${prefix}/share/man' '--infodir=${prefix}/share/info' '--sysconfdir=/etc' '--localstatedir=/var' '--disable-option-checking' '--disable-silent-rules' '--libdir=${prefix}/lib/x86_64-linux-gnu' '--runstatedir=/run' '--disable-maintainer-mode' '--disable-dependency-tracking' '--with-tcl' '--with-perl' '--with-python' '--with-pam' '--with-openssl' '--with-libxml' '--with-libxslt' '--mandir=/usr/share/postgresql/16/man' '--docdir=/usr/share/doc/postgresql-doc-16' '--sysconfdir=/etc/postgresql-common' '--datarootdir=/usr/share/' '--datadir=/usr/share/postgresql/16' '--bindir=/usr/lib/postgresql/16/bin' '--libdir=/usr/lib/x86_64-linux-gnu/' '--libexecdir=/usr/lib/postgresql/' '--includedir=/usr/include/postgresql/' '--with-extra-version= (Ubuntu 16.8-1.pgdg22.04+1)' '--enable-nls' '--enable-thread-safety' '--enable-debug' '--disable-rpath' '--with-uuid=e2fs' '--with-gnu-ld' '--with-gssapi' '--with-ldap' '--with-pgport=5432' '--with-system-tzdata=/usr/share/zoneinfo' 'AWK=mawk' 'MKDIR_P=/bin/mkdir -p' 'PROVE=/usr/bin/prove' 'PYTHON=/usr/bin/python3' 'TAR=/bin/tar' 'XSLTPROC=xsltproc --nonet' 'CFLAGS=-g -O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fno-omit-frame-pointer' 'LDFLAGS=-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now' '--enable-tap-tests' '--with-icu' '--with-llvm' 'LLVM_CONFIG=/usr/bin/llvm-config-15' 'CLANG=/usr/bin/clang-15' '--with-lz4' '--with-zstd' '--with-systemd' '--with-selinux' '--enable-dtrace' 'build_alias=x86_64-linux-gnu' 'CPPFLAGS=-Wdate-time -D_FORTIFY_SOURCE=2' 'CXXFLAGS=-g -O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security'\nCC = gcc\nCPPFLAGS = -Wdate-time -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -I/usr/include/libxml2\nCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Werror=vla -Wendif-labels -Wmissing-format-attribute -Wimplicit-fallthrough=3 -Wcast-function-type -Wshadow=compatible-local -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -Wno-format-truncation -Wno-stringop-truncation -g -g -O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fno-omit-frame-pointer\nCFLAGS_SL = -fPIC\nLDFLAGS = -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now -L/usr/lib/llvm-15/lib -Wl,--as-needed\nLDFLAGS_EX = \nLDFLAGS_SL = \nLIBS = -lpgcommon -lpgport -lselinux -lzstd -llz4 -lxslt -lxml2 -lpam -lssl -lcrypto -lgssapi_krb5 -lz -lreadline -lm \nVERSION = PostgreSQL 16.8 (Ubuntu 16.8-1.pgdg22.04+1)\n"
+                },
+                "pg_settings": {
+                    "header": "PostgreSQL settings",
+                    "description": "Configuration settings of the PostgreSQL server",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "server_settings.sql",
+                    "theader": [
+                        "name",
+                        "setting"
+                    ],
+                    "data": [
+                        [
+                            "allow_in_place_tablespaces",
+                            "off"
+                        ],
+                        [
+                            "allow_system_table_mods",
+                            "off"
+                        ],
+                        [
+                            "application_name",
+                            ""
+                        ],
+                        [
+                            "archive_cleanup_command",
+                            ""
+                        ],
+                        [
+                            "archive_command",
+                            "(disabled)"
+                        ]
+                    ]
+                },
+                "pg_available_extensions": {
+                    "header": "PostgreSQL extensions",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "available_server_extensions.sql",
+                    "theader": [
+                        "name",
+                        "default_version",
+                        "installed_version"
+                    ],
+                    "data": [
+                        [
+                            "adminpack",
+                            "2.1",
+                            null
+                        ],
+                        [
+                            "amcheck",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "autoinc",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "bloom",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "btree_gin",
+                            "1.3",
+                            null
+                        ]
+                    ]
+                }
+            }
+        },
+        "benchmark": {
+            "header": "Common benchmark info",
+            "description": "Common info about current benchmark",
+            "state": "expanded",
+            "reports": {
+                "args": {
+                    "header": "benchmark arguments info",
+                    "description": "Arguments configured by the user",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "python_command": "args",
+                    "theader": [
+                        "arg",
+                        "value"
+                    ],
+                    "data": [
+                        [
+                            "clear_logs",
+                            "False"
+                        ],
+                        [
+                            "log_level",
+                            "debug"
+                        ],
+                        [
+                            "mode",
+                            "benchmark"
+                        ],
+                        [
+                            "report_name",
+                            "None"
+                        ],
+                        [
+                            "collect_pg_logs",
+                            "True"
+                        ],
+                        [
+                            "benchmark_type",
+                            "default"
+                        ],
+                        [
+                            "workload_path",
+                            "None"
+                        ],
+                        [
+                            "pgbench_clients",
+                            "[5]"
+                        ],
+                        [
+                            "pgbench_time",
+                            "None"
+                        ],
+                        [
+                            "init_command",
+                            "ARG_PGBENCH_PATH -i --scale=10 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE"
+                        ],
+                        [
+                            "workload_command",
+                            "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 10 -T 10 --no-vacuum"
+                        ],
+                        [
+                            "pgbench_path",
+                            "/usr/bin/pgbench"
+                        ],
+                        [
+                            "psql_path",
+                            "/usr/bin/psql"
+                        ],
+                        [
+                            "pg_custom_config",
+                            "/home/nad/common/pg_debug/benchmarks/env_postgres/confs/postgresql.conf"
+                        ],
+                        [
+                            "pg_host",
+                            "127.0.0.1"
+                        ],
+                        [
+                            "pg_port",
+                            "5435"
+                        ],
+                        [
+                            "pg_user",
+                            "postgres"
+                        ],
+                        [
+                            "pg_password",
+                            ""
+                        ],
+                        [
+                            "pg_database",
+                            "tdb"
+                        ],
+                        [
+                            "pg_data_path",
+                            "/var/lib/postgresql/data"
+                        ],
+                        [
+                            "pg_bin_path",
+                            "/usr/lib/postgresql/16/bin"
+                        ],
+                        [
+                            "connection_type",
+                            "docker"
+                        ],
+                        [
+                            "ssh_host",
+                            "None"
+                        ],
+                        [
+                            "ssh_port",
+                            "None"
+                        ],
+                        [
+                            "ssh_user",
+                            "None"
+                        ],
+                        [
+                            "ssh_key",
+                            "None"
+                        ],
+                        [
+                            "remote_pg_host",
+                            "127.0.0.1"
+                        ],
+                        [
+                            "remote_pg_port",
+                            "5432"
+                        ],
+                        [
+                            "docker_pg_host",
+                            "None"
+                        ],
+                        [
+                            "docker_pg_port",
+                            "None"
+                        ],
+                        [
+                            "container_name",
+                            "db"
+                        ],
+                        [
+                            "join_tasks",
+                            "None"
+                        ],
+                        [
+                            "reference_report",
+                            "None"
+                        ],
+                        [
+                            "input_dir",
+                            "None"
+                        ]
+                    ]
+                },
+                "options": {
+                    "header": "pgbench options info",
+                    "description": "Benchmark load configuration parameters for pgbench",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "python_command": "pgbench_options_table",
+                    "theader": [
+                        "iteration number",
+                        "pgbench_options"
+                    ],
+                    "data": [
+                        [
+                            0,
+                            "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c 5 -j 10 -T 10 --no-vacuum"
+                        ]
+                    ]
+                },
+                "custom_tables": {
+                    "header": "pgbench tables",
+                    "description": "Table schema for the pgbench load test",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "python_command": "workload_tables",
+                    "data": "ARG_PGBENCH_PATH -i --scale=10 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE"
+                },
+                "custom_workload": {
+                    "header": "pgbench workload",
+                    "description": "Load testing scripts",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "python_command": "workload",
+                    "data": "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 10 -T 10 --no-vacuum"
+                }
+            }
+        },
+        "result": {
+            "header": "Tests result info",
+            "description": "Results of tests",
+            "state": "expanded",
+            "reports": {
+                "pgbench_outputs": {
+                    "header": "benchmark results info",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "python_command": "benchmark_result",
+                    "theader": [
+                        "clients",
+                        "duration",
+                        "number of transactions actually processed",
+                        "latency average",
+                        "initial connection time",
+                        "tps"
+                    ],
+                    "data": [
+                        [
+                            5,
+                            10,
+                            24746,
+                            2.02,
+                            3.835,
+                            2475.089325
+                        ]
+                    ]
+                },
+                "chart": {
+                    "header": "benchmark plots",
+                    "description": "",
+                    "state": "collapsed",
+                    "item_type": "chart",
+                    "python_command": "chart_tps_clients",
+                    "data": {
+                        "series": [
+                            {
+                                "name": "None,tps",
+                                "data": [
+                                    [
+                                        5,
+                                        2475.1
+                                    ]
+                                ]
+                            }
+                        ],
+                        "chart": {
+                            "height": 350,
+                            "type": "line",
+                            "zoom": {
+                                "enabled": false
+                            }
+                        },
+                        "dataLabels": {
+                            "enabled": false
+                        },
+                        "stroke": {
+                            "curve": "smooth",
+                            "width": 2
+                        },
+                        "title": {
+                            "text": "tps(pgbench_clients)"
+                        },
+                        "grid": {
+                            "row": {
+                                "colors": [
+                                    "#f3f3f3",
+                                    "transparent"
+                                ],
+                                "opacity": 0.1
+                            }
+                        },
+                        "yaxis": {
+                            "title": {
+                                "text": "Transactions per Second (tps)"
+                            }
+                        },
+                        "xaxis": {
+                            "title": {
+                                "text": "pgbench_clients"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

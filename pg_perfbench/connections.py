@@ -106,8 +106,9 @@ class SSHConnection:
 
         except Exception as e:
             if self.logger:
-                self.logger.error(f"Unsuccessful attempt to copy the database logs to the local directory 'db_logs':\n"
-                                  f"{str(e)}")
+                self.logger.error(
+                    f"Unsuccessful attempt to copy the database logs to the local directory \"db_logs\":\n"
+                    f"{str(e)}")
             return None
 
     async def __aenter__(self) -> "SSHConnection":
@@ -137,12 +138,12 @@ class DockerConnection:
 
         name = self.conn_params.get("container_name")
         if not name:
-            raise FileNotFoundError("Missing 'container_name' in docker connection params")
+            raise FileNotFoundError("Missing \"container_name\" in docker connection params")
 
         try:
             self.container = self.docker_client.containers.get(name)
         except docker.errors.NotFound:
-            raise FileNotFoundError(f"Container '{name}' not found.")
+            raise FileNotFoundError(f"Container \"{name}\" not found.")
         except Exception as e:
             raise OSError(f"Failed to retrieve container: {e}")
 
@@ -153,11 +154,11 @@ class DockerConnection:
 
         if self.container.status == "running":
             if self.logger:
-                self.logger.debug(f"Container '{name}' is already running.")
+                self.logger.debug(f"Container \"{name}\" is already running.")
         else:
             self.container.start()
             if self.logger:
-                self.logger.debug(f"Container '{name}' has been started.")
+                self.logger.debug(f"Container \"{name}\" has been started.")
 
     def close(self):
         if not self.container:
@@ -171,10 +172,10 @@ class DockerConnection:
             if self.container.status == "running":
                 self.container.stop()
                 if self.logger:
-                    self.logger.debug(f"Container '{name}' has been stopped.")
+                    self.logger.debug(f"Container \"{name}\" has been stopped.")
             else:
                 if self.logger:
-                    self.logger.debug(f"Container '{name}' is already stopped.")
+                    self.logger.debug(f"Container \"{name}\" is already stopped.")
         except Exception as e:
             if self.logger:
                 self.logger.error(f"Error stopping container: {str(e)}")
@@ -186,7 +187,7 @@ class DockerConnection:
 
     async def run_command(self, cmd: str, check=False) -> str:
         if not self.container:
-            raise PermissionError("Container not available or no access to 'postgres' user.")
+            raise PermissionError("Container not available or no access to \"postgres\" user.")
 
         result = self.container.exec_run(
             ["/bin/bash", "-c", cmd],
@@ -244,15 +245,15 @@ class DockerConnection:
             chmod_cmd = f"cp {remote_file_path} {remote_config_path}"
             await self.run_command_as_root(chmod_cmd)
 
-            chown_cmd = f"chown postgres:postgres '{remote_file_path}'"
+            chown_cmd = f"chown postgres:postgres '{remote_config_path}'"
             chown_result = await self.run_command_as_root(chown_cmd)
             if "Operation not permitted" in chown_result:
                 raise PermissionError(f"Failed to chown {remote_file_path}: {chown_result}")
 
-            chmod_cmd = f"chmod 750 '{remote_data_dir}'"
+            chmod_cmd = f"chmod 750 '{remote_config_path}'"
             await self.run_command_as_root(chmod_cmd)
 
-            return remote_file_path
+            return remote_config_path
         except Exception as e:
             raise TimeoutError(f"Unsuccessful attempt to install the database user configuration:\n{str(e)}")
 
@@ -275,8 +276,9 @@ class DockerConnection:
             return archive_path
         except Exception as e:
             if self.logger:
-                self.logger.error(f"Unsuccessful attempt to copy the database logs to the local directory 'db_logs':\n"
-                                  f"{str(e)}")
+                self.logger.error(
+                    f"Unsuccessful attempt to copy the database logs to the local directory \"db_logs\":\n"
+                    f"{str(e)}")
             return None
 
     async def __aenter__(self) -> "DockerConnection":
@@ -340,9 +342,7 @@ class LocalConnection:
                     env=self.env
                 )
         except Exception as e:
-            if self.logger:
-                self.logger.error(f"Failed to start subprocess for command: {cmd}\nError: {str(e)}")
-            return ''
+            raise RuntimeError(f"Failed to start subprocess for command: {cmd}\nError: {str(e)}")
 
         stdout, stderr = await process.communicate()
         if process.returncode != 0 and check:

@@ -321,8 +321,8 @@ async def run(args: Optional[Namespace] = None):
         logger.info("Benchmark report saved successfully.")
 
     except Exception as e:
-        logger.error(e)
-        return None
+        logger.error(f"Fatal error: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

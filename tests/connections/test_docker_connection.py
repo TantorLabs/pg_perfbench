@@ -12,8 +12,9 @@ from pg_perfbench.context import Context, CollectInfoContext, JoinContext
 from pg_perfbench.connections import DockerConnection
 
 
-class TestDockerConnectionFunctions(unittest.IsolatedAsyncioTestCase):
-    def setUp(self):
+class TestDockerConnectionFunctions(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
         dummy_args = argparse.Namespace(
             connection_type=ConnectionType.DOCKER,
             container_name="test_container",
@@ -41,10 +42,9 @@ class TestDockerConnectionFunctions(unittest.IsolatedAsyncioTestCase):
             log_level="INFO"
         )
 
-        self.mock_logger = MagicMock()
+        cls.mock_logger = MagicMock()
 
-        self.context = Context(dummy_args, self.mock_logger)
-        # cls.docker_conn = DockerConnection(**context.structured_params['conn_conf'])
+        cls.context = Context(dummy_args, cls.mock_logger)
 
     def test_conn_conf_matches(self):
         conn_conf = self.context.structured_params["conn_conf"]
@@ -52,17 +52,28 @@ class TestDockerConnectionFunctions(unittest.IsolatedAsyncioTestCase):
         expected_conn_params = {"container_name": "test_container"}
         expected_env = {"ARG_PG_BIN_PATH": "/usr/lib/postgresql/12/bin"}
 
-        self.assertEqual(conn_conf.get("conn_params"), expected_conn_params,
-                         "DockerConnection conn_params do not match expected values.")
-        self.assertEqual(conn_conf.get("env"), expected_env,
-                         "DockerConnection env does not match expected values.")
+        self.assertEqual(
+            conn_conf.get("conn_params"),
+            expected_conn_params,
+            "DockerConnection conn_params do not match expected values."
+        )
+        self.assertEqual(
+            conn_conf.get("env"),
+            expected_env,
+            "DockerConnection env does not match expected values."
+        )
 
         docker_conn = DockerConnection(conn_conf["conn_params"], conn_conf["env"])
-
-        self.assertEqual(docker_conn.conn_params, expected_conn_params,
-                         "DockerConnection.conn_params do not match expected dictionary.")
-        self.assertEqual(docker_conn.env, expected_env,
-                         "DockerConnection.env do not match expected dictionary.")
+        self.assertEqual(
+            docker_conn.conn_params,
+            expected_conn_params,
+            "DockerConnection.conn_params do not match expected dictionary."
+        )
+        self.assertEqual(
+            docker_conn.env,
+            expected_env,
+            "DockerConnection.env do not match expected dictionary."
+        )
 
 
 if __name__ == "__main__":

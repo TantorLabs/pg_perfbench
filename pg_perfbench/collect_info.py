@@ -118,17 +118,7 @@ async def collect_info(
             # Optionally collect DB logs.
             if args["mode"] in [WorkMode.COLLECT_DB_INFO, WorkMode.COLLECT_ALL_INFO]:
                 if log_conf.get("collect_pg_logs"):
-                    logger.info("Collection of database logs.")
-                    log_dir = await db_conn.fetchval("show log_directory")
-                    log_report = await collect_logs(logger, client, log_dir, report["report_name"])
-                    if log_report:
-                        report["sections"]["logs"] = {
-                            "header": "Tests result info",
-                            "description": "Results of tests",
-                            "state": "expanded",
-                            "reports": log_report
-                        }
-                        logger.info("DB logs collected successfully.")
+                    await collect_db_logs(logger, client, db_conn, report)
                 await db_conn.close()
                 logger.info("Database connection closed.")
 

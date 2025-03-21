@@ -1,3 +1,4 @@
+import argparse
 import unittest
 from unittest.mock import MagicMock
 
@@ -88,10 +89,18 @@ class TestContext(unittest.TestCase):
         args = Args()
         context_obj = Context(args, self.logger)
         self.assertEqual(context_obj.structured_params["conn_type"], ConnectionType.DOCKER)
-        self.assertEqual(context_obj.structured_params["conn_conf"]["conn_params"]["container_name"], "my_container")
-
-        self.assertEqual(context_obj.structured_params["workload_conf"]["pgbench_iter_name"], "pgbench_time")
-        self.assertEqual(context_obj.structured_params["workload_conf"]["pgbench_iter_list"], [60])
+        self.assertEqual(
+            context_obj.structured_params["conn_conf"]["conn_params"]["container_name"],
+            "my_container"
+        )
+        self.assertEqual(
+            context_obj.structured_params["workload_conf"]["pgbench_iter_name"],
+            "pgbench_time"
+        )
+        self.assertEqual(
+            context_obj.structured_params["workload_conf"]["pgbench_iter_list"],
+            [60]
+        )
 
     def test_context_local_ok(self):
         class Args:
@@ -142,7 +151,7 @@ class TestContext(unittest.TestCase):
                 self.remote_pg_port = "5432"
 
                 self.pg_host = "localhost"
-                self.pg_port = None
+                self.pg_port = None  # Missing parameter
                 self.pg_user = "postgres"
                 self.pg_password = "pwd"
                 self.pg_database = "db"
@@ -210,7 +219,7 @@ class TestCollectInfoContext(unittest.TestCase):
             def __init__(self):
                 self.mode = WorkMode.COLLECT_DB_INFO
                 self.connection_type = ConnectionType.SSH
-                # ssh_port is not specified
+                # Missing SSH parameters and DB parameters.
                 self.ssh_host = None
                 self.ssh_port = None
                 self.ssh_key = None
