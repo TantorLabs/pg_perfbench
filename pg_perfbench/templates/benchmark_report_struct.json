@@ -329,7 +329,7 @@
                     "description": "",
                     "state": "collapsed",
                     "item_type": "chart",
-                    "python_command": "chart_tps_clients",
+                    "python_command": "chart_tps",
                     "data": {
                         "series": [],
                         "chart": {

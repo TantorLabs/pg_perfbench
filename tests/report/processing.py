@@ -87,7 +87,7 @@ class TestReportProcessing(unittest.TestCase):
         does not contain a 'report_name' key.
         """
         with self.assertRaises(ValueError):
-            save_report({}, MagicMock())
+            save_report( MagicMock(), {})
 
     def test_save_json_report(self) -> None:
         """Check that _save_json_report writes JSON data to the specified path."""

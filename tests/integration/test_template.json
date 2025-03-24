@@ -1,0 +1,147 @@
+{
+    "header": "PostgreSQL database benchmark report",
+    "report_name": "result_test_pg_14",
+    "description": "24/03/2025 17:19:46",
+    "sections": {
+        "system": {
+            "header": "System properties <hn>",
+            "description": "Common info about current host",
+            "state": "expanded",
+            "reports": {
+                "etc_os_release": {
+                    "header": "OS distribution information | /etc/os-release",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_os_release.sh",
+                    "data": ""
+                }
+            }
+        },
+        "db": {
+            "header": "Common database info",
+            "description": "Common info about current database",
+            "state": "expanded",
+            "reports": {
+                "version_major": {
+                    "header": "PostgreSQL major version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": ""
+                },
+                "pg_available_extensions": {
+                    "header": "PostgreSQL extensions",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "available_server_extensions.sql",
+                    "theader": [],
+                    "data": []
+                }
+            }
+        },
+        "benchmark": {
+            "header": "Common benchmark info",
+            "description": "Common info about current benchmark",
+            "state": "expanded",
+            "reports": {
+                "options": {
+                    "header": "pgbench options info",
+                    "description": "Benchmark load configuration parameters for pgbench",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "python_command": "pgbench_options_table",
+                    "theader": [
+                        "iteration number",
+                        "pgbench_options"
+                    ],
+                    "data": []
+                },
+                "custom_tables": {
+                    "header": "pgbench tables",
+                    "description": "Table schema for the pgbench load test",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "python_command": "workload_tables",
+                    "data": ""
+                },
+                "custom_workload": {
+                    "header": "pgbench workload",
+                    "description": "Load testing scripts",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "python_command": "workload",
+                    "data": ""
+                }
+            }
+        },
+        "result": {
+            "header": "Tests result info",
+            "description": "Results of tests",
+            "state": "expanded",
+            "reports": {
+                "pgbench_outputs": {
+                    "header": "benchmark results info",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "python_command": "benchmark_result",
+                    "theader": [
+                        "clients",
+                        "duration",
+                        "number of transactions actually processed",
+                        "latency average",
+                        "initial connection time",
+                        "tps"
+                    ],
+                    "data": []
+                },
+                "chart": {
+                    "header": "benchmark plots",
+                    "description": "",
+                    "state": "collapsed",
+                    "item_type": "chart",
+                    "python_command": "chart_tps",
+                    "data": {
+                        "series": [],
+                        "chart": {
+                            "height": 350,
+                            "type": "line",
+                            "zoom": {
+                                "enabled": false
+                            }
+                        },
+                        "dataLabels": {
+                            "enabled": false
+                        },
+                        "stroke": {
+                            "curve": "smooth",
+                            "width": 2
+                        },
+                        "title": {
+                            "text": "tps(clients)",
+                            "align": "left"
+                        },
+                        "grid": {
+                            "row": {
+                                "colors": [
+                                    "#f3f3f3",
+                                    "transparent"
+                                ],
+                                "opacity": 0.1
+                            }
+                        },
+                        "yaxis": {
+                            "title": {
+                                "text": "Transactions per Second (tps)"
+                            }
+                        },
+                        "xaxis": {
+                            "title": {
+                                "text": "Clients"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

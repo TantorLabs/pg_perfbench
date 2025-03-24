@@ -261,7 +261,7 @@ def benchmark_result(report_data, item):
     item['data'] = results
 
 
-def chart_tps_clients(report_data, item):
+def chart_tps(report_data, item):
     # fill chart data with tps vs iteration
     if ('workload_conf' not in report_data or
             'pgbench_iter_list' not in report_data['workload_conf']):

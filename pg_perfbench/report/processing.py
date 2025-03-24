@@ -71,26 +71,32 @@ def _save_html_report(new_report_json_path: str, path) -> None:
         raise OSError(f"Failed to write HTML report: {str(e)}")
 
 
-def save_report(report_struct, logger):
-    # Validate that 'report_name' key exists
+def save_report(logger, report_struct, dest_dir = ""):
+
     if "report_name" not in report_struct or not report_struct["report_name"]:
         raise ValueError(
             "The 'report_name' field is missing or empty in the report structure."
         )
 
-    REPORT_FOLDER.mkdir(parents=True, exist_ok=True)
+    if dest_dir == "":
+        dest_dir = str(REPORT_FOLDER)
+
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir, exist_ok=True)
+        logger.info(f"Report directory was created: {dest_dir}")
+
     report_name = report_struct["report_name"]
 
-    new_report_json_path = REPORT_FOLDER / f'{report_name}.json'
-    new_report_html_path = REPORT_FOLDER / f'{report_name}.html'
+    new_report_json_path = os.path.join(dest_dir,f"{report_name}.json")
+    new_report_html_path = os.path.join(dest_dir,f"{report_name}.html")
 
     _save_json_report(str(new_report_json_path), report_struct)
     _save_html_report(str(new_report_json_path), str(new_report_html_path))
 
     logger.info(
-        'Reports generated: %s.json, %s.html', str(report_name), str(report_name)
+        "Reports generated: %s.json, %s.html", str(report_name), str(report_name)
     )
-    logger.info('The report is saved in the "report" folder')
+    logger.info("The report is saved in the 'report' folder")
 
 
 def dump_updated_json(data: dict, output_file: str) -> None:

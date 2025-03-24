@@ -317,7 +317,7 @@ async def run(args: Optional[Namespace] = None):
             return None
 
         # save the generated report (JSON/HTML)
-        save_report(report, logger)
+        save_report(logger, report)
         logger.info("Benchmark report saved successfully.")
 
     except Exception as e:
