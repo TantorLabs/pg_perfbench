@@ -270,10 +270,7 @@ python -m pg_perfbench --mode=benchmark \
 --report-name=docker-pg-default-benchmark \
 --collect-pg-logs \
 --custom-config=/tmp/user_postgresql.conf \
---image-name=postgres:15 \
 --container-name=cntr_expected \
---docker-pg-host=127.0.0.1 \
---docker-pg-port=5432 \
 --pg-host=127.0.0.1 \
 --pg-port=5435 \
 --pg-user=postgres \
@@ -311,8 +308,6 @@ python -m pg_perfbench --mode=collect-db-info   \
 --report-name=test-collect-db-info-docker-container \
 --log-level=debug   \
 --container-name=cntr_result    \
---docker-pg-host=127.0.0.1  \
---docker-pg-port=5432   \
 --pg-host=127.0.0.1 \
 --pg-port=5435  \
 --pg-user=postgres  \
@@ -339,7 +334,7 @@ python -m pg_perfbench --mode=collect-all-info  \
 --pg-bin-path=/usr/lib/postgresql/16/bin
 ```
 
-Examples of information collection reports - [examples collect info.](examples/collect_info) 
+Examples of information collection reports - [collect-all-info-docker.html](examples/collect_info/collect-all-info-docker.html) 
 # Configuring pg_perfbench in `join` mode
 
 | Parameter           | Description                                                                                                                                                    |
@@ -368,7 +363,7 @@ python -m pg_perfbench --mode=join \
 --input-dir=/path/to/some/reports
 ```
 
-Examples of join report - [examples.](examples/join)
+Examples of join report - [join_report.html .](examples/join/join_report.html)
 # Configuring report
 See more details about report configuration [here](doc/logic_building_and_comparing_reports.md).
 

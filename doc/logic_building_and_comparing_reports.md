@@ -11,19 +11,13 @@
 ### Docker container parameters 
 | Parameter           | Description                                                            |
 |---------------------|------------------------------------------------------------------------|
-| `--image-name`     | Docker image name (must be pre-installed)                              |
 | `--container-name` | Name of creating container                                             |
-| `--docker-pg-host` | Container PostgreSQL database host (optional, default: 127.0.0.1)      |
-| `--docker-pg-port` | Container PostgreSQL database port (optional, default: 5432)           |
 
 <br>For example, the following parameter group can be configured:
 ```
 python -m pg_perfbench --mode=collect-sys-info \
 --log-level=debug \
---image-name=postgres:16 \
---container-name=cntr_test \
---docker-pg-host=127.0.0.1 \
---docker-pg-port=5432
+--container-name=cntr_test
 ```
 
 ### Remote host parameters via SSH
@@ -96,19 +90,13 @@ Add or remove reports of the following types:
 ### Docker container parameters 
 | Parameter           | Description                                                            |
 |---------------------|------------------------------------------------------------------------|
-| `--image-name`     | Docker image name (must be pre-installed)                              |
 | `--container-name` | Name of creating container                                             |
-| `--docker-pg-host` | Container PostgreSQL database host (optional, default: 127.0.0.1)      |
-| `--docker-pg-port` | Container PostgreSQL database port (optional, default: 5432)           | 
 
 <br>For example, the following parameter group can be configured:
 ```
 python -m pg_perfbench --mode=collect-db-info   \
 --log-level=debug   \
---image-name=postgres:15.5  \
 --container-name=cntr_test    \
---docker-pg-host=127.0.0.1  \
---docker-pg-port=5432   \
 --pg-host=127.0.0.1 \
 --pg-port=5435  \
 --pg-user=postgres  \
@@ -190,19 +178,15 @@ Add or remove reports of the following types:
 ### Docker container parameters 
 | Parameter           | Description                                                            |
 |---------------------|------------------------------------------------------------------------|
-| `--image-name`     | Docker image name (must be pre-installed)                              |
+
 | `--container-name` | Name of creating container                                             |
-| `--docker-pg-host` | Container PostgreSQL database host (optional, default: 127.0.0.1)      |
-| `--docker-pg-port` | Container PostgreSQL database port (optional, default: 5432)           | 
+
 
 <br>For example, the following parameter group can be configured:
 ```
 python -m pg_perfbench --mode=collect-db-info   \
 --log-level=debug   \
---image-name=postgres:15.5  \
 --container-name=cntr_test    \
---docker-pg-host=127.0.0.1  \
---docker-pg-port=5432   \
 --pg-host=127.0.0.1 \
 --pg-port=5435  \
 --pg-user=postgres  \

@@ -1,6 +1,7 @@
 import asyncio
 import argparse
 from argparse import Namespace
+import sys
 from typing import Optional
 
 from pg_perfbench.const import (
