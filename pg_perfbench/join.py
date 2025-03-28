@@ -197,7 +197,7 @@ def _merge_reports(logger, names: list[str], reports: list[dict], compare_items:
 def join_reports(raw_args: dict, join_tasks: str, reference_report: str, input_dir: str, report_name: str,
                  logger) -> dict | None:
     if raw_args and isinstance(raw_args, dict):
-        display_user_configuration(args, logger)
+        display_user_configuration(raw_args, logger)
 
     if not join_tasks:
         logger.error("No join_tasks specified.")

@@ -8,7 +8,7 @@ from pg_perfbench.const import (
 from pg_perfbench.connections import get_connection
 from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks
 from pg_perfbench.report.processing import get_report_structure
-from pg_perfbench.report.commands import collect_logs, fill_info_report
+from pg_perfbench.report.commands import collect_db_logs, fill_info_report
 from pg_perfbench.log import display_user_configuration
 
 
