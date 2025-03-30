@@ -410,7 +410,7 @@ export PYTHONPATH=$(pwd)
 ```
 - single test running. Example of executing unit tests:
 ```
-python -m unittest tests.connections.test_docker_connection -v --failfast
+python -m unittest tests.context.test_docker_connection_context -v --failfast
 ```
 - executing all tests: 
 <br>`python -m unittest discover tests`
