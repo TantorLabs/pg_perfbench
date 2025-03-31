@@ -9,12 +9,12 @@ from pg_perfbench.const import (
     WorkMode,
     ConnectionType,
 )
-from pg_perfbench.benchmark import run_benchmark_and_collect_metrics
+from pg_perfbench.benchmark import BenchmarkRunner
 from pg_perfbench.context import Context, CollectInfoContext, JoinContext
 from pg_perfbench.log import setup_logger
 from pg_perfbench.report.processing import save_report
-from pg_perfbench.collect_info import collect_info
-from pg_perfbench.join import join_reports
+from pg_perfbench.collect_info import InfoCollector
+from pg_perfbench.join import ReportJoiner
 
 
 def parse_pgbench_options(value):
@@ -293,7 +293,7 @@ async def execute_pg_perfbench(args: Optional[Namespace] = None):
         if args.mode == WorkMode.BENCHMARK:
             # Creating a context for benchmark mode
             ctx = Context(args, logger)
-            report = await run_benchmark_and_collect_metrics(
+            report = await BenchmarkRunner.run_benchmark_and_collect_metrics(
                 **ctx.structured_params
             )
 
@@ -304,12 +304,12 @@ async def execute_pg_perfbench(args: Optional[Namespace] = None):
         }:
             # Creating a context for collect info mode
             ctx = CollectInfoContext(args, logger)
-            report = await collect_info(**ctx.structured_params)
+            report = await InfoCollector.collect_info(**ctx.structured_params)
 
         elif args.mode in WorkMode.JOIN:
             # Creating a context for join mode
             ctx = JoinContext(args, logger)
-            report = join_reports(**ctx.structured_params)
+            report = ReportJoiner.join_reports(**ctx.structured_params)
 
         else:
             logger.error(f'Unsupported mode: {args.mode}')
