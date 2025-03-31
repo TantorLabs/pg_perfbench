@@ -163,8 +163,19 @@ def pgbench_options_table(report_data, item):
     item['data'] = [[idx, cmd] for idx, cmd in enumerate(pgbench_cmds)]
 
 
-def workload_tables(report_data, item):
-    # show .sql content or commands for init phase
+def workload_parse(report_data, item, phase='workload'):
+    """
+    Process workload data for either 'init' or 'workload' phase.
+
+    Args:
+        report_data: The report data dictionary
+        item: The item to store results in
+        phase: Either 'init' or 'workload' to determine which phase to process
+    """
+    # Get command key based on phase
+    command_key = 'init_command' if phase == 'init' else 'workload_command'
+
+    # Get workload configuration
     workload_conf = report_data.get('workload_conf', {})
     if not workload_conf or not isinstance(workload_conf, dict):
         item['data'] = "No 'workload_conf' found in report_data"
@@ -172,12 +183,12 @@ def workload_tables(report_data, item):
 
     btype = workload_conf.get('benchmark_type')
     if btype == WorkloadTypes.CUSTOM:
-        init_command = str(workload_conf.get('init_command', ''))
-        init_command = init_command.replace(
+        command = str(workload_conf.get(command_key, ''))
+        command = command.replace(
             'ARG_WORKLOAD_PATH', str(workload_conf.get('workload_path', ''))
         )
         pattern = re.compile(r'(?:(?:-f|--file=)\s*)?(\S+\.sql)')
-        matches = pattern.findall(init_command)
+        matches = pattern.findall(command)
         matches = [match for match in matches if match]
 
         data = ''
@@ -195,48 +206,21 @@ def workload_tables(report_data, item):
         item['data'] = data
 
     elif btype == WorkloadTypes.DEFAULT:
-        item['data'] = str(workload_conf.get('init_command', ''))
+        item['data'] = str(workload_conf.get(command_key, ''))
 
     else:
         item['data'] = f"Unknown or missing benchmark_type: {btype}"
+
+
+# Wrapper functions to maintain backward compatibility
+def workload_tables(report_data, item):
+    """Process initial command parse data"""
+    workload_parse(report_data, item, phase='init')
 
 
 def workload(report_data, item):
-    # show .sql content or commands for workload phase
-    workload_conf = report_data.get('workload_conf', {})
-    if not workload_conf or not isinstance(workload_conf, dict):
-        item['data'] = "No 'workload_conf' found in report_data"
-        return
-
-    btype = workload_conf.get('benchmark_type')
-    if btype == WorkloadTypes.CUSTOM:
-        pgbench_command = str(workload_conf.get('workload_command', ''))
-        pgbench_command = pgbench_command.replace(
-            'ARG_WORKLOAD_PATH', str(workload_conf.get('workload_path', ''))
-        )
-        pattern = re.compile(r'(?:(?:-f|--file=)\s*)?(\S+\.sql)')
-        matches = pattern.findall(pgbench_command)
-        matches = [match for match in matches if match]
-
-        data = ''
-        for m in matches:
-            if not os.path.exists(m):
-                data += f"File not found: {m}\n\n"
-                continue
-            try:
-                with open(m, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                data += f'{m} :\n{content}\n\n'
-            except OSError as e:
-                data += f'Error reading file {m}: {str(e)}\n\n'
-
-        item['data'] = data
-
-    elif btype == WorkloadTypes.DEFAULT:
-        item['data'] = str(workload_conf.get('workload_command', ''))
-
-    else:
-        item['data'] = f"Unknown or missing benchmark_type: {btype}"
+    """Process workload command parse data"""
+    workload_parse(report_data, item, phase='workload')
 
 
 def benchmark_result(report_data, item):
