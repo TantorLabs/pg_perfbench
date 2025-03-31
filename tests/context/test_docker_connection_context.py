@@ -9,7 +9,7 @@ from pg_perfbench.const import (
     ConnectionType
 )
 from pg_perfbench.context import Context, CollectInfoContext, JoinContext
-from pg_perfbench.connections.docker import DockerConnection
+from pg_perfbench.connections import DockerConnection
 
 
 class TestDockerConnectionFunctions(unittest.TestCase):
