@@ -145,7 +145,7 @@ class DockerConnection:
         except Exception as e:
             raise TimeoutError(f"Unsuccessful attempt to install the database user configuration:\n{str(e)}")
 
-    async def copy_db_log_files(self, log_source_path, local_path, report_name):
+    async def copy_db_log_files(self, log_source_path, local_path, report_name) -> Optional[str]:
         if not self.container:
             raise PermissionError("Container not available.")
         os.makedirs(local_path, exist_ok=True)

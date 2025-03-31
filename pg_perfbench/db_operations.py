@@ -48,6 +48,7 @@ async def collect_db_logs(logger, client, db_conn, report):
         if log_report:
             report["sections"]["result"]["reports"].update(log_report)
             logger.info("DB logs collected successfully.")
+
     except Exception as e:
         logger.error(f"Failed to collect DB logs: {e}")
 

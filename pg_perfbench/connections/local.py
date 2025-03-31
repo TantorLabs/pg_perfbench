@@ -82,7 +82,7 @@ class LocalConnection:
         except Exception as e:
             raise TimeoutError(f"Unsuccessful attempt to install the database user configuration:\n{str(e)}")
 
-    async def copy_db_log_files(self, log_source_path: str, local_path: str, report_name: str) -> str:
+    async def copy_db_log_files(self, log_source_path: str, local_path: str, report_name: str)  -> Optional[str]:
         try:
             if not os.path.isdir(log_source_path):
                 raise FileNotFoundError(f"Log source path does not exist or is not a directory: {log_source_path}")

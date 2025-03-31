@@ -75,7 +75,7 @@ class SSHConnection:
         except Exception as e:
             raise TimeoutError(f"Unsuccessful attempt to install the database user configuration:\n{str(e)}")
 
-    async def copy_db_log_files(self, log_source_path, local_path, report_name):
+    async def copy_db_log_files(self, log_source_path, local_path, report_name) -> Optional[str]:
         try:
             if not self.client:
                 raise ConnectionError("SSH client not initialized.")
