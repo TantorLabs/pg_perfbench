@@ -13,7 +13,7 @@ from pg_perfbench.const import (
     ConnectionType
 )
 from pg_perfbench.context import Context, CollectInfoContext, JoinContext
-from pg_perfbench.connections import SSHConnection
+from pg_perfbench.connections.ssh import SSHConnection
 
 
 class TestSSHConnectionFunctions(unittest.IsolatedAsyncioTestCase):

@@ -13,7 +13,7 @@ import asyncpg
 from unittest.mock import patch, MagicMock, mock_open
 from docker.errors import DockerException, NotFound
 
-from pg_perfbench.connections import DockerConnection
+from pg_perfbench.connections.docker import DockerConnection
 from pg_perfbench.db_operations import DBTasks
 from pg_perfbench.log import setup_logger
 from pg_perfbench.const import (

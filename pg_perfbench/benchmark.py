@@ -7,7 +7,7 @@ from pg_perfbench.const import (
     WorkMode, DEFAULT_REPORT_NAME, BENCHMARK_TEMPLATE_JSON_PATH,
     get_datetime_report, CURRENT_TIME
 )
-from pg_perfbench.connections import get_connection
+from pg_perfbench.connections.common import get_connection
 from pg_perfbench.db_operations import get_conn_type_tasks, DBTasks, run_command, collect_db_logs
 from pg_perfbench.report.processing import get_report_structure
 from pg_perfbench.report.commands import fill_info_report
