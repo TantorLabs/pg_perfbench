@@ -8,5 +8,5 @@ __all__ = [
     'DockerConnection',
     'LocalConnection',
     'SSHConnection',
-    'get_connection'
+    'get_connection',
 ]

@@ -1,11 +1,13 @@
 import json
 import re
-import subprocess
 import os
 
 from pg_perfbench.const import (
-    SHELL_COMMANDS_PATH, SQL_COMMANDS_PATH, DEFAULT_LOG_ARCHIVE_NAME,
-    LOCAL_DB_LOGS_PATH, WorkloadTypes
+    SHELL_COMMANDS_PATH,
+    SQL_COMMANDS_PATH,
+    DEFAULT_LOG_ARCHIVE_NAME,
+    LOCAL_DB_LOGS_PATH,
+    WorkloadTypes,
 )
 from pg_perfbench.report.processing import parse_json_in_order
 
@@ -13,115 +15,128 @@ from pg_perfbench.report.processing import parse_json_in_order
 def get_script_text(full_script_path) -> str:
     # check if file exists before reading
     if not os.path.exists(full_script_path):
-        raise FileNotFoundError(f"Script file not found: {full_script_path}")
+        raise FileNotFoundError(f'Script file not found: {full_script_path}')
 
     try:
         with open(full_script_path, 'r', encoding='utf-8') as file_content:
             return file_content.read()
     except OSError as e:
-        raise OSError(f"Failed to open or read script file {full_script_path}: {e}")
+        raise OSError(
+            f'Failed to open or read script file {full_script_path}: {e}'
+        )
 
 
 async def run_shell_command(logger, conn, item):
     # check necessary fields in item
     shell_cmd_file = item.get('shell_command_file')
     if not shell_cmd_file:
-        logger.debug("Missing \"shell_command_file\" in item. Skipping execution.")
+        logger.debug(
+            'Missing "shell_command_file" in item. Skipping execution.'
+        )
         return
 
     raw_script_text = get_script_text(SHELL_COMMANDS_PATH / shell_cmd_file)
 
-    if item.get("item_type") == "plain_text":
+    if item.get('item_type') == 'plain_text':
         try:
             result = await conn.run_command(raw_script_text, True)
             if result is None:
-                item["data"] = "Error generating report of type \"plain_text\": No output returned."
+                item[
+                    'data'
+                ] = 'Error generating report of type "plain_text": No output returned.'
             else:
-                item["data"] = result
+                item['data'] = result
         except Exception as e:
-            logger.debug(f"Error generating report of type \"plain_text\": {e}")
-            item["data"] = f"Error generating report of type \"plain_text\": {e}"
-    elif item.get("item_type") == "table":
+            logger.debug(f'Error generating report of type "plain_text": {e}')
+            item['data'] = f'Error generating report of type "plain_text": {e}'
+    elif item.get('item_type') == 'table':
         try:
             data_str = await conn.run_command(raw_script_text, True)
             try:
                 data = json.loads(data_str)
             except json.JSONDecodeError as e:
-                logger.debug(f"Error parsing JSON for table report:\n{e}")
-                item["data"] = f"Error parsing JSON for table report: {e}"
-                item["item_type"] = "plain_text"
+                logger.debug(f'Error parsing JSON for table report:\n{e}')
+                item['data'] = f'Error parsing JSON for table report: {e}'
+                item['item_type'] = 'plain_text'
                 return
 
             if not isinstance(data, list):
-                logger.debug(f"Unexpected data format from shell command. A list of dicts is expected.")
-                item["data"] = "Unexpected data format from shell command. A list of dicts is expected."
-                item["item_type"] = "plain_text"
+                logger.debug(
+                    'Unexpected data format from shell command. A list of dicts is expected.'
+                )
+                item[
+                    'data'
+                ] = 'Unexpected data format from shell command. A list of dicts is expected.'
+                item['item_type'] = 'plain_text'
                 return
 
             # Ensure 'theader' is a list in item
-            if "theader" not in item or not isinstance(item["theader"], list):
-                item["theader"] = []
+            if 'theader' not in item or not isinstance(item['theader'], list):
+                item['theader'] = []
 
-            if "data" not in item or not isinstance(item["data"], list):
-                item["data"] = []
+            if 'data' not in item or not isinstance(item['data'], list):
+                item['data'] = []
 
             # Build table headers and rows
             for obj in data:
                 if not isinstance(obj, dict):
-                    item["data"].append(f"Skipping invalid object: {obj}")
+                    item['data'].append(f'Skipping invalid object: {obj}')
                     continue
                 for key in obj.keys():
-                    if key not in item["theader"]:
-                        item["theader"].append(key)
+                    if key not in item['theader']:
+                        item['theader'].append(key)
 
             for obj in data:
                 if isinstance(obj, dict):
                     row = []
-                    for key in item["theader"]:
+                    for key in item['theader']:
                         row.append(obj.get(key, None))
-                    item["data"].append(row)
+                    item['data'].append(row)
         except Exception as e:
-            logger.debug(f"Error generating report of type \"table\": {e}")
-            item["data"] = f"Error generating report of type \"table\": {e}"
-            item["item_type"] = "plain_text"
+            logger.debug(f'Error generating report of type "table": {e}')
+            item['data'] = f'Error generating report of type "table": {e}'
+            item['item_type'] = 'plain_text'
 
 
 async def run_sql_command(logger, dbconn, item):
     sql_cmd_file = item.get('sql_command_file')
     if not sql_cmd_file:
-        logger.debug("Missing \"sql_command_file\" in item. Skipping execution.")
+        logger.debug('Missing "sql_command_file" in item. Skipping execution.')
         return
 
     raw_script_text = get_script_text(SQL_COMMANDS_PATH / sql_cmd_file)
     item_type = item.get('item_type')
-    if item_type == "plain_text":
+    if item_type == 'plain_text':
         try:
             result = await dbconn.fetchval(raw_script_text)
             if result is None:
-                item["data"] = "Error generating report of type \"plain_text\": No data returned."
+                item[
+                    'data'
+                ] = 'Error generating report of type "plain_text": No data returned.'
             else:
-                item["data"] = result
+                item['data'] = result
         except Exception as e:
-            logger.debug(f"Error generating report of type \"plain_text\": {e}")
-            item["data"] = f"Error generating report of type \"plain_text\": {e}"
-    elif item_type == "table":
+            logger.debug(f'Error generating report of type "plain_text": {e}')
+            item['data'] = f'Error generating report of type "plain_text": {e}'
+    elif item_type == 'table':
         try:
             fetch_result = await dbconn.fetch(raw_script_text)
             if fetch_result:
-                item["theader"] = [key for key in fetch_result[0].keys()]
-                item["data"] = [list(record) for record in fetch_result]
+                item['theader'] = [key for key in fetch_result[0].keys()]
+                item['data'] = [list(record) for record in fetch_result]
             else:
-                item["theader"] = []
+                item['theader'] = []
                 item[
-                    "data"] = "Error generating a report of type \"shell_command_file\" for format \"table\": No data returned."
-                item["item_type"] = "plain_text"
+                    'data'
+                ] = 'Error generating a report of type "shell_command_file" for format "table": No data returned.'
+                item['item_type'] = 'plain_text'
         except Exception as e:
-            logger.debug(f"Error generating report of type \"table\": {e}")
-            item["theader"] = []
-            item["data"] = f"Error generating report of type \"table\": {e}"
-            item["item_type"] = "plain_text"
+            logger.debug(f'Error generating report of type "table": {e}')
+            item['theader'] = []
+            item['data'] = f'Error generating report of type "table": {e}'
+            item['item_type'] = 'plain_text'
     else:
-        logger.debug(f"Unknown item_type in sql_command: {item_type}")
+        logger.debug(f'Unknown item_type in sql_command: {item_type}')
 
 
 def args(report_data, item):
@@ -131,7 +146,9 @@ def args(report_data, item):
         return
 
     item['theader'] = ['arg', 'value']
-    item['data'] = [[key, str(value)] for key, value in report_data['args'].items()]
+    item['data'] = [
+        [key, str(value)] for key, value in report_data['args'].items()
+    ]
 
 
 def get_workload_cmds(report_data):
@@ -150,7 +167,9 @@ def get_workload_cmds(report_data):
     pgbench_cmds = []
     placeholder = f'ARG_{str(iter_name).upper()}'
     for iteration in iter_list:
-        workload_cmd_iter = workload_command.replace(placeholder, str(iteration))
+        workload_cmd_iter = workload_command.replace(
+            placeholder, str(iteration)
+        )
         pgbench_cmds.append(workload_cmd_iter)
 
     return pgbench_cmds
@@ -194,7 +213,7 @@ def workload_parse(report_data, item, phase='workload'):
         data = ''
         for m in matches:
             if not os.path.exists(m):
-                data += f"File not found: {m}\n\n"
+                data += f'File not found: {m}\n\n'
                 continue
             try:
                 with open(m, 'r', encoding='utf-8') as f:
@@ -209,7 +228,7 @@ def workload_parse(report_data, item, phase='workload'):
         item['data'] = str(workload_conf.get(command_key, ''))
 
     else:
-        item['data'] = f"Unknown or missing benchmark_type: {btype}"
+        item['data'] = f'Unknown or missing benchmark_type: {btype}'
 
 
 # Wrapper functions to maintain backward compatibility
@@ -231,7 +250,7 @@ def benchmark_result(report_data, item):
 
     results = report_data['pgbench_outputs']
     if not isinstance(results, list):
-        item['data'] = "pgbench_outputs is not a list"
+        item['data'] = 'pgbench_outputs is not a list'
         return
 
     item['theader'] = [
@@ -247,8 +266,10 @@ def benchmark_result(report_data, item):
 
 def chart_tps(report_data, item):
     # fill chart data with tps vs iteration
-    if ('workload_conf' not in report_data or
-            'pgbench_iter_list' not in report_data['workload_conf']):
+    if (
+        'workload_conf' not in report_data
+        or 'pgbench_iter_list' not in report_data['workload_conf']
+    ):
         item['data'] = "Missing 'workload_conf' or 'pgbench_iter_list'"
         return
 
@@ -264,23 +285,21 @@ def chart_tps(report_data, item):
         return
 
     if len(iter_list) != len(outputs):
-        item['data'] = "Mismatched length between 'pgbench_iter_list' and 'pgbench_outputs'"
+        item[
+            'data'
+        ] = "Mismatched length between 'pgbench_iter_list' and 'pgbench_outputs'"
         return
 
-    param_name = report_data['workload_conf'].get('pgbench_iter_name', 'iteration')
+    param_name = report_data['workload_conf'].get(
+        'pgbench_iter_name', 'iteration'
+    )
     report_name = report_data.get('report_conf', {}).get('report_name', 'N/A')
 
     # build the chart structure in 'item["data"]'
     item['data'].update(
         {
-            'title': {
-                'text': f'tps({param_name})'
-            },
-            'xaxis': {
-                'title': {
-                    'text': param_name
-                }
-            },
+            'title': {'text': f'tps({param_name})'},
+            'xaxis': {'title': {'text': param_name}},
             'series': [
                 {
                     'name': f'{report_name},tps',
@@ -290,21 +309,30 @@ def chart_tps(report_data, item):
                         if isinstance(val, list) and len(val) >= 6
                     ],
                 }
-            ]
+            ],
         }
     )
 
 
-async def collect_logs(logger, connect, remote_logs_path, report_name: str = DEFAULT_LOG_ARCHIVE_NAME):
+async def collect_logs(
+    logger,
+    connect,
+    remote_logs_path,
+    report_name: str = DEFAULT_LOG_ARCHIVE_NAME,
+):
     # check if remote_logs_path is provided
     if not remote_logs_path:
-        print("Remote logs path is not provided. Skipping log collection.")
+        print('Remote logs path is not provided. Skipping log collection.')
         return None
 
     if logger:
-        logger.info(f"Copying logs from {remote_logs_path} -> {LOCAL_DB_LOGS_PATH}/{report_name}")
+        logger.info(
+            f'Copying logs from {remote_logs_path} -> {LOCAL_DB_LOGS_PATH}/{report_name}'
+        )
 
-    data = await connect.copy_db_log_files(remote_logs_path, LOCAL_DB_LOGS_PATH, report_name)
+    data = await connect.copy_db_log_files(
+        remote_logs_path, LOCAL_DB_LOGS_PATH, report_name
+    )
     if data:
         report_item = {
             'header': 'database logs',
@@ -312,24 +340,26 @@ async def collect_logs(logger, connect, remote_logs_path, report_name: str = DEF
             'item_type': 'link',
             'state': 'collapsed',
             'python_command': '',
-            'data': data
+            'data': data,
         }
 
         if logger:
-            logger.info(f"The log archive has been collected to: {report_item['data']}")
-        return {
-            'logs': report_item
-        }
+            logger.info(
+                f"The log archive has been collected to: {report_item['data']}"
+            )
+        return {'logs': report_item}
     else:
         logger.error('Error collecting db log files')
         return None
 
 
-async def execute_steps_in_order(logger, command_steps, report_data, conn, db) -> None:
+async def execute_steps_in_order(
+    logger, command_steps, report_data, conn, db
+) -> None:
     # validate command_steps is a list
     if not isinstance(command_steps, list):
         if logger:
-            logger.error("Command_steps is not a valid list. Skipping.")
+            logger.error('Command_steps is not a valid list. Skipping.')
         return
 
     for step in command_steps:
@@ -340,8 +370,10 @@ async def execute_steps_in_order(logger, command_steps, report_data, conn, db) -
         cmd_value = step.get('cmd_value')
 
         if logger:
-            logger.debug(f"Executing step - Section: {section_name}, Report: {report_name}, "
-                         f"Command Type: {cmd_type}, Command: {cmd_value}")
+            logger.debug(
+                f'Executing step - Section: {section_name}, Report: {report_name}, '
+                f'Command Type: {cmd_type}, Command: {cmd_value}'
+            )
         if not report_obj:
             if logger:
                 logger.warning("Missing 'report_obj' in step. Skipping.")
@@ -356,7 +388,9 @@ async def execute_steps_in_order(logger, command_steps, report_data, conn, db) -
                 await run_sql_command(logger, db, report_obj)
             else:
                 if logger:
-                    logger.error("No database connection provided for sql_command. Skipping.")
+                    logger.error(
+                        'No database connection provided for sql_command. Skipping.'
+                    )
 
         elif cmd_type == 'python_command':
             func_name = report_obj.get('python_command')
@@ -364,7 +398,9 @@ async def execute_steps_in_order(logger, command_steps, report_data, conn, db) -
             if callable(possible_func):
                 possible_func(report_data, report_obj)
             else:
-                report_obj['data'] = f'Not found or is not a function: {func_name}'
+                report_obj[
+                    'data'
+                ] = f'Not found or is not a function: {func_name}'
         else:
             output_str = f'Unknown command type {cmd_type}'
             report_obj['data'] = output_str
@@ -377,4 +413,6 @@ async def fill_info_report(logger, conn, db, workload_conf, report):
         # If there's nothing to process
         return
     # Then execute them as usual
-    await execute_steps_in_order(logger, command_steps, workload_conf, conn, db)
+    await execute_steps_in_order(
+        logger, command_steps, workload_conf, conn, db
+    )

@@ -1,7 +1,6 @@
 import asyncio
 
 from .common import run_command
-from pg_perfbench.const import ConnectionType
 
 
 class DockerTasks:
@@ -16,7 +15,9 @@ class DockerTasks:
             self.conn.close()
             return True
         except Exception as e:
-            raise RuntimeError(f"Database '{self.pg_data_path}' shutdown error:\n{str(e)}")
+            raise RuntimeError(
+                f"Database '{self.pg_data_path}' shutdown error:\n{str(e)}"
+            )
 
     async def start_db(self):
         await self.conn.start()
@@ -24,9 +25,11 @@ class DockerTasks:
         return True
 
     async def sync(self):
-        self.logger.debug("Reset database host cache.")
-        await run_command(self.logger, "sync", True)
+        self.logger.debug('Reset database host cache.')
+        await run_command(self.logger, 'sync', True)
 
     async def drop_caches(self):
-        cmd = "sudo /bin/sh -c 'echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches'"
+        cmd = (
+            "sudo /bin/sh -c 'echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches'"
+        )
         await run_command(self.logger, cmd, True)

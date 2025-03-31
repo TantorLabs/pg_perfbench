@@ -42,19 +42,21 @@ def setup_logger(raw_log_level, arg_clear_logs=False):
     )
     log_level = LogLevel(raw_log_level)
     log = logging.getLogger()
-    logging.getLogger("paramiko").setLevel(logging.CRITICAL)
-    logging.getLogger("asyncssh").setLevel(logging.CRITICAL)
-    logging.getLogger("docker").setLevel(logging.CRITICAL)
-    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
-    logging.getLogger("asyncio").setLevel(logging.CRITICAL)
+    logging.getLogger('paramiko').setLevel(logging.CRITICAL)
+    logging.getLogger('asyncssh').setLevel(logging.CRITICAL)
+    logging.getLogger('docker').setLevel(logging.CRITICAL)
+    logging.getLogger('urllib3').setLevel(logging.CRITICAL)
+    logging.getLogger('asyncio').setLevel(logging.CRITICAL)
 
     if (log_level_int := log_level.as_level_int_value()) is None:
         log.setLevel(logging.INFO)
-        log.error('Incorrectly specified --log-level, automatically set to "info" level.')
+        log.error(
+            'Incorrectly specified --log-level, automatically set to "info" level.'
+        )
     log.setLevel(log_level_int)
     log.info('Logging level: %s', log_level)
     if arg_clear_logs:
-        log.info("Clearing logs folder.")
+        log.info('Clearing logs folder.')
     return log
 
 

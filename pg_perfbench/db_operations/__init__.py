@@ -9,25 +9,27 @@ __all__ = [
     'SSHTasks',
     'DockerTasks',
     'LocalConnTasks',
-    'run_command'
+    'run_command',
 ]
 
 
 async def collect_db_logs(logger, client, db_conn, report):
     try:
-        logger.info("Collection of database logs.")
-        log_dir = await db_conn.fetchval("show log_directory")
+        logger.info('Collection of database logs.')
+        log_dir = await db_conn.fetchval('show log_directory')
         # If log_dir doesn't contain a slash, fetch data_directory and join them.
-        if "/" not in log_dir:
-            data_dir = await db_conn.fetchval("show data_directory")
-            log_dir = f"{data_dir}/{log_dir}"
-        log_report = await collect_logs(logger, client, log_dir, report["report_name"])
+        if '/' not in log_dir:
+            data_dir = await db_conn.fetchval('show data_directory')
+            log_dir = f'{data_dir}/{log_dir}'
+        log_report = await collect_logs(
+            logger, client, log_dir, report['report_name']
+        )
         if log_report:
-            report["sections"]["result"]["reports"].update(log_report)
-            logger.info("DB logs collected successfully.")
+            report['sections']['result']['reports'].update(log_report)
+            logger.info('DB logs collected successfully.')
 
     except Exception as e:
-        logger.error(f"Failed to collect DB logs: {e}")
+        logger.error(f'Failed to collect DB logs: {e}')
 
 
 def get_conn_type_tasks(type):
