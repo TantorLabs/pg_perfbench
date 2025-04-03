@@ -193,7 +193,8 @@ class BenchmarkRunner:
             logger.warning(
                 'Workload command returned an empty or whitespace-only result.'
             )
-
+        else:
+            logger.debug(f'Result of pgbench iteration:\n{perf_result}')
         return BenchmarkRunner.get_pgbench_results(perf_result)
 
     @staticmethod
@@ -203,10 +204,12 @@ class BenchmarkRunner:
         """
         report = get_report_structure(BENCHMARK_TEMPLATE_JSON_PATH)
         report['description'] = get_datetime_report('%d/%m/%Y %H:%M:%S')
-        report['report_name'] = (
-            report_conf.get('report_name')
-            or f'{WorkMode.BENCHMARK}-{DEFAULT_REPORT_NAME}'
-        )
+        if report_conf.get('report_name') is None:
+            report['report_name'] = f'{WorkMode.BENCHMARK}-{DEFAULT_REPORT_NAME}'
+            report_conf['report_name'] = report['report_name']
+        else:
+            report['report_name'] = report_conf.get('report_name')
+
         logger.info('Report structure initialized.')
         return report
 

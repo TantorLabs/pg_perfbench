@@ -229,19 +229,21 @@
                     "sql_command_file": "full_version.sql",
                     "data": ""
                 },
-                "version_major": {
-                    "header": "PostgreSQL major version",
-                    "state": "hidden",
-                    "item_type": "plain_text",
-                    "sql_command_file": "full_version.sql",
-                    "data": ""
-                },
                 "version_minor": {
                     "header": "PostgreSQL minor version",
                     "state": "hidden",
                     "item_type": "plain_text",
                     "sql_command_file": "server_version.sql",
                     "data": ""
+                },
+                "pg_settings": {
+                    "header": "PostgreSQL settings",
+                    "description": "Configuration settings of the PostgreSQL server",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "pg_settings.sql",
+                    "theader": [],
+                    "data": []
                 },
                 "pg_config": {
                     "header": "PostgreSQL pg_config",
@@ -250,15 +252,6 @@
                     "item_type": "plain_text",
                     "shell_command_file": "pg_config.sh",
                     "data": ""
-                },
-                "pg_settings": {
-                    "header": "PostgreSQL settings",
-                    "description": "Configuration settings of the PostgreSQL server",
-                    "state": "collapsed",
-                    "item_type": "table",
-                    "sql_command_file": "server_settings.sql",
-                    "theader": [],
-                    "data": []
                 },
                 "pg_available_extensions": {
                     "header": "PostgreSQL extensions",
