@@ -189,6 +189,22 @@
 								var tblData = report_data.sections[section].reports[report].data;
 								var tbl_header = report_data.sections[section].reports[report].theader;
 
+								if (Array.isArray(tblData) && tblData.length == 0) {
+                                    var font_style = 'font-family: Consolas, monospace; padding: 10px; white-space: pre-wrap; border: 1px solid #ccc; border-radius: 4px; background-color: #1a1a1a; color: #fff; border-color: #444;';
+                                    var listview_id = 'lv_' + report_id;
+                                    var value = "Empty result";
+                                    if (Array.isArray(value)) {
+                                        $("#" + report_id + " > button.acc_collapsed").css("background-color", "pink");
+                                        value.forEach(item => {
+                                            $("#" + report_id + " > .panel").append('<br>');
+                                            $("#" + report_id + " > .panel").append("<p class='common_div'>" + item[0] + "</p></div>");
+                                            $("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + item[1] + "</p>");
+                                        });
+                                    } else {
+                                        $("#" + report_id + " > .panel").append("<p class='consolas-font' style='" + font_style + "'>" + value + "</p>");
+                                    }
+                                    continue;
+                                }
 								if (Array.isArray(tblData) && tblData.length > 0 && typeof tblData[0][0] === 'string' && Array.isArray(tblData[0][1])) {
 									$("#" + report_id + " > button.acc_collapsed").css("background-color", "pink");
 									$("#" + report_id + " > .panel").append('<br>');
