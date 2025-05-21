@@ -2,21 +2,91 @@
 ## Testing a PostgreSQL database instance located on a remote host
 
 #### General environment preparation 
-Review and follow the steps outlined in the README [preparation](../README.md#dependencies-and-installation).
-
+The dependencies and installation instructions for the application are described on the main README [page](../README.md#dependencies-and-installation).
 
 #### Environment preparation for SSH connection
-Review and follow the steps outlined in the README [preparation for ssh connection](../README.md#connection-options)
+The SSH setup steps are described in more detail in the [README](../README.md#connection-options).<br>
+Here is a list of steps for configuring a loadable remote database host over an SSH connection:
+```bash
+# ========================================
+# Actions on the pg_perfbench host
+# ========================================
 
-#### Logic for testing over SSH connection
+# Create an ssh key at the path you specify 
+mkdir -p path/to/your/postgres_keys/.ssh
+ssh-keygen -t rsa -b 4096 -C "postgres" -f postgres_keys/.ssh/id_rsa
+ 
+ls postgres_keys/.ssh
+>>
+    id_rsa  id_rsa.pub
+ 
+ 
+chmod 700 postgres_keys/.ssh
+chmod 644 postgres_keys/.ssh/id_rsa.pub
+chmod 600 postgres_keys/.ssh/id_rsa 
+ 
+scp postgres_keys/.ssh/id_rsa.pub <user>@<database_server_address>:/tmp
 
+# ========================================
+# Actions on the data base server
+# ========================================
+cat >> /etc/ssh/sshd_config << EOL
+PubkeyAcceptedKeyTypes=+ssh-rsa
+EOL
+systemctl restart sshd
+ 
+mkdir /var/lib/postgresql/.ssh
+cat /tmp/id_rsa.pub >> /var/lib/postgresql/.ssh/authorized_keys
+chmod 700 /var/lib/postgresql/.ssh
+chown -R postgres:postgres /var/lib/postgresql/.ssh
 
+sudo visudo
+>>>
+# Add the following line to grant the `postgres` user permission to drop caches
+postgres ALL=(ALL) NOPASSWD: /usr/bin/tee /proc/sys/vm/drop_caches
+# To allow the `postgres` user to execute `lshw` without a password, add the following privileges
+postgres ALL=(root) NOPASSWD: /usr/bin/lshw
+
+# To archive the instance logs, install tar(Ubuntu example) on the data base server
+sudo apt update
+sudo apt install tar
+
+# Allow the client to pass locale and custom environment variables
+# Open the SSH server configuration file
+sudo nano /etc/ssh/sshd_config
+>>>
+AcceptEnv LANG LC_* ARG_* # Locate or add the following line (append ARG_* at the end if it's not already present)
+
+# Save the file and restart the SSH daemon to apply changes
+sudo systemctl restart sshd
+
+```
+### Database configuration on the load host:
+PostgreSQL must be pre-installed on the load host (from any installation source):
+```bash
+apt install postgresql
+```
+The cluster must be initialized in advance:
+```bash
+initdb -D data_dir
+```
+### Application configuration for remote access to the database via an SSH connection
+
+It is strongly recommended to use local address forwarding for minimal database configuration:
+```bash
+<local_port>:127.0.0.1:<remote_port>
+```
 #### Simple test configuration of a PostgreSQL database instance located on a remote host 
 
 - `pg_perfbench`  is executed as a module:
 ```
 python -m pg_perfbench <args>
 ```
+Database configuration on the load host:
+PostgreSQL must be pre-installed on the load host (from any installation source).
+apt install postgresql
+The cluster must be initialized in advance:
+initdb -D data_dir
 
 - Application operating mode {benchmark, join}:
 ```

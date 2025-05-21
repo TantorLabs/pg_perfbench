@@ -1,17 +1,17 @@
 {
         "description": "Comparison of database performance across different configurations in the same environment using the same PostgreSQL version",
         "items": [
-            "system.sysctl_vm.data",
-            "system.sysctl_net_ipv4_tcp.data",
-            "system.sysctl_net_ipv4_udp.data",
-            "system.total_ram.data",
-            "system.cpu_info.data",
-            "system.etc_fstab.data",
-            "db.version_major.data",
-            "db.pg_available_extensions.data",
-            "db.pg_config.data",
-            "benchmark.options.data",
-            "benchmark.custom_tables.data",
-            "benchmark.custom_workload.data"
+            "sections.system.reports.sysctl_vm.data",
+            "sections.system.reports.sysctl_net_ipv4_tcp.data",
+            "sections.system.reports.sysctl_net_ipv4_udp.data",
+            "sections.system.reports.total_ram.data",
+            "sections.system.reports.cpu_info.data",
+            "sections.system.reports.etc_fstab.data",
+            "sections.db.reports.version_major.data",
+            "sections.db.reports.pg_available_extensions.data",
+            "sections.db.reports.pg_config.data",
+            "sections.benchmark.reports.options.data",
+            "sections.benchmark.reports.custom_tables.data",
+            "sections.benchmark.reports.custom_workload.data"
         ]
 }

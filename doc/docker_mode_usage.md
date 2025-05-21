@@ -7,8 +7,13 @@ Review and follow the steps outlined in the README [Prerequisites](../README.md#
 
 ### Simple testing configuration using the Postgres image from DockerHub
 #### Environment preparation 
-
-Download the postgres docker image, for example postgres:16
+Set up Docker access for the standard user:
+```commandline
+sudo apt-get install docker
+sudo apt-get install docker.io
+chmod 666 /var/run/docker.sock
+```
+Download the postgres docker image, for example `postgres:16`:
 ```
 docker pull postgres:16
 ```
@@ -26,10 +31,7 @@ python -m pg_perfbench <args>
 
 - Сonfigure docker container usage parameters:
 ```
---image-name=postgres:16
 --container-name=test_container
---docker-pg-host=127.0.0.1
---docker-pg-port=5432
 --pg-host=127.0.0.1
 --pg-port=5438
 ```
@@ -66,10 +68,7 @@ python -m pg_perfbench <args>
 python -m pg_perfbench --mode=benchmark    \
 --log-level=debug   \
 --collect-pg-logs   \
---image-name=postgres:16    \
 --container-name=test_container  \
---docker-pg-host=127.0.0.1  \
---docker-pg-port=5432   \
 --pg-host=127.0.0.1 \
 --pg-port=5438  \
 --pg-user=postgres  \
@@ -109,9 +108,6 @@ Initial application log output with correct configuration:
 #   pg_database = tdb
 #   pg_data_path = /var/lib/postgresql/data
 #   pg_bin_path = /usr/lib/postgresql/16/bin
-#   image_name = postgres:16
-#   docker_pg_host = 127.0.0.1
-#   docker_pg_port = 5432
 #   container_name = test_container
 #-----------------------------------
 2024-11-27 18:51:41,621       INFO                                root :   18 - Database connection type - Docker

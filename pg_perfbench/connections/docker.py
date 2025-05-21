@@ -1,32 +1,195 @@
-import logging
-import os
-from types import TracebackType
-from typing import Self
-import subprocess
-from pathlib import Path
-
 import docker
-from docker.errors import DockerException
-
-from pg_perfbench.connections import Connectable
-from pg_perfbench.const import DEFAULT_LOG_ARCHIVE_NAME, get_datetime_report
-from pg_perfbench.context.schemes.connections import DockerParams
-from pg_perfbench.exceptions import BashCommandException
-from pg_perfbench.operations.common import config_format_check
-from pg_perfbench.operations.db import run_command
-
-log = logging.getLogger(__name__)
+import io
+import os
+import tarfile
+from typing import Optional
+from types import TracebackType
 
 
-class DockerConnection(Connectable):
-    params: DockerParams
-
-    def __init__(self, connection_params: DockerParams) -> None:
-        self.params = connection_params
+class DockerConnection:
+    def __init__(self, conn_params, env) -> None:
+        self.conn_params = conn_params
         self.docker_client = None
         self.container = None
+        self.logger = None
+        self.env: dict[str, str] = {}
+        for key, value in env.items():
+            self.env[key] = value
 
-    async def __aenter__(self) -> Self:
+    async def start(self):
+        if not self.docker_client:
+            try:
+                self.docker_client = docker.from_env()
+            except docker.errors.DockerException as e:
+                raise OSError(f'Cannot access Docker daemon: {e}')
+
+        name = self.conn_params.get('container_name')
+        if not name:
+            raise FileNotFoundError(
+                'Missing "container_name" in docker connection params'
+            )
+
+        try:
+            self.container = self.docker_client.containers.get(name)
+        except docker.errors.NotFound:
+            raise FileNotFoundError(f'Container "{name}" not found.')
+        except Exception as e:
+            raise OSError(f'Failed to retrieve container: {e}')
+
+        try:
+            self.container.reload()
+        except Exception:
+            raise OSError('Cannot reload container or port is unavailable.')
+
+        if self.container.status == 'running':
+            if self.logger:
+                self.logger.debug(f'Container "{name}" is already running.')
+        else:
+            self.container.start()
+            if self.logger:
+                self.logger.debug(f'Container "{name}" has been started.')
+
+    def close(self):
+        if not self.container:
+            if self.logger:
+                self.logger.warning('No container to stop.')
+            return
+
+        name = self.container.name
+        try:
+            self.container.reload()
+            if self.container.status == 'running':
+                self.container.stop()
+                if self.logger:
+                    self.logger.debug(f'Container "{name}" has been stopped.')
+            else:
+                if self.logger:
+                    self.logger.debug(
+                        f'Container "{name}" is already stopped.'
+                    )
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f'Error stopping container: {str(e)}')
+
+        if self.docker_client:
+            self.docker_client.close()
+        self.container = None
+        self.docker_client = None
+
+    async def run_command(self, cmd: str, check=False) -> str:
+        if not self.container:
+            raise PermissionError(
+                'Container not available or no access to "postgres" user.'
+            )
+
+        result = self.container.exec_run(
+            ['/bin/bash', '-c', cmd],
+            user='postgres',
+            demux=True,
+            environment=self.env,
+        )
+        if result.exit_code != 0 and check:
+            out, err = result.output
+            error_message = (
+                err.decode('utf-8', 'replace') if err else 'Unknown error'
+            )
+            raise RuntimeError(
+                f'Command "{cmd}" failed for Docker connection with exit code {result.exit_code}: {error_message} \n'
+            )
+        out, _ = result.output
+        return out.decode('utf-8', 'replace') if out else ''
+
+    async def run_command_as_root(self, cmd: str) -> str:
+        if not self.container:
+            raise PermissionError('No container available.')
+
+        result = self.container.exec_run(
+            ['/bin/bash', '-c', cmd],
+            user='root',
+            demux=True,
+            environment=self.env,
+        )
+
+        if result.exit_code != 0:
+            out, err = result.output
+            error_message = (
+                err.decode('utf-8', 'replace') if err else 'Unknown error'
+            )
+            raise RuntimeError(
+                f'Command "{cmd}" failed with exit code {result.exit_code}: {error_message}'
+            )
+
+        out, _ = result.output
+        return out.decode('utf-8', 'replace') if out else ''
+
+    async def send_pg_config_file(self, local_config_path, remote_data_dir):
+        if not self.container:
+            raise PermissionError('Container not available.')
+        if not os.path.exists(local_config_path):
+            raise FileNotFoundError(f'File not found: {local_config_path}')
+
+        try:
+            file_name = os.path.basename(local_config_path)
+            tmp_path = '/tmp'
+            tar_buffer = io.BytesIO()
+            with tarfile.TarFile(fileobj=tar_buffer, mode='w') as tar:
+                tar.add(local_config_path, arcname=file_name)
+            tar_buffer.seek(0)
+
+            success = self.container.put_archive(
+                tmp_path, tar_buffer.getvalue()
+            )
+            if not success:
+                raise OSError('Failed to put_archive into Docker container.')
+
+            remote_file_path = os.path.join(tmp_path, file_name)
+            remote_config_path = os.path.join(
+                remote_data_dir, 'postgresql.conf'
+            )
+            chmod_cmd = f'cp {remote_file_path} {remote_config_path}'
+            await self.run_command_as_root(chmod_cmd)
+
+            chown_cmd = f"chown postgres:postgres '{remote_config_path}'"
+            chown_result = await self.run_command_as_root(chown_cmd)
+            if 'Operation not permitted' in chown_result:
+                raise PermissionError(
+                    f'Failed to chown {remote_file_path}: {chown_result}'
+                )
+
+            chmod_cmd = f"chmod 750 '{remote_config_path}'"
+            await self.run_command_as_root(chmod_cmd)
+
+            return remote_config_path
+        except Exception as e:
+            raise TimeoutError(
+                f'Unsuccessful attempt to install the database user configuration:\n{str(e)}'
+            )
+
+    async def copy_db_log_files(
+        self, log_source_path, local_path, report_name
+    ) -> Optional[str]:
+        if not self.container:
+            raise PermissionError('Container not available.')
+        os.makedirs(local_path, exist_ok=True)
+
+        try:
+            stream, _ = self.container.get_archive(log_source_path)
+            tar_bytes = b''.join(stream)
+
+            archive_path = os.path.join(local_path, f'{report_name}.tar')
+            with open(archive_path, 'wb') as f:
+                f.write(tar_bytes)
+
+            return archive_path
+        except Exception as e:
+            if self.logger:
+                self.logger.error(
+                    f'Unsuccessful attempt to copy the database logs to the local directory "db_logs":\n'
+                    f'{str(e)}'
+                )
+            return None
+
+    async def __aenter__(self) -> 'DockerConnection':
         if not hasattr(self, 'client'):
             await self.start()
         return self
@@ -37,153 +200,5 @@ class DockerConnection(Connectable):
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        self.close()
-
-    async def start(self) -> None:
-        containers_run_parameters = {
-            'image': self.params.image_name,
-            'name': self.params.container_name,
-            'detach': True,
-            'privileged': True,
-            'ports': {
-                f'{str(self.params.tunnel.remote.port)}/tcp': str(
-                    self.params.tunnel.local.port
-                )
-            },
-            'environment': {
-                'POSTGRES_HOST_AUTH_METHOD': 'trust',
-                'ARG_PG_BIN_PATH': self.params.work_paths.pg_bin_path,
-            },
-
-        }
-        host_data_dir_name = f'{self.params.container_name}_{get_datetime_report("%Y-%m-%d_%H-%M-%S")}'
-        host_mount_data_catalog = os.path.join(
-            '/tmp', 'data', host_data_dir_name
-        )
-
-        self.docker_client = docker.from_env()
-        try:
-            mount_files = {
-                '/sbin/sysctl': {
-                    'bind': '/sbin/sysctl',
-                    'mode': 'ro'
-                },
-                host_mount_data_catalog: {
-                    'bind': str(self.params.work_paths.pg_data_path),
-                    'mode': 'rw',
-                },
-            }
-
-            if self.params.work_paths.custom_config:
-                if config_format_check(self.params.work_paths.custom_config):
-                    config_data_path = '/etc/postgresql/postgresql.conf'
-                    mount_files[self.params.work_paths.custom_config] = {
-                        'bind': config_data_path,
-                        'mode': 'rw',
-                    }
-                    containers_run_parameters['command'] = f' -c config_file={config_data_path}'
-                    log.info(f'Custom config moved to the data directory:{config_data_path}')
-
-            containers_run_parameters['volumes'] = mount_files
-
-            self.container = self.docker_client.containers.run(**containers_run_parameters)
-            log.info(f'Started Docker container: {self.params.container_name}')
-
-        except docker.errors.NotFound:
-            log.error(
-                f'Container {self.params.container_name} not found.'
-                f" Make sure it's running.",
-            )
-            raise Exception
-        except DockerException as e:
-            log.error(f'Error when connecting via Docker: {e!s}')
-            raise Exception
-        except Exception as e:
-            log.error(
-                f'Error when connecting to the database inside the Docker container: {e!s}'
-            )
-            raise Exception
-
-    async def run(self, command: str, check: bool = False) -> str | None:
-        if self.container:
-            try:
-                log.info(f"Executing command: {command}")
-                exec_result = self.container.exec_run(command)
-                if exec_result.exit_code and check:
-                    log.error(f"Error executing: {exec_result.output.decode('utf-8')!s}")
-                    return None
-
-                log.info(
-                    f"Docker Result: {exec_result.output.decode('utf-8').strip()}"
-                )
-                return exec_result.output
-            except Exception as e:
-                log.error(f'Error executing {command}: {e!s}')
-                return None
-
-    async def drop_cache(self) -> None:
-        self.close()
-        await run_command('sync')
-        await run_command(
-            'sudo /bin/sh -c "echo 3 | /usr/bin/tee /proc/sys/vm/drop_caches"'
-        )
-        await self.start()
-
-    async def restart_db(self) -> None:
+        # self.close()
         ...
-
-    async def bash_command(self, command: str) -> str:
-        result = self.container.exec_run(
-            cmd=f'bash -c "{command}"',
-            stdin=True,
-            tty=True,
-            detach=False,
-            stdout=True,
-            stderr=True,
-        )
-        if result.exit_code != 0:
-            raise BashCommandException(
-                result.exit_code, result.output.decode('utf-8')
-            )
-
-        return result.output.decode('utf-8')
-
-    async def copy_db_log_files(
-        self, log_source_path, local_path, report_name
-    ) -> str | None:
-        log_archive_local_path = os.path.join(local_path, report_name)
-        try:
-            if not os.path.exists(local_path):
-                os.makedirs(local_path)
-
-            archive_cmd = [
-                "docker", "exec", self.params.container_name,
-                "tar", "-cz", "-C", os.path.dirname(log_source_path), os.path.basename(log_source_path)
-            ]
-            with Path(str(log_archive_local_path)).open("wb") as archive_file:
-                subprocess.run(archive_cmd, stdout=archive_file, check=True)
-
-            log.info(
-                f'The log archive has been sent to :{log_archive_local_path}'
-            )
-
-            return str(log_archive_local_path)
-        except Exception as e:
-            log.error(f'Attempt to transfer database logs failed')
-            return None
-
-    def print_logs(self):
-        docker_logs = 'Docker logs: \n'
-        logs = self.container.logs()
-        for line in logs.decode('utf-8').splitlines():
-            docker_logs.join(f'{line}')
-        log.info(docker_logs)
-
-    def close(self) -> None:
-        if self.container:
-            self.print_logs()
-            self.container.stop()
-            self.container.remove()
-            log.info(
-                f'Stopped and removed Docker container: {self.params.container_name}',
-            )

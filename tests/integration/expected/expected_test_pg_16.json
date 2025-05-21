@@ -1,0 +1,410 @@
+{
+    "header": "PostgreSQL database benchmark report",
+    "report_name": "result_test_pg_16",
+    "description": "24/03/2025 18:10:17",
+    "sections": {
+        "system": {
+            "header": "System properties <hn>",
+            "description": "Common info about current host",
+            "state": "expanded",
+            "reports": {
+                "etc_os_release": {
+                    "header": "OS distribution information | /etc/os-release",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "shell_command_file": "etc_os_release.sh",
+                    "data": "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"12\"\nVERSION=\"12 (bookworm)\"\nVERSION_CODENAME=bookworm\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n"
+                }
+            }
+        },
+        "db": {
+            "header": "Common database info",
+            "description": "Common info about current database",
+            "state": "expanded",
+            "reports": {
+                "version_major": {
+                    "header": "PostgreSQL major version",
+                    "state": "hidden",
+                    "item_type": "plain_text",
+                    "sql_command_file": "full_version.sql",
+                    "data": "PostgreSQL 16.8 (Debian 16.8-1.pgdg120+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit"
+                },
+                "pg_available_extensions": {
+                    "header": "PostgreSQL extensions",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "sql_command_file": "available_server_extensions.sql",
+                    "theader": [
+                        "name",
+                        "default_version",
+                        "installed_version"
+                    ],
+                    "data": [
+                        [
+                            "adminpack",
+                            "2.1",
+                            null
+                        ],
+                        [
+                            "amcheck",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "autoinc",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "bloom",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "btree_gin",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "btree_gist",
+                            "1.7",
+                            null
+                        ],
+                        [
+                            "citext",
+                            "1.6",
+                            null
+                        ],
+                        [
+                            "cube",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "dblink",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "dict_int",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "dict_xsyn",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "earthdistance",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "file_fdw",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "fuzzystrmatch",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "hstore",
+                            "1.8",
+                            null
+                        ],
+                        [
+                            "insert_username",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "intagg",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "intarray",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "isn",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "lo",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "ltree",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "moddatetime",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "old_snapshot",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "pageinspect",
+                            "1.12",
+                            null
+                        ],
+                        [
+                            "pg_buffercache",
+                            "1.4",
+                            null
+                        ],
+                        [
+                            "pg_freespacemap",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pg_prewarm",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pg_stat_statements",
+                            "1.10",
+                            null
+                        ],
+                        [
+                            "pg_surgery",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "pg_trgm",
+                            "1.6",
+                            null
+                        ],
+                        [
+                            "pg_visibility",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pg_walinspect",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "pgcrypto",
+                            "1.3",
+                            null
+                        ],
+                        [
+                            "pgrowlocks",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "pgstattuple",
+                            "1.5",
+                            null
+                        ],
+                        [
+                            "plpgsql",
+                            "1.0",
+                            "1.0"
+                        ],
+                        [
+                            "postgres_fdw",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "refint",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "seg",
+                            "1.4",
+                            null
+                        ],
+                        [
+                            "sslinfo",
+                            "1.2",
+                            null
+                        ],
+                        [
+                            "tablefunc",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "tcn",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "tsm_system_rows",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "tsm_system_time",
+                            "1.0",
+                            null
+                        ],
+                        [
+                            "unaccent",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "uuid-ossp",
+                            "1.1",
+                            null
+                        ],
+                        [
+                            "xml2",
+                            "1.1",
+                            null
+                        ]
+                    ]
+                }
+            }
+        },
+        "benchmark": {
+            "header": "Common benchmark info",
+            "description": "Common info about current benchmark",
+            "state": "expanded",
+            "reports": {
+                "options": {
+                    "header": "pgbench options info",
+                    "description": "Benchmark load configuration parameters for pgbench",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "python_command": "pgbench_options_table",
+                    "theader": [
+                        "iteration number",
+                        "pgbench_options"
+                    ],
+                    "data": [
+                        [
+                            0,
+                            "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c 3 -j 10 -T 10 --no-vacuum"
+                        ]
+                    ]
+                },
+                "custom_tables": {
+                    "header": "pgbench tables",
+                    "description": "Table schema for the pgbench load test",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "python_command": "workload_tables",
+                    "data": "ARG_PGBENCH_PATH -i --scale=10 --foreign-keys -p ARG_PG_PORT -h ARG_PG_HOST -U postgres ARG_PG_DATABASE"
+                },
+                "custom_workload": {
+                    "header": "pgbench workload",
+                    "description": "Load testing scripts",
+                    "state": "collapsed",
+                    "item_type": "plain_text",
+                    "python_command": "workload",
+                    "data": "ARG_PGBENCH_PATH -p ARG_PG_PORT -h ARG_PG_HOST -U ARG_PG_USER ARG_PG_DATABASE -c ARG_PGBENCH_CLIENTS -j 10 -T 10 --no-vacuum"
+                }
+            }
+        },
+        "result": {
+            "header": "Tests result info",
+            "description": "Results of tests",
+            "state": "expanded",
+            "reports": {
+                "pgbench_outputs": {
+                    "header": "benchmark results info",
+                    "state": "collapsed",
+                    "item_type": "table",
+                    "python_command": "benchmark_result",
+                    "theader": [
+                        "clients",
+                        "duration",
+                        "number of transactions actually processed",
+                        "latency average",
+                        "initial connection time",
+                        "tps"
+                    ],
+                    "data": [
+                        [
+                            3,
+                            10,
+                            17071,
+                            1.757,
+                            3.831,
+                            1707.575218
+                        ]
+                    ]
+                },
+                "chart": {
+                    "header": "benchmark plots",
+                    "description": "",
+                    "state": "collapsed",
+                    "item_type": "chart",
+                    "python_command": "chart_tps",
+                    "data": {
+                        "series": [
+                            {
+                                "name": "result_test_pg_16,tps",
+                                "data": [
+                                    [
+                                        3,
+                                        1707.6
+                                    ]
+                                ]
+                            }
+                        ],
+                        "chart": {
+                            "height": 350,
+                            "type": "line",
+                            "zoom": {
+                                "enabled": false
+                            }
+                        },
+                        "dataLabels": {
+                            "enabled": false
+                        },
+                        "stroke": {
+                            "curve": "smooth",
+                            "width": 2
+                        },
+                        "title": {
+                            "text": "tps(pgbench_clients)"
+                        },
+                        "grid": {
+                            "row": {
+                                "colors": [
+                                    "#f3f3f3",
+                                    "transparent"
+                                ],
+                                "opacity": 0.1
+                            }
+                        },
+                        "yaxis": {
+                            "title": {
+                                "text": "Transactions per Second (tps)"
+                            }
+                        },
+                        "xaxis": {
+                            "title": {
+                                "text": "pgbench_clients"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

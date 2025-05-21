@@ -1,57 +1,13 @@
-from abc import ABC
-from abc import abstractmethod
-from types import TracebackType
-from typing import Protocol
-from typing import Self
+from pg_perfbench.const import ConnectionType
+from pg_perfbench.connections.ssh import SSHConnection
+from pg_perfbench.connections.docker import DockerConnection
+from pg_perfbench.connections.local import LocalConnection
 
 
-class HasLifeCycle(Protocol):
-    @abstractmethod
-    async def start(self) -> None:
-        ...
-
-    @abstractmethod
-    def close(self) -> None:
-        ...
-
-
-class Runnable(Protocol):
-    @abstractmethod
-    async def run(self, cmd: str) -> str:
-        ...
-
-    @abstractmethod
-    async def bash_command(self, cmd: str) -> str:
-        ...
-
-    @abstractmethod
-    async def drop_cache(self) -> None:
-        ...
-
-    @abstractmethod
-    async def restart_db(self) -> None:
-        ...
-
-    @abstractmethod
-    async def copy_db_log_files(self, remote_logs_path: str, local_report_file: str, report_name: str) -> None:
-        ...
-
-
-class IsAsyncContextManager(Protocol):
-    @abstractmethod
-    async def __aenter__(self) -> Self:
-        # TODO: add support for Python < 3.11, where Self is not implemented yet
-        ...
-
-    @abstractmethod
-    async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> None:
-        ...
-
-
-class Connectable(Runnable, IsAsyncContextManager, HasLifeCycle, ABC):
-    ...
+def get_connection(type):
+    if type == ConnectionType.SSH:
+        return SSHConnection
+    if type == ConnectionType.DOCKER:
+        return DockerConnection
+    if type == ConnectionType.LOCAL:
+        return LocalConnection
