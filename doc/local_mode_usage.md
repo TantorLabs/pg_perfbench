@@ -8,6 +8,15 @@ Review and follow the steps outlined in the README [preparation](../README.md#de
 Review and follow the steps outlined in the README [general instructions](../README.md#general-instructions-for-all-connection-types)
  and [local connection](../README.md#local-connection) description.
 
+When using a local connection, the application must be configured in the `postgres` user's environment:
+```commandline
+su - postgres 
+git clone https://github.com/TantorLabs/pg_perfbench.git
+cd pg_perfbench
+python3.10 -m venv venv
+source venv/bin/activate
+```
+
 #### Application configuration for local access to the database
 
 - `pg_perfbench`  is executed as a module:

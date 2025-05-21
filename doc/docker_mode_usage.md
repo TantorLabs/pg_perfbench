@@ -7,8 +7,13 @@ Review and follow the steps outlined in the README [Prerequisites](../README.md#
 
 ### Simple testing configuration using the Postgres image from DockerHub
 #### Environment preparation 
-
-Download the postgres docker image, for example postgres:16
+Set up Docker access for the standard user:
+```commandline
+sudo apt-get install docker
+sudo apt-get install docker.io
+chmod 666 /var/run/docker.sock
+```
+Download the postgres docker image, for example `postgres:16`:
 ```
 docker pull postgres:16
 ```
