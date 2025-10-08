@@ -11,7 +11,7 @@ class LocalConnTasks:
     async def stop_db(self):
         try:
             res = await self.conn.run_command(
-                f"su - postgres -c '{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}'"
+                f"{self.pg_bin_path}/pg_ctl stop -D {self.pg_data_path}"
             )
             return res
         except Exception as e:
@@ -21,7 +21,7 @@ class LocalConnTasks:
 
     async def start_db(self):
         res = await self.conn.run_command(
-            f"su - postgres -c '{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}'"
+            f"{self.pg_bin_path}/pg_ctl start -D {self.pg_data_path}"
         )
         return res
 
